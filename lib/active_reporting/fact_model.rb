@@ -13,8 +13,8 @@ module ActiveReporting
     end
 
     def self.dimension(name, label: :value)
-      @dimensions ||= []
-      @dimensions << Dimension.new(model, name: name.to_sym, label: label)
+      @dimensions ||= {}
+      @dimensions[name.to_sym] = Dimension.new(model, name: name.to_sym, label: label)
     end
   end
 end

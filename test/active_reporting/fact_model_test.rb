@@ -23,7 +23,7 @@ class ActiveReporting::FactModelTest < Minitest::Test
   end
 
   def test_model_has_dimensions
-    assert PostFactModel.dimensions.is_a?(Array)
-    assert PostFactModel.dimensions.all?{|d| d.is_a?(ActiveReporting::Dimension)}
+    assert PostFactModel.dimensions.is_a?(Hash)
+    assert PostFactModel.dimensions.values.all?{|d| d.is_a?(ActiveReporting::Dimension)}
   end
 end
