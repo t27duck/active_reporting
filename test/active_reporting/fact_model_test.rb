@@ -21,4 +21,9 @@ class ActiveReporting::FactModelTest < Minitest::Test
     PostFactModel.use_model :post
     assert_equal Post, PostFactModel.model
   end
+
+  def test_model_has_dimensions
+    assert PostFactModel.dimensions.is_a?(Array)
+    assert PostFactModel.dimensions.all?{|d| d.is_a?(ActiveReporting::Dimension)}
+  end
 end
