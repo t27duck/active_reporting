@@ -1,5 +1,8 @@
+require 'forwardable'
 module ActiveReporting
   class Metric
+    extend Forwardable
+    def_delegators :@fact_model, :model
     attr_reader :fact_model, :dimensions
 
     def initialize(name, fact_model:, dimensions: [])
