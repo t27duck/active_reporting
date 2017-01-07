@@ -22,6 +22,16 @@ class ActiveReporting::FactModelTest < Minitest::Test
     assert_equal Post, PostFactModel.model
   end
 
+  def test_factmodel_has_a_measure_is_settable
+    original = PostFactModel.measure
+    refute PostFactModel.nil?
+    new_value = :new_value
+    PostFactModel.measure = new_value
+    assert_equal new_value, PostFactModel.measure
+  ensure
+    PostFactModel.measure = original
+  end
+
   def test_model_has_dimensions
     assert PostFactModel.dimensions.is_a?(Hash)
     assert PostFactModel.dimensions.values.all?{|d| d.is_a?(ActiveReporting::Dimension)}

@@ -11,5 +11,13 @@ module ActiveReporting
     def self.default_dimension_label=(dl)
       @default_dimension_label = dl.to_sym
     end
+
+    def self.default_measure
+      @default_measure ||= :value
+    end
+
+    def self.default_measure=(dm)
+      @default_measure = dm.to_sym
+    end
   end
 end
