@@ -2,7 +2,7 @@ module ActiveReporting
   class Dimension
     attr_reader :name
 
-    def initialize(model, name:, label: :value)
+    def initialize(model, name:, label: Configuration.default_dimension_label)
       @model      = model
       @name       = name
       @label      = label

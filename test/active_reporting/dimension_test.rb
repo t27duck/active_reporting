@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class ActiveReporting::DimensionTest < ActiveSupport::TestCase
+  def setup
+    @default_label = ActiveReporting::Configuration.default_dimension_label
+  end
+
   def test_dimension_can_have_a_type
     subject = ActiveReporting::Dimension.new(Post, name: :creator)
     assert_equal :standard, subject.type
@@ -35,10 +39,10 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
 
   def test_select_statement_can_include_identifier_if_standard
     subject = ActiveReporting::Dimension.new(Post, name: :creator)
-    expected = ['"users".value AS creator', '"users".id AS creator_identifier']
+    expected = ["\"users\".#{@default_label} AS creator", '"users".id AS creator_identifier']
     assert_equal expected, subject.select_statement
 
-    expected = ['"users".value AS creator']
+    expected = ["\"users\".#{@default_label} AS creator"]
     assert_equal expected, subject.select_statement(with_identifier: false)
   end
 
@@ -49,10 +53,10 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
 
   def test_group_by_statement_can_include_identifier_if_standard
     subject = ActiveReporting::Dimension.new(Post, name: :creator)
-    expected = ['"users".value', '"users".id']
+    expected = ["\"users\".#{@default_label}", '"users".id']
     assert_equal expected, subject.group_by_statement
 
-    expected = ['"users".value']
+    expected = ["\"users\".#{@default_label}"]
     assert_equal expected, subject.group_by_statement(with_identifier: false)
   end
 
