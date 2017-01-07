@@ -14,13 +14,19 @@ end
     username: Faker::Internet.unique.user_name,
     group: group_users
   )
+
+  Profile.create!(
+    user: user,
+    favorite_pokemon: Faker::Pokemon.name,
+    favorite_color: Faker::Color.color_name
+  )
 end
 
 Post.create!(
   title: Faker::Lorem.words.join(' '),
   body: Faker::Lorem.paragraph,
   state: 'draft',
-  user: User.find_by!(username: 'admin_1')
+  creator: User.find_by!(username: 'admin_1')
 )
 
 (1..20).each do |x|
@@ -28,7 +34,7 @@ Post.create!(
     title: Faker::Lorem.words.join(' '),
     body: Faker::Lorem.paragraph,
     state: 'publish',
-    user: admins.sample
+    creator: admins.sample
   )
 
   rand(10).times.each do

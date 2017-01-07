@@ -7,6 +7,13 @@ ActiveRecord::Schema.define do
     t.timestamps null: false
   end
 
+  create_table :profiles, force: true do |t|
+    t.integer :user_id
+    t.string :favorite_pokemon, null: false
+    t.string :favorite_color, null: false
+    t.timestamps null: false
+  end
+
   create_table :groups, force: true do |t|
     t.string :name
     t.timestamps null: false
@@ -16,7 +23,7 @@ ActiveRecord::Schema.define do
     t.string :title
     t.text :body
     t.string :state
-    t.integer :user_id
+    t.integer :creator_id
     t.timestamps null: false
   end
 
