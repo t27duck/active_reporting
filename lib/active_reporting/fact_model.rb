@@ -12,7 +12,7 @@ module ActiveReporting
       @model ||= name.gsub(/FactModel\z/, '').constantize
     end
 
-    def self.dimension(name, label: :value)
+    def self.dimension(name, label: Configuration.default_dimension_label)
       @dimensions ||= {}
       @dimensions[name.to_sym] = Dimension.new(model, name: name.to_sym, label: label)
     end
