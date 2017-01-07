@@ -1,0 +1,22 @@
+AllCops:
+  Exclude:
+    - test/**/*
+  TargetRubyVersion: 2.2
+
+Metrics/LineLength:
+  Max: 120
+
+MethodLength:
+  Max: 20
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/PredicateName:
+  Enabled: false
+
+Style/RaiseArgs:
+  Enabled: false
