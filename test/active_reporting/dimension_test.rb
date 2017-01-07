@@ -27,4 +27,33 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
     subject = ActiveReporting::Dimension.new(User, name: :profile)
     assert_equal 'user_id', subject.foreign_key
   end
+
+  def test_select_statement_is_just_column_if_degenerate
+    subject = ActiveReporting::Dimension.new(Post, name: :state)
+    assert_equal ['"posts".state'], subject.select_statement
+  end
+
+  def test_select_statement_can_include_identifier_if_standard
+    subject = ActiveReporting::Dimension.new(Post, name: :creator)
+    expected = ['"users".value AS creator', '"users".id AS creator_identifier']
+    assert_equal expected, subject.select_statement
+
+    expected = ['"users".value AS creator']
+    assert_equal expected, subject.select_statement(with_identifier: false)
+  end
+
+  def test_group_by_statement_is_just_column_if_degenerate
+    subject = ActiveReporting::Dimension.new(Post, name: :state)
+    assert_equal ['"posts".state'], subject.group_by_statement
+  end
+
+  def test_group_by_statement_can_include_identifier_if_standard
+    subject = ActiveReporting::Dimension.new(Post, name: :creator)
+    expected = ['"users".value', '"users".id']
+    assert_equal expected, subject.group_by_statement
+
+    expected = ['"users".value']
+    assert_equal expected, subject.group_by_statement(with_identifier: false)
+  end
+
 end
