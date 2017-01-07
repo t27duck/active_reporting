@@ -2,19 +2,19 @@ module ActiveReporting
   class Dimension
     attr_reader :name
 
-    def initialize(fact_model, name:, label: :value)
-      @fact_model = fact_model
+    def initialize(model, name:, label: :value)
+      @model      = model
       @name       = name
       @label      = label
     end
 
     def type
-      @type ||= if @fact_model.column_names.include?(@name.to_s)
+      @type ||= if @model.column_names.include?(@name.to_s)
                   :degenerate
                 elsif association
                   :standard
                 else
-                  raise UnknownDimension.new(@name, @fact_model)
+                  raise UnknownDimension.new(@name, @model)
                 end
     end
 
@@ -41,11 +41,11 @@ module ActiveReporting
     private ######################################################################
 
     def association
-      @association_info ||= @fact_model.reflect_on_association(@name.to_s)
+      @association_info ||= @model.reflect_on_association(@name.to_s)
     end
 
     def degenerate_fragment
-      "#{@fact_model.quoted_table_name}.#{@name}"
+      "#{@model.quoted_table_name}.#{@name}"
     end
 
     def identifier_fragment
