@@ -10,4 +10,15 @@ module ActiveReporting
     end
     alias to_s message
   end
+
+  class UnknownAggregate < StandardError
+    def initialize(name)
+      @name = name
+    end
+
+    def message
+      "Unknown aggregate '#{@name}'"
+    end
+    alias to_s message
+  end
 end
