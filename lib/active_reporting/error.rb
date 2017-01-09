@@ -21,4 +21,16 @@ module ActiveReporting
     end
     alias to_s message
   end
+
+  class UnknownDimensionFilter < StandardError
+    def initialize(name, fact_model)
+      @name       = name
+      @fact_model = fact_model
+    end
+
+    def message
+      "Dimension filter '#{@name}' not found on fact model '#{@fact_model}'"
+    end
+    alias to_s message
+  end
 end
