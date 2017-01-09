@@ -1,5 +1,9 @@
 module ActiveReporting
   module Configuration
+    class << self
+      attr_accessor :ransack_available
+    end
+
     def self.config
       yield self
     end
