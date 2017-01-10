@@ -23,5 +23,14 @@ module ActiveReporting
     def self.default_measure=(dm)
       @default_measure = dm.to_sym
     end
+
+    def self.ransack_fallback
+      @ransack_fallback ||= false
+    end
+
+    def self.ransack_fallback=(rf)
+      raise RansackNotAvailable unless ransack_available
+      @ransack_fallback = rf
+    end
   end
 end

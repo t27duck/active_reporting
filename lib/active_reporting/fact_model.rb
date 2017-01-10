@@ -35,11 +35,22 @@ module ActiveReporting
       @dimension_filters[name.to_sym] = DimensionFilter.new(name, type, body)
     end
 
+    def self.use_ransack_for_unknown_dimension_filters
+      raise RansackNotAvailable unless ransack_available
+      @ransack_fallback = true
+    end
+
+    def self.ransack_fallback
+      @ransack_fallback || Configuration.ransack_fallback
+    end
+    private_class_method :ransack_fallback
+
     def self.find_dimension_filter(name)
       @dimension_filters ||= {}
-      dm = @dimension_filters[name.to_sym]
-      raise UnknownDimensionFilter.new(name, self.name) if dm.blank?
-      dm
+      dm = @dimension_filters[name]
+      return dm if dm.present?
+      return @dimension_filters[name] = Dimension.new(name, :ransack) if ransack_fallback
+      raise UnknownDimensionFilter.new(name, self.name)
     end
   end
 end
