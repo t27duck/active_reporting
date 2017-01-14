@@ -23,16 +23,8 @@ module ActiveReporting
     end
 
     def self.dimension_filter(name, lambda_or_type = :scope)
-      body = nil
-      type = lambda_or_type
-
-      if lambda_or_type.respond_to?(:call)
-        body = lambda_or_type
-        type = :lambda
-      end
-
       @dimension_filters ||= {}
-      @dimension_filters[name.to_sym] = DimensionFilter.new(name, type, body)
+      @dimension_filters[name.to_sym] = DimensionFilter.build(self, name, lambda_or_type)
     end
 
     def self.use_ransack_for_unknown_dimension_filters
@@ -49,7 +41,7 @@ module ActiveReporting
       @dimension_filters ||= {}
       dm = @dimension_filters[name]
       return dm if dm.present?
-      return @dimension_filters[name] = Dimension.new(name, :ransack) if ransack_fallback
+      return @dimension_filters[name] = Dimension.build(self, name, :ransack) if ransack_fallback
       raise UnknownDimensionFilter.new(name, self.name)
     end
   end
