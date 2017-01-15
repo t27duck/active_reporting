@@ -22,4 +22,9 @@ class ActiveReporting::MetricTest < Minitest::Test
       ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, dimensions: [:invalid])
     end
   end
+
+  def test_metric_has_dimension_filter
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, dimension_filter: {some_filter: 1})
+    assert metric.dimension_filter.is_a?(Hash)
+  end
 end

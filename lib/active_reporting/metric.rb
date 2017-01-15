@@ -3,12 +3,15 @@ module ActiveReporting
   class Metric
     extend Forwardable
     def_delegators :@fact_model, :model
-    attr_reader :fact_model, :dimensions
+    attr_reader :fact_model, :name, :dimensions, :dimension_filter, :aggregate
 
-    def initialize(name, fact_model:, dimensions: [])
-      @name = name
-      @fact_model = fact_model
-      @dimensions = determine_dimensions Array(dimensions)
+    def initialize(name, fact_model:, aggregate: :count, dimensions: [], dimension_filter: {})
+      @name             = name.to_sym
+      @fact_model       = fact_model
+      @dimensions       = determine_dimensions Array(dimensions)
+      @dimension_filter = dimension_filter
+      @aggregate        = aggregate
+      check_dimension_filter
     end
 
     private ####################################################################
@@ -20,6 +23,12 @@ module ActiveReporting
           raise UnknownDimension.new(dim, @fact_model.model) unless d.present?
           dims << d
         end
+      end
+    end
+
+    def check_dimension_filter
+      @dimension_filter.each do |name, _|
+        @fact_model.find_dimension_filter(name)
       end
     end
   end
