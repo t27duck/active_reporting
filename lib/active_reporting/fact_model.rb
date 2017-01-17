@@ -6,7 +6,13 @@ module ActiveReporting
     end
 
     def self.use_model(m)
-      @model = m.is_a?(String) || m.is_a?(Symbol) ? m.to_s.classify.constantize : m
+      @model = if m.is_a?(String) || m.is_a?(Symbol)
+                 m.to_s.classify.constantize
+               else
+                 m
+               end
+      @model.instance_variable_set('@fact_model', self)
+      @model
     end
 
     def self.model

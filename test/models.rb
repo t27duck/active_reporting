@@ -22,3 +22,7 @@ class Comment < ActiveRecord::Base
   belongs_to :user
   belongs_to :post
 end
+
+class Story < ActiveRecord::Base
+  self.table_name = 'posts'
+end

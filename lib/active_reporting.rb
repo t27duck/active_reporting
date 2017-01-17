@@ -1,4 +1,5 @@
 require 'active_record'
+require 'active_reporting/active_record_adaptor'
 require 'active_reporting/configuration'
 require 'active_reporting/dimension'
 require 'active_reporting/dimension_filter'
@@ -14,3 +15,5 @@ begin
 rescue
   ActiveReporting::Configuration.ransack_available = false
 end
+
+ActiveRecord::Base.extend(ActiveReporting::ActiveRecordAdaptor)
