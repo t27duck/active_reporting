@@ -23,7 +23,16 @@ module ActiveReporting
       @measure ||= Configuration.default_measure
     end
 
-    def self.dimension(name, label: Configuration.default_dimension_label)
+    def self.default_dimension_label(label)
+      @dimension_labels ||= {}
+      @dimension_labels[:default] = label.to_sym
+    end
+
+    def self.dimension_labels
+      @dimension_labels ||= {}
+    end
+
+    def self.dimension(name, label: nil)
       @dimensions ||= {}
       @dimensions[name.to_sym] = Dimension.new(model, name: name.to_sym, label: label)
     end
