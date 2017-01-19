@@ -11,8 +11,11 @@ module ActiveReporting
       partition_dimension_filters dimension_filter
     end
 
+    # Builds and executes a query, returning the raw result
+    #
+    # @return [Array]
     def run
-      model.connection.execute statement.to_sql
+      model.connection.execute(statement.to_sql).to_a
     end
 
     private ######################################################################

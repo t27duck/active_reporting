@@ -2,7 +2,14 @@ module ActiveReporting
   class DimensionFilter
     attr_reader :type, :body
 
-    def self.build(fact_model, name, lambda_or_type)
+    # Factory for creating a new DimensionFilter
+    #
+    # Determines the type based on if passed in a callable object or a symbol
+    #
+    # @param name (Symbol)
+    # @param lambda_or_type (Symbol, Lambda)
+    # @return (ActiveReporting::DimensionFilter) a new instance of a dimension filter
+    def self.build(name, lambda_or_type)
       body = nil
       type = lambda_or_type
 
