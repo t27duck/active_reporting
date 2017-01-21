@@ -19,9 +19,9 @@ module ActiveReporting
     def determine_dimensions(dimensions)
       [].tap do |dims|
         dimensions.each do |dim|
-          d = @fact_model.dimensions[dim.to_sym]
-          raise UnknownDimension.new(dim, @fact_model.model) unless d.present?
-          dims << d
+          found_dimension = @fact_model.dimensions[dim.to_sym]
+          raise UnknownDimension.new(dim, @fact_model) unless found_dimension.present?
+          dims << ReportingDimension.new(found_dimension)
         end
       end
     end

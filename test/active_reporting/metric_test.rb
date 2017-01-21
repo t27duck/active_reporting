@@ -14,7 +14,8 @@ class ActiveReporting::MetricTest < Minitest::Test
   end
 
   def test_metric_makes_dimensions_available
-    assert_equal [@metric.fact_model.dimensions[:state]], @metric.dimensions
+    assert @metric.dimensions.is_a?(Array)
+    assert @metric.dimensions.all?{ |d| d.is_a?(ActiveReporting::ReportingDimension) }
   end
 
   def test_metric_raises_if_given_an_unknown_dimension

@@ -75,7 +75,7 @@ module ActiveReporting
     #   An inteligent default will be used if not provided
     def self.dimension(name, label: nil)
       @dimensions ||= {}
-      @dimensions[name.to_sym] = Dimension.new(model, name: name.to_sym, label: label)
+      @dimensions[name.to_sym] = Dimension.new(self, name: name, label: label)
     end
 
     # Declares a dimension filter for this fact model

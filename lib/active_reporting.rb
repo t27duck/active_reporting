@@ -6,6 +6,7 @@ require 'active_reporting/dimension_filter'
 require 'active_reporting/metric'
 require 'active_reporting/fact_model'
 require 'active_reporting/report'
+require 'active_reporting/reporting_dimension'
 require 'active_reporting/version'
 
 begin
