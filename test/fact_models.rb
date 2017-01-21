@@ -6,4 +6,5 @@ class PostFactModel < ActiveReporting::FactModel
 end
 
 class UserFactModel < ActiveReporting::FactModel
+  default_dimension_label :username
 end

@@ -35,7 +35,11 @@ module ActiveReporting
       group
     end
 
-    private ######################################################################
+    private ####################################################################
+
+    def label
+      @label ||= dimension_fact_model.dimension_labels[name.to_sym]
+    end
 
     def degenerate_fragment
       "#{model.quoted_table_name}.#{name}"
@@ -46,7 +50,11 @@ module ActiveReporting
     end
 
     def label_fragment
-      "#{klass.quoted_table_name}.#{Configuration.default_dimension_label}"
+      "#{klass.quoted_table_name}.#{label}"
+    end
+
+    def dimension_fact_model
+      @dimension_fact_model ||= klass.fact_model
     end
   end
 end

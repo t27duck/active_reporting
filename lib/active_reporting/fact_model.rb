@@ -58,14 +58,14 @@ module ActiveReporting
     # @return [Symbol]
     def self.default_dimension_label(label)
       @dimension_labels ||= {}
-      @dimension_labels[:default] = label.to_sym
+      @dimension_labels.default = label.to_sym
     end
 
     # All the known dimension labels for the fact model
     #
     # @return [Hash]
     def self.dimension_labels
-      @dimension_labels ||= { default: Configuration.default_dimension_label }
+      @dimension_labels ||= Hash.new(Configuration.default_dimension_label)
     end
 
     # Declares a dimension for this fact model

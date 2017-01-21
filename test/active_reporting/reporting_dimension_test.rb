@@ -6,6 +6,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     @post_state_dimension   = ActiveReporting::Dimension.new(PostFactModel, name: :state)
     @post_creator_dimension = ActiveReporting::Dimension.new(PostFactModel, name: :creator)
     @user_profile_dimension = ActiveReporting::Dimension.new(UserFactModel, name: :profile)
+    @user_fact_model_default_label = UserFactModel.dimension_labels[:default]
   end
 
   def test_forign_key_is_name_if_degenerate
@@ -30,10 +31,10 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_select_statement_can_include_identifier_if_standard
     subject = ActiveReporting::ReportingDimension.new(@post_creator_dimension)
-    expected = ["\"users\".#{@default_label} AS creator", '"users".id AS creator_identifier']
+    expected = ["\"users\".#{@user_fact_model_default_label} AS creator", '"users".id AS creator_identifier']
     assert_equal expected, subject.select_statement
 
-    expected = ["\"users\".#{@default_label} AS creator"]
+    expected = ["\"users\".#{@user_fact_model_default_label} AS creator"]
     assert_equal expected, subject.select_statement(with_identifier: false)
   end
 
@@ -44,12 +45,10 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_group_by_statement_can_include_identifier_if_standard
     subject = ActiveReporting::ReportingDimension.new(@post_creator_dimension)
-    expected = ["\"users\".#{@default_label}", '"users".id']
+    expected = ["\"users\".#{@user_fact_model_default_label}", '"users".id']
     assert_equal expected, subject.group_by_statement
 
-    expected = ["\"users\".#{@default_label}"]
+    expected = ["\"users\".#{@user_fact_model_default_label}"]
     assert_equal expected, subject.group_by_statement(with_identifier: false)
   end
-
-
 end

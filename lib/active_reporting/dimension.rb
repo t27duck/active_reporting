@@ -28,7 +28,7 @@ module ActiveReporting
                 end
     end
 
-    private ######################################################################
+    private ####################################################################
 
     def klass
       @klass ||= association ? association.klass : model
@@ -39,7 +39,7 @@ module ActiveReporting
     end
 
     def association
-      @association_info ||= model.reflect_on_association(@name.to_s)
+      @association_info ||= model.reflect_on_association(@name)
     end
   end
 end
