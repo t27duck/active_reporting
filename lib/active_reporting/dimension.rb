@@ -5,10 +5,9 @@ module ActiveReporting
     # @param model [ActiveRecord::Base]
     # @param name [Symbol]
     # @param label [String, Symbol]
-    def initialize(fact_model, name:, label: nil)
+    def initialize(fact_model, name:)
       @fact_model = fact_model
       @name       = name.to_s
-      @label      = label || Configuration.default_dimension_label
     end
 
     # Determins the type of the dimension

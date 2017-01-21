@@ -65,17 +65,15 @@ module ActiveReporting
     #
     # @return [Hash]
     def self.dimension_labels
-      @dimension_labels ||= {}
+      @dimension_labels ||= { default: Configuration.default_dimension_label }
     end
 
     # Declares a dimension for this fact model
     #
     # @param name [String, Symbol] The name of the dimension
-    # @param label [String, Symbol] the default label to use for the dimension
-    #   An inteligent default will be used if not provided
-    def self.dimension(name, label: nil)
+    def self.dimension(name)
       @dimensions ||= {}
-      @dimensions[name.to_sym] = Dimension.new(self, name: name, label: label)
+      @dimensions[name.to_sym] = Dimension.new(self, name: name)
     end
 
     # Declares a dimension filter for this fact model
