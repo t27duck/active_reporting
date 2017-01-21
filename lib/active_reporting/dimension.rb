@@ -24,7 +24,7 @@ module ActiveReporting
                 elsif association
                   :standard
                 else
-                  raise UnknownDimension.new(@name, @fac_model)
+                  raise UnknownDimension.new(@name, @fact_model)
                 end
     end
 
