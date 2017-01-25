@@ -8,6 +8,9 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
     subject = ActiveReporting::Dimension.new(PostFactModel, name: :state)
     assert_equal :degenerate, subject.type
 
+    subject = ActiveReporting::Dimension.new(PostFactModel, name: :created_on)
+    assert_equal :herarchical, subject.type
+
     assert_raises ActiveReporting::UnknownDimension do
       ActiveReporting::Dimension.new(PostFactModel, name: :not_a_dimension).type
     end

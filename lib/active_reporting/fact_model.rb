@@ -1,7 +1,7 @@
 module ActiveReporting
   class FactModel
     class << self
-      attr_reader :dimensions, :dimension_filters
+      attr_reader :dimensions, :dimension_filters, :dimension_label, :hierarchical_levels
       attr_writer :measure
     end
 
@@ -52,20 +52,31 @@ module ActiveReporting
       @measure ||= Configuration.default_measure
     end
 
+    # The (in order) hierarchical levels of the fact model when used as
+    # a dimension.
+    #
+    # @return [Array]
+    def self.hierarchical_levels
+      @hierarchical_levels ||= []
+    end
+
+    # Specifies an in order array of columns which describes a series of
+    # columns that may be used as dimensions in a hierarchy.
+    #
+    # For example, a fact model of tablets may have a hierarchy of
+    # name -> manufacturer -> operating system.
+    #
+    # @param levels (Array) An array of symbols or strings of columns
+    def self.dimension_hierarchy(levels)
+      @hierarchical_levels = Array(levels).map(&:to_sym)
+    end
+
     # When this fact model is used as a dimension, this is the label it will
     # use by default
     #
     # @return [Symbol]
     def self.default_dimension_label(label)
-      @dimension_labels ||= {}
-      @dimension_labels.default = label.to_sym
-    end
-
-    # All the known dimension labels for the fact model
-    #
-    # @return [Hash]
-    def self.dimension_labels
-      @dimension_labels ||= Hash.new(Configuration.default_dimension_label)
+      @dimension_label = label.to_sym
     end
 
     # Declares a dimension for this fact model

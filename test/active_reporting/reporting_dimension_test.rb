@@ -6,7 +6,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     @post_state_dimension   = ActiveReporting::Dimension.new(PostFactModel, name: :state)
     @post_creator_dimension = ActiveReporting::Dimension.new(PostFactModel, name: :creator)
     @user_profile_dimension = ActiveReporting::Dimension.new(UserFactModel, name: :profile)
-    @user_fact_model_default_label = UserFactModel.dimension_labels[:default]
+    @user_fact_model_default_label = UserFactModel.dimension_label
   end
 
   def test_forign_key_is_name_if_degenerate

@@ -21,6 +21,8 @@ module ActiveReporting
     def type
       @type ||= if model.column_names.include?(@name)
                   :degenerate
+                elsif !klass.fact_model.hierarchical_levels.empty?
+                  :herarchical
                 elsif association
                   :standard
                 else

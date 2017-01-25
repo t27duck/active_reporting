@@ -4,8 +4,9 @@ module ActiveReporting
     extend Forwardable
     def_delegators :@dimension, :name, :type, :klass, :association, :model
 
-    def initialize(dimension)
-      @dimension = dimension
+    def initialize(dimension, label: nil)
+      @dimension  = dimension
+      @label      = label
     end
 
     # The foreign key to use in queries
@@ -38,7 +39,7 @@ module ActiveReporting
     private ####################################################################
 
     def label
-      @label ||= dimension_fact_model.dimension_labels[name.to_sym]
+      @label ||= dimension_fact_model.dimension_label || Configuration.default_dimension_label
     end
 
     def degenerate_fragment

@@ -24,6 +24,7 @@ ActiveRecord::Schema.define do
     t.text :body
     t.string :state
     t.integer :creator_id
+    t.integer :created_on_id
     t.timestamps null: false
   end
 
@@ -32,5 +33,14 @@ ActiveRecord::Schema.define do
     t.integer :user_id
     t.text :body
     t.timestamps null: false
+  end
+
+  create_table :date_dimensions, id: false do |t|
+    t.integer :id,          null: false # YYYYMMDD
+    t.integer :year,        null: false # 1 - 12
+    t.integer :quarter,     null: false # 1 - 4
+    t.integer :month,       null: false # 1 - 12
+    t.integer :day,         null: false # 1 - 31
+    t.date    :date,        null: false # Date object
   end
 end

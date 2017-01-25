@@ -1,3 +1,7 @@
+(Date.new(2011,1,1)..(1.years.from_now).to_date).each do |d|
+  DateDimension.new_from_date(d).save!
+end
+
 group_admins = Group.create!(name: 'Admins')
 group_users  = Group.create!(name: 'Users')
 

@@ -8,21 +8,25 @@ module ActiveReporting
     def initialize(name, fact_model:, aggregate: :count, dimensions: [], dimension_filter: {})
       @name             = name.to_sym
       @fact_model       = fact_model
-      @dimensions       = determine_dimensions Array(dimensions)
       @dimension_filter = dimension_filter
       @aggregate        = aggregate
+      determine_dimensions Array(dimensions)
       check_dimension_filter
     end
 
     private ####################################################################
 
     def determine_dimensions(dimensions)
-      [].tap do |dims|
-        dimensions.each do |dim|
-          found_dimension = @fact_model.dimensions[dim.to_sym]
-          raise UnknownDimension.new(dim, @fact_model) unless found_dimension.present?
-          dims << ReportingDimension.new(found_dimension)
-        end
+      @dimensions = []
+      dimensions.each do |dim|
+        dimension_name, label = if dim.is_a?(Hash)
+                                  Array(dim)
+                                else
+                                  [dim, nil]
+                                end
+        found_dimension = @fact_model.dimensions[dimension_name.to_sym]
+        raise UnknownDimension.new(dim, @fact_model) unless found_dimension.present?
+        @dimensions << ReportingDimension.new(found_dimension, label: label)
       end
     end
 

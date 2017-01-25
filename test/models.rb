@@ -15,6 +15,7 @@ end
 
 class Post < ActiveRecord::Base
   belongs_to :creator, class_name: 'User'
+  belongs_to :created_on, class_name: 'DateDimension'
   has_many :comments
 end
 
@@ -25,4 +26,15 @@ end
 
 class Story < ActiveRecord::Base
   self.table_name = 'posts'
+end
+
+class DateDimension < ActiveRecord::Base
+  def self.new_from_date(date)
+    new(id:           date.strftime('%Y%m%d'),
+        year:         date.year,
+        month:        date.month,
+        day:          date.day,
+        quarter:      (date.month / 3.0).ceil,
+        date:         date)
+  end
 end
