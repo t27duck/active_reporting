@@ -1,5 +1,7 @@
 require 'forwardable'
 module ActiveReporting
+  AGGREGATES = %i(count sum max min avg).freeze
+
   class Metric
     extend Forwardable
     def_delegators :@fact_model, :model
@@ -9,7 +11,7 @@ module ActiveReporting
       @name             = name.to_sym
       @fact_model       = fact_model
       @dimension_filter = dimension_filter
-      @aggregate        = aggregate
+      @aggregate        = determin_aggregate(aggregate.to_sym)
       determine_dimensions Array(dimensions)
       check_dimension_filter
     end
@@ -34,6 +36,11 @@ module ActiveReporting
       @dimension_filter.each do |name, _|
         @fact_model.find_dimension_filter(name)
       end
+    end
+
+    def determin_aggregate(agg)
+      raise UnknownAggregate.new(agg) unless AGGREGATES.include?(agg)
+      @aggregate = agg
     end
   end
 end

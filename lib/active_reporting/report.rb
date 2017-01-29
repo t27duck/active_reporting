@@ -57,7 +57,7 @@ module ActiveReporting
       when :count
         'COUNT(*)'
       else
-        raise UnknownAggregate.new(@metric.aggregate)
+        "#{@metric.aggregate.to_s.upcase}(#{@metric.measure})"
       end
     end
 

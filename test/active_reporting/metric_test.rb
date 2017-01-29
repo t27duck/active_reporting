@@ -28,4 +28,10 @@ class ActiveReporting::MetricTest < Minitest::Test
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, dimension_filter: {some_filter: 1})
     assert metric.dimension_filter.is_a?(Hash)
   end
+
+  def test_metric_raises_on_an_invalid_aggregate
+    assert_raises ActiveReporting::UnknownAggregate do
+      ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, aggregate: :not_valid)
+    end
+  end
 end

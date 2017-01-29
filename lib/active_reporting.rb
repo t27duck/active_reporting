@@ -54,7 +54,7 @@ module ActiveReporting
     alias to_s message
   end
 
-  class RansackNotAvailable
+  class RansackNotAvailable < StandardError
     def message
       'Ransack is not available. Please include it in your Gemfile.'
     end
