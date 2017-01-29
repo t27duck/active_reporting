@@ -2,11 +2,12 @@ require 'test_helper'
 
 class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
   def setup
-    @default_label = ActiveReporting::Configuration.default_dimension_label
-    @post_state_dimension   = ActiveReporting::Dimension.new(PostFactModel, name: :state)
-    @post_creator_dimension = ActiveReporting::Dimension.new(PostFactModel, name: :creator)
-    @user_profile_dimension = ActiveReporting::Dimension.new(UserFactModel, name: :profile)
-    @user_fact_model_default_label = UserFactModel.dimension_label
+    @default_label                  = ActiveReporting::Configuration.default_dimension_label
+    @post_state_dimension           = ActiveReporting::Dimension.new(PostFactModel, name: :state)
+    @post_creator_dimension         = ActiveReporting::Dimension.new(PostFactModel, name: :creator)
+    @post_created_on_dimension      = ActiveReporting::Dimension.new(PostFactModel, name: :created_on)
+    @user_profile_dimension         = ActiveReporting::Dimension.new(UserFactModel, name: :profile)
+    @user_fact_model_default_label  = UserFactModel.dimension_label
   end
 
   def test_forign_key_is_name_if_degenerate
@@ -50,5 +51,23 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
     expected = ["\"users\".#{@user_fact_model_default_label}"]
     assert_equal expected, subject.group_by_statement(with_identifier: false)
+  end
+
+  def test_label_may_be_passed_for_herarchical_dimension
+    subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :year)
+    assert_equal :year, subject.instance_variable_get(:@label)
+  end
+
+  def test_label_must_be_of_the_fact_models_herarchical_dimension_labels
+    assert_raises ActiveReporting::InvalidDimensionLabel do
+      ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :not_a_label)
+    end
+  end
+
+  def test_label_can_only_be_passed_in_if_dimension_is_herarchical
+    refute @post_creator_dimension.type == :herarchical
+    assert_raises ActiveReporting::InvalidDimensionLabel do
+      ActiveReporting::ReportingDimension.new(@post_creator_dimension, label: :foo)
+    end
   end
 end

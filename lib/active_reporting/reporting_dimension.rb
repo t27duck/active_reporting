@@ -5,8 +5,8 @@ module ActiveReporting
     def_delegators :@dimension, :name, :type, :klass, :association, :model
 
     def initialize(dimension, label: nil)
-      @dimension  = dimension
-      @label      = label
+      @dimension = dimension
+      determine_label(label)
     end
 
     # The foreign key to use in queries
@@ -38,8 +38,15 @@ module ActiveReporting
 
     private ####################################################################
 
-    def label
+    def determine_label(label)
+      @label = label.to_sym if label.present? && validate_hierarchical_label(label)
       @label ||= dimension_fact_model.dimension_label || Configuration.default_dimension_label
+    end
+
+    def validate_hierarchical_label(hierarchical_label)
+      raise InvalidDimensionLabel unless type == :hierarchical
+      raise InvalidDimensionLabel unless dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
+      true
     end
 
     def degenerate_fragment
@@ -51,7 +58,7 @@ module ActiveReporting
     end
 
     def label_fragment
-      "#{klass.quoted_table_name}.#{label}"
+      "#{klass.quoted_table_name}.#{@label}"
     end
 
     def dimension_fact_model

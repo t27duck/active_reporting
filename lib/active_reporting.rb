@@ -31,6 +31,14 @@ module ActiveReporting
     alias to_s message
   end
 
+  class InvalidDimensionLabel < StandardError
+    def message
+      "Label is not within fact model's herarchical labels"
+    end
+
+    alias to_s message
+  end
+
   class UnknownAggregate < StandardError
     def initialize(name)
       @name = name

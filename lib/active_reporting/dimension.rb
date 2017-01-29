@@ -4,7 +4,6 @@ module ActiveReporting
 
     # @param model [ActiveRecord::Base]
     # @param name [Symbol]
-    # @param label [String, Symbol]
     def initialize(fact_model, name:)
       @fact_model = fact_model
       @name       = name.to_s
@@ -22,7 +21,7 @@ module ActiveReporting
       @type ||= if model.column_names.include?(@name)
                   :degenerate
                 elsif !klass.fact_model.hierarchical_levels.empty?
-                  :herarchical
+                  :hierarchical
                 elsif association
                   :standard
                 else
