@@ -21,11 +21,7 @@ module ActiveReporting
     def determine_dimensions(dimensions)
       @dimensions = []
       dimensions.each do |dim|
-        dimension_name, label = if dim.is_a?(Hash)
-                                  Array(dim)
-                                else
-                                  [dim, nil]
-                                end
+        dimension_name, label = dim.is_a?(Hash) ? Array(dim) : [dim, nil]
         found_dimension = @fact_model.dimensions[dimension_name.to_sym]
         raise UnknownDimension.new(dim, @fact_model) unless found_dimension.present?
         @dimensions << ReportingDimension.new(found_dimension, label: label)
