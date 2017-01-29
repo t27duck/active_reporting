@@ -1,7 +1,7 @@
 module ActiveReporting
   class FactModel
     class << self
-      attr_reader :dimensions, :dimension_filters, :dimension_label, :hierarchical_levels
+      attr_reader :dimensions, :dimension_filters, :dimension_label
       attr_writer :measure
     end
 
