@@ -13,7 +13,6 @@ matrix:
       gemfile: gemfiles/5.0.gemfile
     - rvm: 2.2
       gemfile: gemfiles/5.0.gemfile
-before_install: gem install bundler -v 1.13.7
 script:
   - bundle exec rake
 
