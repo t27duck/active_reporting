@@ -23,7 +23,9 @@ module ActiveReporting
       dimensions.each do |dim|
         dimension_name, label = dim.is_a?(Hash) ? Array(dim) : [dim, nil]
         found_dimension = @fact_model.dimensions[dimension_name.to_sym]
-        raise UnknownDimension.new(dim, @fact_model) unless found_dimension.present?
+        if found_dimension.nil?
+          raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{@fact_model}'"
+        end
         @dimensions << ReportingDimension.new(found_dimension, label: label)
       end
     end
@@ -35,7 +37,7 @@ module ActiveReporting
     end
 
     def determin_aggregate(agg)
-      raise UnknownAggregate.new(agg) unless AGGREGATES.include?(agg)
+      raise UnknownAggregate, "Unknown aggregate '#{agg}'" unless AGGREGATES.include?(agg)
       @aggregate = agg
     end
   end

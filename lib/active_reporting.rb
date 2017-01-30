@@ -19,53 +19,9 @@ end
 ActiveRecord::Base.extend(ActiveReporting::ActiveRecordAdaptor)
 
 module ActiveReporting
-  class UnknownDimension < StandardError
-    def initialize(name, fact_model)
-      @name       = name
-      @fact_model = fact_model
-    end
-
-    def message
-      "Dimension '#{@name}' not found on fact model '#{@fact_model}'"
-    end
-    alias to_s message
-  end
-
-  class InvalidDimensionLabel < StandardError
-    def message
-      "Label is not within fact model's herarchical labels"
-    end
-
-    alias to_s message
-  end
-
-  class UnknownAggregate < StandardError
-    def initialize(name)
-      @name = name
-    end
-
-    def message
-      "Unknown aggregate '#{@name}'"
-    end
-    alias to_s message
-  end
-
-  class UnknownDimensionFilter < StandardError
-    def initialize(name, fact_model)
-      @name       = name
-      @fact_model = fact_model
-    end
-
-    def message
-      "Dimension filter '#{@name}' not found on fact model '#{@fact_model}'"
-    end
-    alias to_s message
-  end
-
-  class RansackNotAvailable < StandardError
-    def message
-      'Ransack is not available. Please include it in your Gemfile.'
-    end
-    alias to_s message
-  end
+  InvalidDimensionLabel = Class.new(StandardError)
+  RansackNotAvailable = Class.new(StandardError)
+  UnknownAggregate = Class.new(StandardError)
+  UnknownDimension = Class.new(StandardError)
+  UnknownDimensionFilter = Class.new(StandardError)
 end

@@ -44,8 +44,12 @@ module ActiveReporting
     end
 
     def validate_hierarchical_label(hierarchical_label)
-      raise InvalidDimensionLabel unless type == :hierarchical
-      raise InvalidDimensionLabel unless dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
+      if type != :hierarchical
+        raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"
+      end
+      unless dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
+        raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
+      end
       true
     end
 

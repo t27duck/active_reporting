@@ -117,7 +117,7 @@ module ActiveReporting
     # Invoke this method to make all dimension filters fallback to use ransack
     # if they are not defined as scopes on the model
     def self.use_ransack_for_unknown_dimension_filters
-      raise RansackNotAvailable unless ransack_available
+      raise RansackNotAvailable, 'Ransack not available. Please include it in your Gemfile.' unless ransack_available
       @ransack_fallback = true
     end
 
@@ -138,7 +138,7 @@ module ActiveReporting
       dm = @dimension_filters[name]
       return dm if dm.present?
       return @dimension_filters[name] = DimensionFilter.build(self, name, :ransack) if ransack_fallback
-      raise UnknownDimensionFilter.new(name, self.name)
+      raise UnknownDimensionFilter, "Dimension filter '#{name}' not found on fact model '#{self.name}'"
     end
   end
 end

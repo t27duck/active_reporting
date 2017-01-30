@@ -25,7 +25,7 @@ module ActiveReporting
                 elsif association
                   :standard
                 else
-                  raise UnknownDimension.new(@name, @fact_model)
+                  raise UnknownDimension, "Dimension '#{@name}' not found on fact model '#{@fact_model}'"
                 end
     end
 
