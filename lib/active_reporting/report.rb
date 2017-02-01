@@ -1,13 +1,22 @@
 require 'forwardable'
 module ActiveReporting
   class Report
+    AGGREGATE_FUNCTION_OPERATORS = {
+      eq:   '=',
+      gt:   '>',
+      gte:  '>=',
+      lt:   '<',
+      lte:  '<='
+    }.freeze
+
     extend Forwardable
     def_delegators :@metric, :fact_model, :model
 
-    def initialize(metric, dimension_identifiers: true, dimension_filter: {})
+    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, metric_filter: {})
       @metric                 = metric
       @dimension_identifiers  = dimension_identifiers
       @dimensions             = metric.dimensions
+      @metric_filter          = metric.metric_filter.merge(metric_filter)
       partition_dimension_filters dimension_filter
     end
 
@@ -32,7 +41,8 @@ module ActiveReporting
       parts = {
         select: select_statement,
         joins: dimension_joins,
-        group: group_by_statement
+        group: group_by_statement,
+        having: having_statement
       }
 
       statement = ([model] + parts.keys).inject do |chain, method|
@@ -98,6 +108,12 @@ module ActiveReporting
       end
       chain = chain.ransack(ransack_hash).result if ransack_hash.present?
       chain
+    end
+
+    def having_statement
+      @metric_filter.map do |operator, value|
+        "#{select_aggregate} #{AGGREGATE_FUNCTION_OPERATORS[opteraor]} #{value.to_f}"
+      end.join(' AND ')
     end
   end
 end
