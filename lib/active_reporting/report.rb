@@ -13,7 +13,9 @@ module ActiveReporting
     def_delegators :@metric, :fact_model, :model
 
     def initialize(metric, dimension_identifiers: true, dimension_filter: {}, metric_filter: {})
-      @metric                 = metric
+      @metric = metric.is_a?(Metric) ? metric : ActiveReporting.fetch_metric(metric)
+      raise UnknownMetric, "Unknown metric #{metric}" if @metric.nil?
+
       @dimension_identifiers  = dimension_identifiers
       @dimensions             = metric.dimensions
       @metric_filter          = metric.metric_filter.merge(metric_filter)

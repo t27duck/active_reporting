@@ -19,9 +19,21 @@ end
 ActiveRecord::Base.extend(ActiveReporting::ActiveRecordAdaptor)
 
 module ActiveReporting
-  InvalidDimensionLabel = Class.new(StandardError)
-  RansackNotAvailable = Class.new(StandardError)
-  UnknownAggregate = Class.new(StandardError)
-  UnknownDimension = Class.new(StandardError)
-  UnknownDimensionFilter = Class.new(StandardError)
+  @metrics = {}
+
+  def self.register_metric(name, setup = {})
+    args = Array(setup).map{ |s| [s[0].to_sym, s[1]] }.to_h
+    @metrics[name.to_sym] = Metric.new(name, args)
+  end
+
+  def self.fetch_metric(name)
+    @metrics[name.to_sym]
+  end
+
+  InvalidDimensionLabel   = Class.new(StandardError)
+  RansackNotAvailable     = Class.new(StandardError)
+  UnknownAggregate        = Class.new(StandardError)
+  UnknownDimension        = Class.new(StandardError)
+  UnknownDimensionFilter  = Class.new(StandardError)
+  UnknownMetrci           = Class.new(StandardError)
 end
