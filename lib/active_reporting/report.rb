@@ -17,8 +17,8 @@ module ActiveReporting
       raise UnknownMetric, "Unknown metric #{metric}" if @metric.nil?
 
       @dimension_identifiers  = dimension_identifiers
-      @dimensions             = metric.dimensions
-      @metric_filter          = metric.metric_filter.merge(metric_filter)
+      @dimensions             = @metric.dimensions
+      @metric_filter          = @metric.metric_filter.merge(metric_filter)
       partition_dimension_filters dimension_filter
     end
 
