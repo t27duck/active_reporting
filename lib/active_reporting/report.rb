@@ -93,11 +93,11 @@ module ActiveReporting
     end
 
     def process_lambda_dimension_filter(chain)
-      @dimension_filters[:lambda].each do |dm, args|
+      @dimension_filters[:lambda].each do |df, args|
         chain = if [true, 'true'].include?(args)
-                  chain.scoping { model.instance_exec(&dm.lambda) }
+                  chain.scoping { model.instance_exec(&df.body) }
                 else
-                  chain.scoping { model.instance_exec(args, &dm.lambda) }
+                  chain.scoping { model.instance_exec(args, &df.body) }
                 end
       end
       chain
