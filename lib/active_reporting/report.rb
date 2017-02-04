@@ -12,12 +12,13 @@ module ActiveReporting
     extend Forwardable
     def_delegators :@metric, :fact_model, :model
 
-    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, metric_filter: {})
+    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {})
       @metric = metric.is_a?(Metric) ? metric : ActiveReporting.fetch_metric(metric)
       raise UnknownMetric, "Unknown metric #{metric}" if @metric.nil?
 
       @dimension_identifiers  = dimension_identifiers
-      @dimensions             = @metric.dimensions
+      local_dimensions        = ReportingDimension.build_from_dimensions(fact_model, Array(dimensions))
+      @dimensions             = (@metric.dimensions + local_dimensions).uniq
       @metric_filter          = @metric.metric_filter.merge(metric_filter)
       partition_dimension_filters dimension_filter
     end
@@ -74,11 +75,11 @@ module ActiveReporting
     end
 
     def dimension_joins
-      @metric.dimensions.select { |d| d.type == :standard }.map(&:name)
+      @dimensions.select { |d| d.type == :standard }.map{ |d| d.name.to_sym }
     end
 
     def group_by_statement
-      @metric.dimensions.map { |d| d.group_by_statement(with_identifier: @dimension_identifiers) }
+      @dimensions.map { |d| d.group_by_statement(with_identifier: @dimension_identifiers) }
     end
 
     def process_scope_dimension_filter(chain)

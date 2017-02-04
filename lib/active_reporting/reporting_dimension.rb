@@ -4,6 +4,17 @@ module ActiveReporting
     extend Forwardable
     def_delegators :@dimension, :name, :type, :klass, :association, :model
 
+    def self.build_from_dimensions(fact_model, dimensions)
+      Array(dimensions).map do |dim|
+        dimension_name, label = dim.is_a?(Hash) ? Array(dim) : [dim, nil]
+        found_dimension = fact_model.dimensions[dimension_name.to_sym]
+        if found_dimension.nil?
+          raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'"
+        end
+        new(found_dimension, label: label)
+      end
+    end
+
     def initialize(dimension, label: nil)
       @dimension = dimension
       determine_label(label)

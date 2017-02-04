@@ -13,23 +13,11 @@ module ActiveReporting
       @dimension_filter = dimension_filter
       @aggregate        = determin_aggregate(aggregate.to_sym)
       @metric_filter    = metric_filter
-      determine_dimensions Array(dimensions)
+      @dimensions       = ReportingDimension.build_from_dimensions(@fact_model, Array(dimensions))
       check_dimension_filter
     end
 
     private ####################################################################
-
-    def determine_dimensions(dimensions)
-      @dimensions = []
-      dimensions.each do |dim|
-        dimension_name, label = dim.is_a?(Hash) ? Array(dim) : [dim, nil]
-        found_dimension = @fact_model.dimensions[dimension_name.to_sym]
-        if found_dimension.nil?
-          raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{@fact_model}'"
-        end
-        @dimensions << ReportingDimension.new(found_dimension, label: label)
-      end
-    end
 
     def check_dimension_filter
       @dimension_filter.each do |name, _|
