@@ -22,7 +22,7 @@ module ActiveReporting
   @metrics = {}
 
   def self.register_metric(name, setup = {})
-    args = Array(setup).map{ |s| [s[0].to_sym, s[1]] }.to_h
+    args = Array(setup).map { |s| [s[0].to_sym, s[1]] }.to_h
     @metrics[name.to_sym] = Metric.new(name, args)
   end
 

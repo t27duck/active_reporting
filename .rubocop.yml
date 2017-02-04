@@ -6,6 +6,9 @@ AllCops:
 Metrics/LineLength:
   Max: 120
 
+Metrics/ParameterLists:
+  Max: 8
+
 MethodLength:
   Max: 20
 

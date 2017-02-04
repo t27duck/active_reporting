@@ -75,7 +75,7 @@ module ActiveReporting
     end
 
     def dimension_joins
-      @dimensions.select { |d| d.type == :standard }.map{ |d| d.name.to_sym }
+      @dimensions.select { |d| d.type == :standard }.map { |d| d.name.to_sym }
     end
 
     def group_by_statement
@@ -115,7 +115,7 @@ module ActiveReporting
 
     def having_statement
       @metric_filter.map do |operator, value|
-        "#{select_aggregate} #{AGGREGATE_FUNCTION_OPERATORS[opteraor]} #{value.to_f}"
+        "#{select_aggregate} #{AGGREGATE_FUNCTION_OPERATORS[operator]} #{value.to_f}"
       end.join(' AND ')
     end
   end
