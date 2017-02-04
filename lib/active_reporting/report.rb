@@ -75,7 +75,7 @@ module ActiveReporting
     end
 
     def dimension_joins
-      @dimensions.select { |d| %i(standard hierarchical).include?(d.type) }.map { |d| d.name.to_sym }
+      @dimensions.select { |d| d.type == :standard }.map { |d| d.name.to_sym }
     end
 
     def group_by_statement

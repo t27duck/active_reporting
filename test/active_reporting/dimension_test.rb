@@ -9,10 +9,21 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
     assert_equal :degenerate, subject.type
 
     subject = ActiveReporting::Dimension.new(PostFactModel, name: :created_on)
-    assert_equal :hierarchical, subject.type
+    assert_equal :standard, subject.type
 
     assert_raises ActiveReporting::UnknownDimension do
       ActiveReporting::Dimension.new(PostFactModel, name: :not_a_dimension).type
     end
+  end
+
+  def test_dimension_can_be_hierarchical
+    subject = ActiveReporting::Dimension.new(PostFactModel, name: :creator)
+    refute subject.hierarchical?
+
+    subject = ActiveReporting::Dimension.new(PostFactModel, name: :state)
+    refute subject.hierarchical?
+
+    subject = ActiveReporting::Dimension.new(PostFactModel, name: :created_on)
+    assert subject.hierarchical?
   end
 end

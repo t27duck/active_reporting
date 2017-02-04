@@ -2,7 +2,7 @@ require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
-    def_delegators :@dimension, :name, :type, :klass, :association, :model
+    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?
 
     def self.build_from_dimensions(fact_model, dimensions)
       Array(dimensions).map do |dim|
@@ -55,7 +55,7 @@ module ActiveReporting
     end
 
     def validate_hierarchical_label(hierarchical_label)
-      if type != :hierarchical
+      if !hierarchical?
         raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"
       end
       unless dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)

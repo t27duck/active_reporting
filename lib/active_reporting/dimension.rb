@@ -20,13 +20,15 @@ module ActiveReporting
     def type
       @type ||= if model.column_names.include?(@name)
                   :degenerate
-                elsif !klass.fact_model.hierarchical_levels.empty?
-                  :hierarchical
                 elsif association
                   :standard
                 else
                   raise UnknownDimension, "Dimension '#{@name}' not found on fact model '#{@fact_model}'"
                 end
+    end
+
+    def hierarchical?
+      @hierarchical ||= !klass.fact_model.hierarchical_levels.empty?
     end
 
     private ####################################################################
