@@ -38,3 +38,12 @@ class DateDimension < ActiveRecord::Base
         date:         date)
   end
 end
+
+class Metric
+  @metrics = {
+    a_metric: ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel)
+  }
+  def self.lookup(name)
+    @metrics[name.to_sym]
+  end
+end

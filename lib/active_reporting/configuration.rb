@@ -57,5 +57,24 @@ module ActiveReporting
       raise RansackNotAvailable unless ransack_available
       @ransack_fallback = fallback
     end
+
+    # Sets the name of the constant used to lookup prebuilt `Reporting::Metric`
+    # objects by name.
+    #
+    # @param klass_name [String]
+    def self.metric_lookup_class=(klass_name)
+      @metric_lookup_class = "::#{klass_name.to_s.classify}"
+    end
+
+    # Sets the name of the constant used to lookup prebuilt `Reporting::Metric`
+    # objects by name. The constant should define a class method called `#lookup`
+    # which can take a string or symbol of the metric name.
+    #
+    # Default value is ::Metric
+    #
+    # @returns [String]
+    def self.metric_lookup_class
+      @metric_lookup_class ||= '::Metric'
+    end
   end
 end

@@ -13,7 +13,7 @@ require 'minitest/pride'
 
 ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: ':memory:'
 
+require 'fact_models'
 require 'schema'
 require 'models'
 require 'seed'
-require 'fact_models'
