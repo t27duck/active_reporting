@@ -34,4 +34,9 @@ class ActiveReporting::MetricTest < Minitest::Test
       ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, aggregate: :not_valid)
     end
   end
+
+  def test_report_builds_a_report_object
+    result = @metric.report
+    assert result.is_a?(ActiveReporting::Report)
+  end
 end

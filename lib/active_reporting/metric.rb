@@ -17,6 +17,13 @@ module ActiveReporting
       check_dimension_filter
     end
 
+    # Builds an ActiveReporting::Report object based on the metric
+    #
+    # @return [ActiveReporting::Report]
+    def report
+      Report.new(self)
+    end
+
     private ####################################################################
 
     def check_dimension_filter
