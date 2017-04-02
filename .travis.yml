@@ -1,16 +1,14 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.1.10
-  - 2.2.6
-  - 2.3.3
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
 gemfiles:
   - gemfiles/4.2.gemfile
   - gemfiles/5.0.gemfile
 matrix:
   exclude:
-    - rvm: 2.1
-      gemfile: gemfiles/5.0.gemfile
     - rvm: 2.2
       gemfile: gemfiles/5.0.gemfile
 script:
