@@ -53,12 +53,23 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     assert_equal expected, subject.group_by_statement(with_identifier: false)
   end
 
-  def test_label_may_be_passed_for_herarchical_dimension
+  def test_gorup_by_statement_includes_label_and_hierarchical_label
+    subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :month)
+    assert_includes subject.group_by_statement, "\"date_dimensions\".month_str"
+    assert_includes subject.group_by_statement, "\"date_dimensions\".month"
+  end
+
+  def test_label_may_be_passed_for_hierarchical_dimension
     subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :year)
     assert_equal :year, subject.instance_variable_get(:@label)
   end
 
-  def test_label_must_be_of_the_fact_models_herarchical_dimension_labels
+  def test_label_may_be_passed_for_hierarchical_dimension_and_uses_hierarchical_label
+    subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :month)
+    assert_equal :month_str, subject.instance_variable_get(:@label)
+  end
+
+  def test_label_must_be_of_the_fact_models_hierarchical_dimension_labels
     assert_raises ActiveReporting::InvalidDimensionLabel do
       ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :not_a_label)
     end
@@ -68,6 +79,21 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     refute @post_creator_dimension.type == :herarchical
     assert_raises ActiveReporting::InvalidDimensionLabel do
       ActiveReporting::ReportingDimension.new(@post_creator_dimension, label: :foo)
+    end
+  end
+
+  def test_order_by_statement_is_dimensions_column_sql_snippet
+    subject = ActiveReporting::ReportingDimension.new(@post_state_dimension)
+    assert_equal '"posts".state ASC', subject.order_by_statement(direction: :asc)
+
+    subject = ActiveReporting::ReportingDimension.new(@post_creator_dimension)
+    assert_equal "\"users\".#{@user_fact_model_default_label} DESC", subject.order_by_statement(direction: :desc)
+  end
+
+  def test_order_by_statement_must_have_a_valid_direction
+    subject = ActiveReporting::ReportingDimension.new(@post_state_dimension)
+    assert_raises RuntimeError do
+      subject.order_by_statement(direction: :invalid)
     end
   end
 end

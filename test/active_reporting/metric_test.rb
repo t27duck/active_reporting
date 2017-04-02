@@ -39,4 +39,10 @@ class ActiveReporting::MetricTest < Minitest::Test
     result = @metric.report
     assert result.is_a?(ActiveReporting::Report)
   end
+
+  def test_metric_can_have_an_order_by_dimension
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, dimensions: [:state], order_by_dimension: {state: :asc})
+    assert metric.order_by_dimension.is_a?(Hash)
+    assert_equal({:state => :asc}, metric.order_by_dimension)
+  end
 end

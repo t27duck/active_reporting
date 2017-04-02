@@ -20,6 +20,7 @@ module ActiveReporting
       local_dimensions        = ReportingDimension.build_from_dimensions(fact_model, Array(dimensions))
       @dimensions             = (@metric.dimensions + local_dimensions).uniq
       @metric_filter          = @metric.metric_filter.merge(metric_filter)
+      @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
     end
 
@@ -45,7 +46,8 @@ module ActiveReporting
         select: select_statement,
         joins: dimension_joins,
         group: group_by_statement,
-        having: having_statement
+        having: having_statement,
+        order: order_by_statement
       }
 
       statement = ([model] + parts.keys).inject do |chain, method|
@@ -117,6 +119,15 @@ module ActiveReporting
       @metric_filter.map do |operator, value|
         "#{select_aggregate} #{AGGREGATE_FUNCTION_OPERATORS[operator]} #{value.to_f}"
       end.join(' AND ')
+    end
+
+    def order_by_statement
+      [].tap do |o|
+        @ordering.each do |dimension_key, direction|
+          dim = @dimensions.detect { |d| d.name.to_sym == dimension_key.to_sym }
+          o << dim.order_by_statement(direction: direction) if dim
+        end
+      end
     end
   end
 end

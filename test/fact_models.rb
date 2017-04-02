@@ -14,4 +14,5 @@ class DateDimensionFactModel < ActiveReporting::FactModel
   default_dimension_label :date
 
   dimension_hierarchy [:date, :month, :year, :quarter]
+  hierarchy_label :month, :month_str
 end

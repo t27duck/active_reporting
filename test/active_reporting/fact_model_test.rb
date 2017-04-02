@@ -46,4 +46,14 @@ class ActiveReporting::FactModelTest < Minitest::Test
       PostFactModel.find_dimension_filter(:nonexistant_filter)
     end
   end
+
+  def test_fact_model_has_hierarchy_labels
+    assert PostFactModel.hierarchy_labels.is_a?(Hash)
+  end
+
+  def test_fact_mode_can_set_hierarchy_label
+    PostFactModel.hierarchy_label(:foo, :bar)
+    assert PostFactModel.hierarchy_labels.key?(:foo)
+    assert_equal :bar, PostFactModel.hierarchy_labels[:foo]
+  end
 end

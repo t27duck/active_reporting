@@ -28,6 +28,7 @@ module ActiveReporting
     end
 
     # Fragments of a select statement for queries that use the dimension
+    #
     # @return [Array]
     def select_statement(with_identifier: true)
       return [degenerate_fragment] if type == :degenerate
@@ -38,20 +39,33 @@ module ActiveReporting
     end
 
     # Fragments of a group by clause for queries that use the dimension
+    #
     # @return [Array]
     def group_by_statement(with_identifier: true)
       return [degenerate_fragment] if type == :degenerate
 
       group = [label_fragment]
+      group.unshift(db_label_fragment) if @db_label != @label
       group << identifier_fragment if with_identifier
       group
+    end
+
+    # Fragment of an order by clause for queries that sort by the dimension
+    #
+    # @return [String]
+    def order_by_statement(direction:)
+      direction = direction.to_s.upcase
+      raise "Ording direction should be 'asc' or 'desc'" unless %w(ASC DESC).include?(direction)
+      return "#{degenerate_fragment} #{direction}" if type == :degenerate
+      "#{label_fragment} #{direction}"
     end
 
     private ####################################################################
 
     def determine_label(label)
-      @label = label.to_sym if label.present? && validate_hierarchical_label(label)
+      @label = custom_hierarchical_label(label.to_sym) if label.present? && validate_hierarchical_label(label)
       @label ||= dimension_fact_model.dimension_label || Configuration.default_dimension_label
+      @db_label = label.present? ? label.to_sym : @label
     end
 
     def validate_hierarchical_label(hierarchical_label)
@@ -64,6 +78,10 @@ module ActiveReporting
       true
     end
 
+    def custom_hierarchical_label(label)
+      klass.fact_model.hierarchy_labels[label] || label
+    end
+
     def degenerate_fragment
       "#{model.quoted_table_name}.#{name}"
     end
@@ -74,6 +92,10 @@ module ActiveReporting
 
     def label_fragment
       "#{klass.quoted_table_name}.#{@label}"
+    end
+
+    def db_label_fragment
+      "#{klass.quoted_table_name}.#{@db_label}"
     end
 
     def dimension_fact_model

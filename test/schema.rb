@@ -40,6 +40,7 @@ ActiveRecord::Schema.define do
     t.integer :year,        null: false # 1 - 12
     t.integer :quarter,     null: false # 1 - 4
     t.integer :month,       null: false # 1 - 12
+    t.string  :month_str,   null: false # January
     t.integer :day,         null: false # 1 - 31
     t.date    :date,        null: false # Date object
   end
