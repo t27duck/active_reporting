@@ -33,7 +33,6 @@ class DateDimension < ActiveRecord::Base
     new(id:           date.strftime('%Y%m%d'),
         year:         date.year,
         month:        date.month,
-        month_str:    date.strftime('%B'),
         day:          date.day,
         quarter:      (date.month / 3.0).ceil,
         date:         date)

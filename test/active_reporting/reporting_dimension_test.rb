@@ -53,20 +53,14 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     assert_equal expected, subject.group_by_statement(with_identifier: false)
   end
 
-  def test_gorup_by_statement_includes_label_and_hierarchical_label
+  def test_gorup_by_statement_includes_label
     subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :month)
-    assert_includes subject.group_by_statement, "\"date_dimensions\".month_str"
     assert_includes subject.group_by_statement, "\"date_dimensions\".month"
   end
 
   def test_label_may_be_passed_for_hierarchical_dimension
     subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :year)
     assert_equal :year, subject.instance_variable_get(:@label)
-  end
-
-  def test_label_may_be_passed_for_hierarchical_dimension_and_uses_hierarchical_label
-    subject = ActiveReporting::ReportingDimension.new(@post_created_on_dimension, label: :month)
-    assert_equal :month_str, subject.instance_variable_get(:@label)
   end
 
   def test_label_must_be_of_the_fact_models_hierarchical_dimension_labels

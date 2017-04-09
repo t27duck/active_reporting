@@ -71,22 +71,6 @@ module ActiveReporting
       @hierarchical_levels = Array(levels).map(&:to_sym)
     end
 
-    # Returns a hierarchy-to-label mapping
-    #
-    # @return [Hash]
-    def self.hierarchy_labels
-      @hierarchy_labels ||= {}
-    end
-
-    # Specifies a label to use on a hierarchy level if not itself
-    #
-    # @param column (Symbol) The hierarcy column name
-    # @param label (Symbol) The column to use as the label
-    def self.hierarchy_label(column, label)
-      @hierarchy_labels ||= {}
-      @hierarchy_labels[column.to_sym] = label.to_sym
-    end
-
     # When this fact model is used as a dimension, this is the label it will
     # use by default
     #
