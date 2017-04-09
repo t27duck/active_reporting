@@ -27,20 +27,31 @@ module ActiveReporting
                 end
     end
 
+    # Tells if the dimension is hierarchical
+    #
+    # @return [Boolean]
     def hierarchical?
       @hierarchical ||= !klass.fact_model.hierarchical_levels.empty?
     end
 
-    private ####################################################################
-
+    # Returns either the model of the dimension's association or the model
+    # itself if the dimension lives on the fact model
+    #
+    # @return [Boolean]
     def klass
       @klass ||= association ? association.klass : model
     end
 
+    # Returns the fact model's dimension
+    #
+    # @return [ActiveRecord::Base]
     def model
       @model ||= @fact_model.model
     end
 
+    # Returns the reflected association of the fact model to dimension name
+    #
+    # @return [ActiveRecord::Reflection]
     def association
       @association_info ||= model.reflect_on_association(@name)
     end
