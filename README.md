@@ -204,7 +204,7 @@ For dimensions that can have a hierarchy (such as a mobile phone), you can decla
 
 ```ruby
 class PhoneFactModel < ActiveReporting::FactModel
-  hierarchy_labels [:model_name, :manufacturer, :os, :wireless_technology]
+  dimension_hierarchy [:model_name, :manufacturer, :os, :wireless_technology]
 end
 ```
 
