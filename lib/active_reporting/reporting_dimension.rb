@@ -6,7 +6,7 @@ module ActiveReporting
 
     def self.build_from_dimensions(fact_model, dimensions)
       Array(dimensions).map do |dim|
-        dimension_name, label = dim.is_a?(Hash) ? Array(dim) : [dim, nil]
+        dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
         found_dimension = fact_model.dimensions[dimension_name.to_sym]
         if found_dimension.nil?
           raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'"
@@ -57,6 +57,13 @@ module ActiveReporting
       raise "Ording direction should be 'asc' or 'desc'" unless %w(ASC DESC).include?(direction)
       return "#{degenerate_fragment} #{direction}" if type == :degenerate
       "#{label_fragment} #{direction}"
+    end
+
+    # Looks up the dimension label callback for the label
+    #
+    # @return [Lambda, NilClass]
+    def label_callback
+      klass.fact_model.dimension_label_callbacks[@label]
     end
 
     private ####################################################################

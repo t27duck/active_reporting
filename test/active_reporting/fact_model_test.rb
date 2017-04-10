@@ -37,6 +37,24 @@ class ActiveReporting::FactModelTest < Minitest::Test
     assert PostFactModel.dimensions.values.all?{|d| d.is_a?(ActiveReporting::Dimension)}
   end
 
+  def test_fact_model_has_dimension_label_callbacks
+    original = PostFactModel.dimension_label_callbacks.dup
+
+    assert PostFactModel.dimension_label_callbacks.is_a?(Hash)
+    column = :foo
+    callback = ->() {}
+    PostFactModel.dimension_label_callback column, callback
+    assert_equal callback, PostFactModel.dimension_label_callbacks[column]
+  ensure
+    PostFactModel.instance_variable_set('@dimension_label_callbacks', original)
+  end
+
+  def test_dimension_label_callback_much_be_a_callable_object
+    assert_raises ArgumentError do
+      PostFactModel.dimension_label_callback :foo, 'bar'
+    end
+  end
+
   def test_fact_model_can_lookup_own_dimension_filter
     assert PostFactModel.find_dimension_filter(:some_filter).present?
   end

@@ -28,10 +28,16 @@ module ActiveReporting
     #
     # @return [Array]
     def run
-      model.connection.execute(statement.to_sql).to_a
+      @run ||= build_data
     end
 
     private ######################################################################
+
+    def build_data
+      @data = model.connection.execute(statement.to_sql).to_a
+      apply_dimension_callbacks
+      @data
+    end
 
     def partition_dimension_filters(user_dimension_filter)
       @dimension_filters = { ransack: {}, scope: {}, lambda: {} }
@@ -126,6 +132,16 @@ module ActiveReporting
         @ordering.each do |dimension_key, direction|
           dim = @dimensions.detect { |d| d.name.to_sym == dimension_key.to_sym }
           o << dim.order_by_statement(direction: direction) if dim
+        end
+      end
+    end
+
+    def apply_dimension_callbacks
+      @dimensions.each do |dimension|
+        callback = dimension.label_callback
+        next unless callback
+        @data.each do |hash|
+          hash[dimension.name.to_s] = callback.call(hash[dimension.name.to_s])
         end
       end
     end

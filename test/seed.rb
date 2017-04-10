@@ -30,7 +30,8 @@ Post.create!(
   title: Faker::Lorem.words.join(' '),
   body: Faker::Lorem.paragraph,
   state: 'draft',
-  creator: User.find_by!(username: 'admin_1')
+  creator: User.find_by!(username: 'admin_1'),
+  created_on: DateDimension.random
 )
 
 (1..20).each do |x|
@@ -38,7 +39,8 @@ Post.create!(
     title: Faker::Lorem.words.join(' '),
     body: Faker::Lorem.paragraph,
     state: 'publish',
-    creator: admins.sample
+    creator: admins.sample,
+    created_on: DateDimension.random
   )
 
   rand(10).times.each do

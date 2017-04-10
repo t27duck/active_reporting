@@ -13,4 +13,13 @@ class ActiveReporting::ReportTest < Minitest::Test
   def test_result_contains_the_metric_name
     assert @report.run.all? { |r| r.key?(@metric.name.to_s) }, 'metric name not included'
   end
+
+  def test_result_contains_the_processed_dimension_callback
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel, dimensions: [{created_on: :quarter}])
+    report = ActiveReporting::Report.new(metric)
+    data   = report.run
+
+    refute data.empty?
+    assert data.all? { |r| r['created_on'].to_s.match(/\AQ\d+/) }
+  end
 end

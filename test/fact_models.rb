@@ -14,4 +14,6 @@ class DateDimensionFactModel < ActiveReporting::FactModel
   default_dimension_label :date
 
   dimension_hierarchy [:date, :month, :year, :quarter]
+
+  dimension_label_callback :quarter, ->(q) { "Q#{q}" }
 end

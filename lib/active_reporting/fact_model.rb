@@ -87,6 +87,25 @@ module ActiveReporting
       @dimensions[name.to_sym] = Dimension.new(self, name: name)
     end
 
+    # Returns a hash of dimension label to callback mappings
+    #
+    # @return [Hash]
+    def self.dimension_label_callbacks
+      @dimension_label_callbacks ||= {}
+    end
+
+    # Sets a call back for a given dimension label. The returned value of
+    # the callable body will be used as the label value when used in a report.
+    # The label's raw database value is passed to the callback.
+    #
+    # @param column [Symbol, String]
+    # @param body [Lambda]
+    def self.dimension_label_callback(column, body)
+      @dimension_label_callbacks ||= {}
+      raise ArgumentError, "Dimension label callback body must be a callable object" unless body.respond_to?(:call)
+      @dimension_label_callbacks[column.to_sym] = body
+    end
+
     # Declares a dimension filter for this fact model
     #
     # @param name [Stirng, Symbol] The name of the dimension filter
