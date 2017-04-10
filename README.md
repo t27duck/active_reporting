@@ -223,7 +223,9 @@ end
 ```
 
 The first example exposes the `Ticket.open` scope to the fact model allowing it to be used as a dimension filter.
+
 The second example defines a lambda to be invoked like a Rails scope. It joins against the `category` relationship on `Ticket` and filters by the category's name.
+
 The third example defines a filter called "subject_cont" and will delegate it to ransack when called.
 
 Only dimension filters defined in the fact model may be used. Whitelisting available filters allows for more control over what the user may filter by. Giving the user full control to call any scope or method from the ActiveRecord model could lead to unexpected results, poor performing queries, or possible security concerns.
@@ -234,6 +236,86 @@ If ransack is available, you may flag a fact model to delegate all unknown dimen
 class TicketFactModel < ActiveReporting::FactModel
   use_ransack_for_unknown_dimension_filters
 end
+```
+
+## ActiveReporting::Metric
+
+A `Metric` is the basic building block used to describe a question you want to answer. At minimum, a metric needs a name, a fact table and an aggregate. You can expand a metric further by including dimensions and dimension filters.
+
+```ruby
+my_metric = ActiveReporting::Metric.new(
+  :order_total,
+  fact_model: OrderFactModel,
+  aggregate: :sum
+)
+```
+
+`name` - This is the identifying name of the metric.
+
+`fact_model` - An `ActiveReporting::FactModel` class
+
+`aggregate` - The SQL aggregate used to calculate the metric. Supported aggregates include count, max, min, avg, and sum. (Default: `:count`)
+
+`dimensions - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {order_date: :month}]`)
+
+`dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
+
+`metric_filter` - An additional HAVING clause to be tacked on to the end of the query. This allows for the further filtering of the end results based on the value of the aggregate. (Examples: `{gt: 3}`, `{eq: 5}`, `{lte: 7}`)
+
+`order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. (Examples: `{author: :desc}`, `{sales_ref: :asc}`)
+
+## ActiveReporting::Report
+
+A `Report` takes an `ActiveReporting::Metric` and ties everything together. It is responsible for building and executing the query to generate a result. The result is an simple array of hashing.
+
+```ruby
+metric = ActiveReporting::Metric.new(
+  :order_count,
+  fact_model: OrderFactModel,
+  dimension: [:sales_rep],
+  dimension_filter: {months_ago: 1}
+)
+
+report = ActiveReporting.new(metric)
+report.run
+=> [{order_count: 12, sales_rep: 'Fred Jones', sales_rep_identifier: 123},{order_count: 17, sales_rep: 'Mary Sue', sales_rep_identifier: 123}]
+```
+
+A `Report` may also take additional arguments to merge with the `Metric`'s information. This can be user input for additional filters, or to expand on a base `Metric`.
+
+`dimension_identifiers` - When true, the result will include the database identifier columns of the dimensions. For example, when running a report for the total number of orders dimensioned by sales rep, the rep's IDs from the `sales_reps` table will be included. (Default `true`)
+
+`dimension_filter` - A hash that will be merged with the `Metric`'s dimension filters.
+
+`dimensions` - An array of additional dimensions which are merged with the `Metric`'s dimensions.
+
+`metric_filter` - Sets the HAVING clause of the final query and is merged with the `Metric`'s metric filter.
+
+```ruby
+metric = ActiveReporting::Metric.new(
+  :order_count,
+  fact_model: OrderFactModel,
+  dimension: [:sales_rep],
+  dimension_filter: {months_ago: 1}
+)
+
+report = ActiveReporting.new(metric, dimension_filter: {from_region: 'North'}, dimension_identifiers: false)
+report.run
+=> [{order_count: 17, sales_rep: 'Mary Sue'}]
+```
+
+It may be more DRY to store ready-made metrics in a database table or stored in memory to use as the bases for various reports. You can pass a string or symbol into a `Report` instead of a `Metric` to look up an pre-made metric. This is done by passing the symbol or string into the `lookup` class method on the constant defined in `ActiveReporting::Configuration.metric_lookup_class`.
+
+```ruby
+class StoredMetrics
+  def lookup(metric_name)
+    # Code to construct and return an `ActiveReporting::Metric` object
+  end
+end
+
+ActiveReporting::Configuration.metric_lookup_class = StoredMetrics
+
+report = ActiveReporting::Report.new(:a_stored_metric, ...)
 ```
 
 ## Development
