@@ -6,7 +6,7 @@ class ActiveReporting::ActiveRecordAdaptorTest < ActiveSupport::TestCase
   end
 
   def test_fact_model_is_created_if_not_defined
-    Object.remove_const(:ProfileFactModel) if defined?(ProfileFactModel)
+    Object.send(:remove_const, :ProfileFactModel) if defined?(ProfileFactModel)
     assert Profile.fact_model < ActiveReporting::FactModel, '.model is not a FactModel class'
   end
 end
