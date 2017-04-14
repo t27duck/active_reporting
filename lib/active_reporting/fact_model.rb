@@ -1,7 +1,7 @@
 module ActiveReporting
   class FactModel
     class << self
-      attr_reader :dimensions, :dimension_filters, :dimension_label
+      attr_reader :dimensions, :dimension_filters
       attr_writer :measure
     end
 
@@ -79,6 +79,13 @@ module ActiveReporting
       @dimension_label = label.to_sym
     end
 
+    # Returns the dimension label used when this fact model is used as a dimension
+    #
+    # @return [Symbol]
+    def self.dimension_label
+      @dimension_label || Configuration.default_dimension_label
+    end
+
     # Declares a dimension for this fact model
     #
     # @param name [String, Symbol] The name of the dimension
@@ -154,9 +161,9 @@ module ActiveReporting
     # @return [ActiveReporting::DimensionFilter]
     def self.find_dimension_filter(name)
       @dimension_filters ||= {}
-      dm = @dimension_filters[name]
+      dm = @dimension_filters[name.to_sym]
       return dm if dm.present?
-      return @dimension_filters[name] = DimensionFilter.build(self, name, :ransack) if ransack_fallback
+      return @dimension_filters[name.to_sym] = DimensionFilter.build(self, name, :ransack) if ransack_fallback
       raise UnknownDimensionFilter, "Dimension filter '#{name}' not found on fact model '#{self.name}'"
     end
   end

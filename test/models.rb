@@ -1,31 +1,38 @@
-class User < ActiveRecord::Base
-  belongs_to :group
-  has_one :profile
-  has_many :posts
-  has_many :comments
+class Platform < ActiveRecord::Base
+  has_many :games
+  has_many :game_compatabilities
 end
 
-class Profile < ActiveRecord::Base
-  belongs_to :user
+class Location < ActiveRecord::Base
+  has_many :release_dates
 end
 
-class Group < ActiveRecord::Base
-  has_many :users
+class Series < ActiveRecord::Base
+  self.table_name = 'series'
+
+  has_many :figures
 end
 
-class Post < ActiveRecord::Base
-  belongs_to :creator, class_name: 'User'
-  belongs_to :created_on, class_name: 'DateDimension'
-  has_many :comments
+class Game < ActiveRecord::Base
+  belongs_to :platform
+  has_many :game_compatabilities
 end
 
-class Comment < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :post
+class Figure < ActiveRecord::Base
+  belongs_to :series
+  has_many :release_dates, foreign_key: :amiibo_id
 end
 
-class Story < ActiveRecord::Base
-  self.table_name = 'posts'
+class ReleaseDate < ActiveRecord::Base
+  belongs_to :amiibo, class_name: 'Figure'
+  belongs_to :location
+  belongs_to :released_on, class_name: 'DateDimension'
+end
+
+class GameCompatability < ActiveRecord::Base
+  belongs_to :amiibo, class_name: 'Figure'
+  belongs_to :game
+  has_one :platform, through: :game
 end
 
 class DateDimension < ActiveRecord::Base
@@ -45,11 +52,20 @@ class DateDimension < ActiveRecord::Base
   end
 end
 
+class User < ActiveRecord::Base
+  has_one :profile
+end
+
+class Profile < ActiveRecord::Base
+  belongs_to :user
+end
+
 class Metric
   @metrics = {
-    a_metric: ActiveReporting::Metric.new(:a_metric, fact_model: PostFactModel)
+    a_metric: ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel)
   }
   def self.lookup(name)
     @metrics[name.to_sym]
   end
 end
+

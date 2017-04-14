@@ -1,39 +1,52 @@
 ActiveRecord::Schema.define do
   self.verbose = false
 
-  create_table :users, force: true do |t|
-    t.string :username
-    t.integer :group_id
-    t.timestamps null: false
+  create_table :platforms, force: true do |t|
+    t.string :name, null: false
+    t.string :kind, null: false
   end
+  add_index :platforms, [:name, :kind], unique: true
 
-  create_table :profiles, force: true do |t|
-    t.integer :user_id
-    t.string :favorite_pokemon, null: false
-    t.string :favorite_color, null: false
-    t.timestamps null: false
+  create_table :locations, force: true do |t|
+    t.string :name, null: false
   end
+  add_index :locations, :name, unique: true
 
-  create_table :groups, force: true do |t|
-    t.string :name
-    t.timestamps null: false
+  create_table :series, force: true do |t|
+    t.string :name, null: false
   end
+  add_index :series, :name, unique: true
 
-  create_table :posts, force: true do |t|
-    t.string :title
-    t.text :body
-    t.string :state
-    t.integer :creator_id
-    t.integer :created_on_id
-    t.timestamps null: false
+  create_table :games, force: true do |t|
+    t.string :title, null: false
+    t.integer :platform_id, null: false
   end
+  add_index :games, :platform_id
 
-  create_table :comments, force: true do |t|
-    t.integer :post_id
-    t.integer :user_id
-    t.text :body
-    t.timestamps null: false
+  create_table :figures, force: true do |t|
+    t.integer :series_id, null: false
+    t.string :name, null: false
+    t.string :kind, null: false
   end
+  add_index :figures, :series_id
+
+  create_table :release_dates, force: true do |t|
+    t.integer :amiibo_id, null: false
+    t.integer :location_id, null: false
+    t.integer :released_on_id, null: false
+  end
+  add_index :release_dates, :amiibo_id
+  add_index :release_dates, :location_id
+  add_index :release_dates, :released_on_id
+
+  create_table :game_compatabilities, force: true do |t|
+    t.integer :amiibo_id, null: false
+    #t.integer :platform_id, null: false
+    t.integer :game_id, null: false
+  end
+  add_index :game_compatabilities, :amiibo_id
+  add_index :game_compatabilities, :platform_id
+  add_index :game_compatabilities, :game_id
 
   create_table :date_dimensions, id: false do |t|
     t.integer :id,          null: false # YYYYMMDD
@@ -42,5 +55,17 @@ ActiveRecord::Schema.define do
     t.integer :month,       null: false # 1 - 12
     t.integer :day,         null: false # 1 - 31
     t.date    :date,        null: false # Date object
+  end
+
+  create_table :users, force: true do |t|
+    t.string :username
+    t.timestamps null: false
+  end
+
+  create_table :profiles, force: true do |t|
+    t.integer :user_id
+    t.string :favorite_pokemon, null: false
+    t.string :favorite_color, null: false
+    t.timestamps null: false
   end
 end

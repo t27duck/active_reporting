@@ -7,7 +7,6 @@ rescue LoadError
 end
 
 require 'active_reporting'
-require 'faker'
 require 'minitest/autorun'
 require 'minitest/pride'
 

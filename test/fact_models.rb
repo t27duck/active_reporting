@@ -1,13 +1,28 @@
-class PostFactModel < ActiveReporting::FactModel
-  dimension :creator
-  dimension :state
-  dimension :created_on
+class FigureFactModel < ActiveReporting::FactModel
+  dimension :kind
+  dimension :series
 
-  dimension_filter :some_filter, ->(x) { where(creator_id: x) }
+  dimension_filter :kind_is, ->(k) { where(kind: k) }
 end
 
-class UserFactModel < ActiveReporting::FactModel
-  default_dimension_label :username
+class ReleaseDateFactModel < ActiveReporting::FactModel
+  dimension :amiibo
+  dimension :location
+  dimension :released_on
+end
+
+class GameCompatabilityFactModel < ActiveReporting::FactModel
+  dimension :amiibo
+  dimension :platform
+  dimension :game
+end
+
+class GameFactModel < ActiveReporting::FactModel
+  default_dimension_label :title
+  dimension :platform
+end
+
+class SeriesFactModel < ActiveReporting::FactModel
 end
 
 class DateDimensionFactModel < ActiveReporting::FactModel
@@ -17,3 +32,8 @@ class DateDimensionFactModel < ActiveReporting::FactModel
 
   dimension_label_callback :quarter, ->(q) { "Q#{q}" }
 end
+
+class UserFactModel < ActiveReporting::FactModel
+  default_dimension_label :username
+end
+
