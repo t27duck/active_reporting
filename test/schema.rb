@@ -41,11 +41,9 @@ ActiveRecord::Schema.define do
 
   create_table :game_compatabilities, force: true do |t|
     t.integer :amiibo_id, null: false
-    #t.integer :platform_id, null: false
     t.integer :game_id, null: false
   end
   add_index :game_compatabilities, :amiibo_id
-  add_index :game_compatabilities, :platform_id
   add_index :game_compatabilities, :game_id
 
   create_table :date_dimensions, id: false do |t|
@@ -65,7 +63,6 @@ ActiveRecord::Schema.define do
   create_table :profiles, force: true do |t|
     t.integer :user_id
     t.string :favorite_pokemon, null: false
-    t.string :favorite_color, null: false
     t.timestamps null: false
   end
 end
