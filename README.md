@@ -138,6 +138,8 @@ ActiveReporting::Configuration.setting = value
 
 In ActiveReporting, a fact model stores configuration information on how it can be used in reports. We use the term fact model instead of fact table because this class "models how the fact table interacts with dimensions and other reporting features".
 
+You can put these classes anywhere you want in your app, though I recommend putting them in `app/fact_models`
+
 ### Linking a fact model to an ActiveRecord model
 
 Every fact model links to an ActiveRecord model. This is done either by naming convention or by explicitly declaring the model.
