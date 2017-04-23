@@ -21,8 +21,17 @@ when 'pg'
     # password: 'postgres', # Uncomment if you need this
     min_messages: 'warning'
   )
+when 'mysql'
+  ActiveRecord::Base.establish_connection(
+    adapter:  'mysql2',
+    database: 'active_reporting_test',
+    encoding: 'utf8'
+  )
 when 'sqlite'
-  ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+  ActiveRecord::Base.establish_connection(
+    adapter: 'sqlite3',
+    database: ':memory:'
+  )
 else
   raise "Unknown ENV['DB']: '#{db}'"
 end

@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'ransack'
   spec.add_development_dependency 'sqlite3'
   spec.add_development_dependency 'pg'
+  spec.add_development_dependency 'mysql2'
 end
