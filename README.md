@@ -152,15 +152,15 @@ class TicketFactModel < ActiveRecord::FactModel
 end
 ```
 
-Alternatively, you may manually specify the model manually with `use_model`
+Alternatively, you may manually specify the model manually with `self.model=`
 
 ```ruby
 class TicketFactModel < ActiveRecord::FactModel
-  use_model SomeOtherModel
+  self.model= SomeOtherModel
   # OR you may pass in a string or symbol
-  # use_model :some_other_model
-  # use_model 'some_other_model'
-  # use_model 'SomeOtherModel'
+  # self.model= :some_other_model
+  # self.model= 'some_other_model'
+  # self.model= 'SomeOtherModel'
 end
 ```
 

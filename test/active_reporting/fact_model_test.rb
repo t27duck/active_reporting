@@ -8,17 +8,17 @@ class ActiveReporting::FactModelTest < Minitest::Test
   end
 
   def test_fact_model_may_be_an_active_record_class
-    FigureFactModel.use_model Figure
+    FigureFactModel.model = Figure
     assert_equal Figure, FigureFactModel.model
   end
 
   def test_fact_model_may_be_a_string
-    FigureFactModel.use_model 'figure'
+    FigureFactModel.model = 'figure'
     assert_equal Figure, FigureFactModel.model
   end
 
   def test_fact_model_may_be_a_symbol
-    FigureFactModel.use_model :figure
+    FigureFactModel.model = :figure
     assert_equal Figure, FigureFactModel.model
   end
 

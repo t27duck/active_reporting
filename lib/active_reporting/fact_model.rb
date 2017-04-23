@@ -15,11 +15,11 @@ module ActiveReporting
     #
     # @example
     #   class PostFactModel < ActiveReporting::FactModel
-    #     use_model :post
-    #     use_model Post
-    #     use_model 'post'
+    #     self.model= :post
+    #     self.model= Post
+    #     self.model= 'post'
     #   end
-    def self.use_model(model)
+    def self.model=(model)
       @model = if model.is_a?(String) || model.is_a?(Symbol)
                  model.to_s.classify.constantize
                else

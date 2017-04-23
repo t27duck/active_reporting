@@ -13,7 +13,7 @@ module ActiveReporting
                         const_name.constantize
                       rescue NameError
                         const = Object.const_set(const_name, Class.new(ActiveReporting::FactModel))
-                        const.use_model self
+                        const.model= self
                         const
                       end
     end
