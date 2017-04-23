@@ -4,13 +4,17 @@ rvm:
   - 2.2.7
   - 2.3.4
   - 2.4.1
-gemfiles:
-  - gemfiles/4.2.gemfile
-  - gemfiles/5.0.gemfile
+env:
+  - RAILS=5-0 DB=sqlite
+  - RAILS=5-0 DB=pg
+  - RAILS=4-2 DB=sqlite
+  - RAILS=4-2 DB=pg
 matrix:
   exclude:
-    - rvm: 2.2
-      gemfile: gemfiles/5.0.gemfile
-script:
-  - bundle exec rake
+    - rvm: 2.2.7
+      env: RAILS=5-0 DB=sqlite
+    - rvm: 2.2.7
+      env: RAILS=5-0 DB=pg
+before_script:
+  - psql -c 'create database active_reporting_test;' -U postgres
 

@@ -46,7 +46,7 @@ ActiveRecord::Schema.define do
   add_index :game_compatabilities, :amiibo_id
   add_index :game_compatabilities, :game_id
 
-  create_table :date_dimensions, id: false do |t|
+  create_table :date_dimensions, id: false, force: true do |t|
     t.integer :id,          null: false # YYYYMMDD
     t.integer :year,        null: false # 1 - 12
     t.integer :quarter,     null: false # 1 - 4
