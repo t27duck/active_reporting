@@ -36,7 +36,16 @@ else
   raise "Unknown ENV['DB']: '#{db}'"
 end
 
-require 'fact_models'
 require 'schema'
 require 'models'
+require 'fact_models'
 require 'seed'
+
+class Metric
+  @metrics = {
+    a_metric: ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel)
+  }
+  def self.lookup(name)
+    @metrics[name.to_sym]
+  end
+end

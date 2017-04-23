@@ -59,13 +59,3 @@ end
 class Profile < ActiveRecord::Base
   belongs_to :user
 end
-
-class Metric
-  @metrics = {
-    a_metric: ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel)
-  }
-  def self.lookup(name)
-    @metrics[name.to_sym]
-  end
-end
-
