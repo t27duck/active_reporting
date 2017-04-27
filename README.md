@@ -37,6 +37,7 @@ ROLAP uses a set of terms to describe how a report is generated. ActiveReporting
 A fact table is the primary table where information is derived from in a report. It commonly contains fact columns (usually numeric values) and dimension columns (foreign keys to other tables or values that can be grouped together).
 
 SQL Equivalent: FROM
+
 Rails: ActiveRecord model
 
 ### Dimension
@@ -49,6 +50,7 @@ Examples:
 * The manufacture on a fact table of widgets
 
 SQL Equivalent: JOIN, GROUP BY
+
 Rails: ActiveRecord relation or attribute
 
 ### Dimension Hierarchy
@@ -71,6 +73,7 @@ Examples:
 This isn't really an official term, but I like using it to describe further filtering of dimensionable data.
 
 SQL Equivalent: WHERE
+
 Rails: `where()`, scopes, etc.
 
 ### Measure
@@ -82,6 +85,7 @@ Examples:
 * Number of units used in a transaction
 
 SQL Equivalent: Column in the fact table used in an aggregation function
+
 Rails: ActiveRecord attribute
 
 ### Metric
@@ -89,6 +93,7 @@ Rails: ActiveRecord attribute
 A metric is a measured value and the subject of the report. It is the result of *the* question you want answered.
 
 SQL Equivalent: A query result
+
 Rails: The result of an ActiveRecord query
 
 ### Star Schema
@@ -258,7 +263,7 @@ my_metric = ActiveReporting::Metric.new(
 
 `aggregate` - The SQL aggregate used to calculate the metric. Supported aggregates include count, max, min, avg, and sum. (Default: `:count`)
 
-`dimensions - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {order_date: :month}]`)
+`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {order_date: :month}]`)
 
 `dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
 
