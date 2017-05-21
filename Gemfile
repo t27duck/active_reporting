@@ -4,11 +4,13 @@ gemspec
 
 gem 'simplecov', require: false
 
-rails = ENV['RAILS'] || '5-0'
+rails = ENV['RAILS'] || '5-1'
 
 case rails
 when '4-2'
   gem 'activerecord', '~> 4.2.0'
-else
+when '5-0'
   gem 'activerecord', '~> 5.0.0'
+else
+  gem 'activerecord', '~> 5.1.0'
 end
