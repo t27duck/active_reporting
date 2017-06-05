@@ -152,7 +152,7 @@ Every fact model links to an ActiveRecord model. This is done either by naming c
 This naming convention is `[ModelName]FactModel`. Meaning if you have an ActiveRecord model named `Ticket`, you'll then have a `TicketFactModel` to link them together.
 
 ```ruby
-class TicketFactModel < ActiveRecord::FactModel
+class TicketFactModel < ActiveReporting::FactModel
 
 end
 ```
@@ -160,7 +160,7 @@ end
 Alternatively, you may manually specify the model manually with `self.model=`
 
 ```ruby
-class TicketFactModel < ActiveRecord::FactModel
+class TicketFactModel < ActiveReporting::FactModel
   self.model= SomeOtherModel
   # OR you may pass in a string or symbol
   # self.model= :some_other_model
@@ -175,7 +175,7 @@ ActiveReporting assumes the column of a fact model used for summing, averaging, 
 
 ```ruby
 class OrderFactModel < ActiveReporting::FactModel
-  measure = :total
+  self.measure = :total
 end
 ```
 
@@ -283,7 +283,7 @@ metric = ActiveReporting::Metric.new(
   dimension_filter: {months_ago: 1}
 )
 
-report = ActiveReporting.new(metric)
+report = ActiveReporting::Report.new(metric)
 report.run
 => [{order_count: 12, sales_rep: 'Fred Jones', sales_rep_identifier: 123},{order_count: 17, sales_rep: 'Mary Sue', sales_rep_identifier: 123}]
 ```
