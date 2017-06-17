@@ -1,8 +1,16 @@
-## 0.2.0 (Unreleased)
+## 0.2.0 (2017-06-17)
 
 ### Breaking Changes
 
 * `FactModel.use_model` renamed to `FactModel.model=`
+
+### Bug Fixes
+
+* `metric` lives on fact model and not metric (#3) - *Michael Wheeler (wheeyls)*
+
+### Misc
+
+* Readme corrections and updates (#2) - *Michael Wheeler (wheeyls)*
 
 ## 0.1.1 (2017-04-22)
 
