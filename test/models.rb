@@ -38,10 +38,6 @@ end
 class DateDimension < ActiveRecord::Base
   self.primary_key = 'id'
 
-  def self.random
-    offset(rand(self.count)).first
-  end
-
   def self.new_from_date(date)
     new(id:           date.strftime('%Y%m%d'),
         year:         date.year,
