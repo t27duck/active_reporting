@@ -13,6 +13,18 @@ end
   )
 end
 
+(1..25).each do |i|
+  base = rand(100)
+  tax = rand(100)
+  Sale.create!(
+    item: "Item#{rand(3)}",
+    base_price: base,
+    taxes: tax,
+    total: base + tax,
+    placed_at: DateDimension.find("201603#{(rand(30)+1).to_s.rjust(2, '0')}")
+  )
+end
+
 platforms = {}
 platforms['3DS']    = Platform.create!(name: '3DS', kind: 'Portable')
 platforms['Wii U']  = Platform.create!(name: 'Wii U', kind: 'Console')

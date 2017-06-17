@@ -22,4 +22,13 @@ class ActiveReporting::ReportTest < Minitest::Test
     refute data.empty?
     assert data.all? { |r| r['released_on'].to_s.match(/\AQ\d+/) }
   end
+
+  def test_report_runs_with_an_aggregate_other_than_count
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, dimensions: [:item], aggregate: :sum)
+    report = ActiveReporting::Report.new(metric)
+    data   = report.run
+
+    refute data.empty?
+    assert data.all? { |r| r.key?('a_metric') }
+  end
 end

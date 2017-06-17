@@ -61,8 +61,17 @@ ActiveRecord::Schema.define do
   end
 
   create_table :profiles, force: true do |t|
-    t.integer :user_id
+    t.integer :user_id, null: false
     t.string :favorite_pokemon, null: false
+    t.timestamps null: false
+  end
+
+  create_table :sales, force: true do |t|
+    t.string :item, null: false
+    t.decimal :base_price, null: false, default: 0
+    t.decimal :taxes, null: false, default: 0
+    t.decimal :total, null: false, default: 0
+    t.integer :placed_at_id, null: false
     t.timestamps null: false
   end
 end

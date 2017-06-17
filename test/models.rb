@@ -59,3 +59,7 @@ end
 class Profile < ActiveRecord::Base
   belongs_to :user
 end
+
+class Sale < ActiveRecord::Base
+  belongs_to :placed_at, class_name: 'DateDimension'
+end

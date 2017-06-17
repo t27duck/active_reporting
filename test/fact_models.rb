@@ -37,3 +37,9 @@ class UserFactModel < ActiveReporting::FactModel
   default_dimension_label :username
 end
 
+class SaleFactModel < ActiveReporting::FactModel
+  self.measure= :total
+
+  dimension :placed_at
+  dimension :item
+end
