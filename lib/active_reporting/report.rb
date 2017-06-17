@@ -78,7 +78,7 @@ module ActiveReporting
       when :count
         'COUNT(*)'
       else
-        "#{@metric.aggregate.to_s.upcase}(#{@metric.measure})"
+        "#{@metric.aggregate.to_s.upcase}(#{fact_model.measure})"
       end
     end
 
