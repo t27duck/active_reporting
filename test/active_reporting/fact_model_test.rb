@@ -65,4 +65,20 @@ class ActiveReporting::FactModelTest < Minitest::Test
       FigureFactModel.find_dimension_filter(:nonexistant_filter)
     end
   end
+
+  def test_ransack_fallback_can_be_set
+    FigureFactModel.use_ransack_for_unknown_dimension_filters
+    assert FigureFactModel.send(:ransack_fallback)
+  ensure
+    FigureFactModel.instance_variable_set(:@ransack_fallback, false)
+  end
+
+  def test_ransack_fallback_if_dimension_filter_is_not_found
+    FigureFactModel.use_ransack_for_unknown_dimension_filters
+    dimension_filters = FigureFactModel.find_dimension_filter(:ransack_filter)
+    assert_equal dimension_filters.name, :ransack_filter
+    assert_equal dimension_filters.type, :ransack
+  ensure
+    FigureFactModel.instance_variable_set(:@ransack_fallback, false)
+  end
 end
