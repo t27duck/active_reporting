@@ -6,7 +6,7 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
     assert_equal :standard, subject.type
 
     subject = ActiveReporting::Dimension.new(FigureFactModel, name: :kind)
-    assert_equal :degenerate, subject.type
+    assert_equal ActiveReporting::Dimension::TYPES[:degenerate], subject.type
 
     subject = ActiveReporting::Dimension.new(ReleaseDateFactModel, name: :released_on)
     assert_equal :standard, subject.type

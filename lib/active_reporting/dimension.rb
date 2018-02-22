@@ -1,5 +1,7 @@
 module ActiveReporting
   class Dimension
+    TYPES = { degenerate: :degenerate,
+              standard: :standard }.freeze
     attr_reader :name
 
     # @param model [ActiveRecord::Base]
@@ -19,12 +21,23 @@ module ActiveReporting
     # @return [Symbol]
     def type
       @type ||= if model.column_names.include?(@name)
-                  :degenerate
+                  TYPES[:degenerate]
                 elsif association
-                  :standard
+                  TYPES[:standard]
                 else
                   raise UnknownDimension, "Dimension '#{@name}' not found on fact model '#{@fact_model}'"
                 end
+    end
+
+    # Whether the dimension is a datetime column
+    #
+    # @return [Boolean]
+    def datetime?
+      @datetime ||= if type == TYPES[:degenerate]
+                      model.column_for_attribute(@name).type == :datetime
+                    else
+                      false
+                    end
     end
 
     # Tells if the dimension is hierarchical
