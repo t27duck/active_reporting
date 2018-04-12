@@ -12,7 +12,7 @@ require 'active_reporting/version'
 begin
   require 'ransack'
   ActiveReporting::Configuration.ransack_available = true
-rescue
+rescue LoadError, StandardError
   ActiveReporting::Configuration.ransack_available = false
 end
 
