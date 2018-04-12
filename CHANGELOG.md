@@ -1,3 +1,10 @@
+## 0.3.0 (Unrelased)
+
+### Bug Fixes
+
+* Specify rescue from LoadError for ransack (#9) *niborg*
+* Fix ransack fallback logic *germanotm*
+
 ## 0.2.0 (2017-06-17)
 
 ### Breaking Changes
