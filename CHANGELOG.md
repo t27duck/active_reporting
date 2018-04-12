@@ -5,6 +5,13 @@
 * Specify rescue from LoadError for ransack (#9) *niborg*
 * Fix ransack fallback logic *germanotm*
 
+## Misc
+
+* Test against Rails 5.2
+* Test against Ruby 2.5
+* Drop support for Rails 5.0 (EOL-ed)
+* Drop support for Ruby 2.2 (EOL-ed)
+
 ## 0.2.0 (2017-06-17)
 
 ### Breaking Changes

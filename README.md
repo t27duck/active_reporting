@@ -8,6 +8,10 @@ ActiveReporting implements various terminology used in Relational Online Analyti
 
 ActiveReporting officially supports MySQL, PostgreSQL, and SQLite.
 
+ActiveReporting officially supports Ruby 2.3, 2.4, and 2.5.
+
+ActiveReporting officially supports Rails 4.2, 5.1, and 5.2.
+
 ## Installation
 
 Add this line to your application's Gemfile:
