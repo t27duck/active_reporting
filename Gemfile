@@ -13,6 +13,9 @@ when '4-2'
   if ENV['DB'] == 'pg'
     gem 'pg', '~> 0.18'
   end
+  if ENV['DB'] == 'mysql'
+    gem 'mysql2', '~> 0.3.18'
+  end
 when '5-0'
   gem 'activerecord', '~> 5.0.0'
   if ENV['DB'] == 'pg'
