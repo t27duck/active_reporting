@@ -15,19 +15,20 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
     @user_profile_dimension                       = ActiveReporting::Dimension.new(UserFactModel, name: :profile)
     @user_fact_model_default_label                = UserFactModel.dimension_label
+    @user_dimension                               = ActiveReporting::Dimension.new(UserFactModel, name: :created_at)
   end
 
-  def test_forign_key_is_name_if_degenerate
+  def test_foreign_key_is_name_if_degenerate
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
     assert_equal 'kind', subject.foreign_key
   end
 
-  def test_forign_key_for_belongs_to_relation_if_standard
+  def test_foreign_key_for_belongs_to_relation_if_standard
     subject = ActiveReporting::ReportingDimension.new(@figure_series_dimension)
     assert_equal 'series_id', subject.foreign_key
   end
 
-  def test_forign_key_for_has_one_relation_if_standard
+  def test_foreign_key_for_has_one_relation_if_standard
     subject = ActiveReporting::ReportingDimension.new(@user_profile_dimension)
     assert_equal 'user_id', subject.foreign_key
   end
@@ -76,10 +77,30 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     end
   end
 
-  def test_label_can_only_be_passed_in_if_dimension_is_herarchical
-    refute @figure_series_dimension.type == :herarchical
+  def test_label_can_be_passed_in_if_dimension_is_herarchical
+    refute @figure_series_dimension.hierarchical?
     assert_raises ActiveReporting::InvalidDimensionLabel do
       ActiveReporting::ReportingDimension.new(@figure_series_dimension, label: :foo)
+    end
+  end
+
+  def test_label_can_be_passed_in_if_dimension_is_datetime
+    refute @user_dimension.hierarchical?
+    assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
+    if ENV['DB'] == 'pg'
+      ActiveReporting::ReportingDimension.new(@user_dimension, label: :year)
+    else
+      assert_raises ActiveReporting::InvalidDimensionLabel do
+        ActiveReporting::ReportingDimension.new(@user_dimension, label: :year)
+      end
+    end
+  end
+
+  def test_invalid_label_cannot_be_passed_in_if_dimension_is_datetime
+    refute @user_dimension.hierarchical?
+    assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
+    assert_raises ActiveReporting::InvalidDimensionLabel do
+      ActiveReporting::ReportingDimension.new(@user_dimension, label: :foo)
     end
   end
 

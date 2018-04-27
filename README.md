@@ -219,6 +219,24 @@ class PhoneFactModel < ActiveReporting::FactModel
 end
 ```
 
+### Implicit hierarchies with datetime columns (PostgreSQL support only)
+
+The fastest approach to group by certain date metrics is to create so-called "date dimensions". For
+those Postgres users that are restricted from organizing their data in this way, Postgres provides
+a way to group by `datetime` column data on the fly using the `date_trunc` function.
+
+To use, declare a datetime dimension on a fact model as normal:
+
+```ruby
+class UserFactModel < ActiveReporting::FactModel
+  dimension :created_at
+end
+```
+
+When creating a metric, ActiveReporting will recognize implicit hierarchies for this dimension. The hierarchies correspond to the [values](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC) supported by PostgreSQL. (See example under the metric section, below.)
+
+*NOTE*: PRs welcomed to support this functionality in other databases.
+
 ## Configuring Dimension Filters
 
 A dimension filter provides filtering for a report. In SQL-land, this is the `WHERE` clause.
@@ -275,6 +293,20 @@ my_metric = ActiveReporting::Metric.new(
 
 `order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. (Examples: `{author: :desc}`, `{sales_ref: :asc}`)
 
+For those using Postgres, you can take advantage of implicit hierarchies in `datetime` columns, as mentioned above:
+
+```ruby
+class UserFactModel < ActiveReporting::FactModel
+  dimension :created_at
+end
+
+my_metric = ActiveReporting::Metric.new(
+  :my_total,
+  fact_model: UserFactModel,
+  dimensions: [{ created_at: :quarter } ]
+)
+```
+
 ## ActiveReporting::Report
 
 A `Report` takes an `ActiveReporting::Metric` and ties everything together. It is responsible for building and executing the query to generate a result. The result is an simple array of hashing.
@@ -283,7 +315,7 @@ A `Report` takes an `ActiveReporting::Metric` and ties everything together. It i
 metric = ActiveReporting::Metric.new(
   :order_count,
   fact_model: OrderFactModel,
-  dimension: [:sales_rep],
+  dimensions: [:sales_rep],
   dimension_filter: {months_ago: 1}
 )
 
@@ -306,7 +338,7 @@ A `Report` may also take additional arguments to merge with the `Metric`'s infor
 metric = ActiveReporting::Metric.new(
   :order_count,
   fact_model: OrderFactModel,
-  dimension: [:sales_rep],
+  dimensions: [:sales_rep],
   dimension_filter: {months_ago: 1}
 )
 
@@ -335,6 +367,11 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+## Testing
+
+You can run the test suite using `rake test`. To test against a particular database, you'll need to set the
+appropriate `DB` environment variable, e.g. `DB=pg rake test`.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/active_reporting. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
@@ -343,4 +380,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-

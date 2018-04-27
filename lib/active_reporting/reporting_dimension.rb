@@ -2,7 +2,23 @@ require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
-    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?
+    SUPPORTED_DBS = %w[PostgreSQL PostGIS].freeze
+    # Values for the Postgres `date_trunc` method.
+    # See https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+    DATETIME_HIERARCHIES = %i[microseconds
+                              milliseconds
+                              second
+                              minute
+                              hour
+                              day
+                              week
+                              month
+                              quarter
+                              year
+                              decade
+                              century
+                              millennium].freeze
+    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
     def self.build_from_dimensions(fact_model, dimensions)
       Array(dimensions).map do |dim|
@@ -15,6 +31,8 @@ module ActiveReporting
       end
     end
 
+    # @param dimension [ActiveReporting::Dimension]
+    # @option label [Symbol] Hierarchical dimension to be used as a label
     def initialize(dimension, label: nil)
       @dimension = dimension
       determine_label(label)
@@ -31,7 +49,7 @@ module ActiveReporting
     #
     # @return [Array]
     def select_statement(with_identifier: true)
-      return [degenerate_fragment] if type == :degenerate
+      return [degenerate_select_fragment] if type == Dimension::TYPES[:degenerate]
 
       ss = ["#{label_fragment} AS #{name}"]
       ss << "#{identifier_fragment} AS #{name}_identifier" if with_identifier
@@ -42,7 +60,7 @@ module ActiveReporting
     #
     # @return [Array]
     def group_by_statement(with_identifier: true)
-      return [degenerate_fragment] if type == :degenerate
+      return [degenerate_fragment] if type == Dimension::TYPES[:degenerate]
 
       group = [label_fragment]
       group << identifier_fragment if with_identifier
@@ -55,7 +73,7 @@ module ActiveReporting
     def order_by_statement(direction:)
       direction = direction.to_s.upcase
       raise "Ording direction should be 'asc' or 'desc'" unless %w(ASC DESC).include?(direction)
-      return "#{degenerate_fragment} #{direction}" if type == :degenerate
+      return "#{degenerate_fragment} #{direction}" if type == Dimension::TYPES[:degenerate]
       "#{label_fragment} #{direction}"
     end
 
@@ -74,17 +92,53 @@ module ActiveReporting
     end
 
     def validate_hierarchical_label(hierarchical_label)
-      if !hierarchical?
-        raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"
-      end
-      unless dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
-        raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
+      validate_dimension_is_hierachical(hierarchical_label) unless datetime?
+      if datetime?
+        validate_supported_database_for_datetime_hierarchies
+        validate_against_datetime_hierarchies(hierarchical_label)
+        @datetime_hierarchical_label = true
+      else
+        validate_against_fact_model_properties(hierarchical_label)
       end
       true
     end
 
+    def validate_dimension_is_hierachical(hierarchical_label)
+      return if hierarchical?
+      raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"
+    end
+
+    def validate_supported_database_for_datetime_hierarchies
+      return if SUPPORTED_DBS.include?(model.connection.adapter_name)
+      raise InvalidDimensionLabel,
+            "Cannot utilize datetime grouping for #{name}; " \
+            "database #{model.connection.adapter_name} is not supported"
+    end
+
+    def validate_against_datetime_hierarchies(hierarchical_label)
+      return if DATETIME_HIERARCHIES.include?(hierarchical_label.to_sym)
+      raise InvalidDimensionLabel, "#{hierarchical_label} is not a valid datetime grouping label in #{name}"
+    end
+
+    def validate_against_fact_model_properties(hierarchical_label)
+      return if dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
+      raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
+    end
+
     def degenerate_fragment
-      "#{model.quoted_table_name}.#{name}"
+      if @datetime_hierarchical_label
+        "#{name}_#{@label}"
+      else
+        "#{model.quoted_table_name}.#{name}"
+      end
+    end
+
+    def degenerate_select_fragment
+      if @datetime_hierarchical_label
+        "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}"
+      else
+        "#{model.quoted_table_name}.#{name}"
+      end
     end
 
     def identifier_fragment
