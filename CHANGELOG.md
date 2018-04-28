@@ -1,9 +1,15 @@
+## 0.4.0 (Unreleased)
+
+### Features
+
+* Dimension off of `datetime` columns by date parts in PostgreSQL (#10) - *niborg*
+
 ## 0.3.0 (2018-04-12)
 
 ### Bug Fixes
 
-* Specify rescue from LoadError for ransack (#9) *niborg*
-* Fix ransack fallback logic *germanotm*
+* Specify rescue from LoadError for ransack (#9) - *niborg*
+* Fix ransack fallback logic (#8) - *germanotm*
 
 ## Misc
 
@@ -20,11 +26,11 @@
 
 ### Bug Fixes
 
-* `metric` lives on fact model and not metric (#3) - *Michael Wheeler (wheeyls)*
+* `metric` lives on fact model and not metric (#3) - *wheeyls*
 
 ### Misc
 
-* Readme corrections and updates (#2) - *Michael Wheeler (wheeyls)*
+* Readme corrections and updates (#2) - *wheeyls*
 
 ## 0.1.1 (2017-04-22)
 
