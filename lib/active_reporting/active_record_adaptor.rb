@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporting
   # This is included into every class that inherits from ActiveRecord::Base
   module ActiveRecordAdaptor
@@ -13,7 +15,7 @@ module ActiveReporting
                         const_name.constantize
                       rescue NameError
                         const = Object.const_set(const_name, Class.new(ActiveReporting::FactModel))
-                        const.model= self
+                        const.model = self
                         const
                       end
     end

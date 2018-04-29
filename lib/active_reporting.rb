@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 require 'active_reporting/active_record_adaptor'
 require 'active_reporting/configuration'
@@ -23,8 +25,8 @@ module ActiveReporting
     klass = Configuration.metric_lookup_class
     unless defined?(klass.constantize)
       raise BadMetricLookupClass,
-        "#{klass} not defined. Please define a class responsible for looking up a metric by name." +
-        " You may define your own class and set it with `ActiveReporting::Configuration.metric_lookup_class=`."
+            "#{klass} not defined. Please define a class responsible for looking up a metric by name." \
+            ' You may define your own class and set it with `ActiveReporting::Configuration.metric_lookup_class=`.'
     end
     unless klass.constantize.respond_to?(:lookup)
       raise BadMetricLookupClass, "#{klass} needs to define a class method called 'lookup'"

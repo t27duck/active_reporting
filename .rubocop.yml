@@ -1,7 +1,8 @@
 AllCops:
   Exclude:
     - test/**/*
-  TargetRubyVersion: 2.2
+    - Gemfile
+  TargetRubyVersion: 2.3
 
 Metrics/LineLength:
   Max: 120
@@ -18,7 +19,7 @@ Style/ClassAndModuleChildren:
 Style/Documentation:
   Enabled: false
 
-Style/PredicateName:
+Style/Name:
   Enabled: false
 
 Style/RaiseArgs:

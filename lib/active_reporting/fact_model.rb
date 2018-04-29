@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporting
   class FactModel
     class << self
@@ -109,7 +111,7 @@ module ActiveReporting
     # @param body [Lambda]
     def self.dimension_label_callback(column, body)
       @dimension_label_callbacks ||= {}
-      raise ArgumentError, "Dimension label callback body must be a callable object" unless body.respond_to?(:call)
+      raise ArgumentError, 'Dimension label callback body must be a callable object' unless body.respond_to?(:call)
       @dimension_label_callbacks[column.to_sym] = body
     end
 
@@ -143,7 +145,9 @@ module ActiveReporting
     # Invoke this method to make all dimension filters fallback to use ransack
     # if they are not defined as scopes on the model
     def self.use_ransack_for_unknown_dimension_filters
-      raise RansackNotAvailable, 'Ransack not available. Please include it in your Gemfile.' unless Configuration.ransack_available
+      unless Configuration.ransack_available
+        raise RansackNotAvailable, 'Ransack not available. Please include it in your Gemfile.'
+      end
       @ransack_fallback = true
     end
 

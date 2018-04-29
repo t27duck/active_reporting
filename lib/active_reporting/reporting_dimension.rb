@@ -1,32 +1,21 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
     SUPPORTED_DBS = %w[PostgreSQL PostGIS].freeze
     # Values for the Postgres `date_trunc` method.
-    # See https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-    DATETIME_HIERARCHIES = %i[microseconds
-                              milliseconds
-                              second
-                              minute
-                              hour
-                              day
-                              week
-                              month
-                              quarter
-                              year
-                              decade
-                              century
-                              millennium].freeze
+    # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+    DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
+                              century millennium].freeze
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
     def self.build_from_dimensions(fact_model, dimensions)
       Array(dimensions).map do |dim|
         dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
         found_dimension = fact_model.dimensions[dimension_name.to_sym]
-        if found_dimension.nil?
-          raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'"
-        end
+        raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'" if found_dimension.nil?
         new(found_dimension, label: label)
       end
     end
@@ -72,7 +61,7 @@ module ActiveReporting
     # @return [String]
     def order_by_statement(direction:)
       direction = direction.to_s.upcase
-      raise "Ording direction should be 'asc' or 'desc'" unless %w(ASC DESC).include?(direction)
+      raise "Ording direction should be 'asc' or 'desc'" unless %w[ASC DESC].include?(direction)
       return "#{degenerate_fragment} #{direction}" if type == Dimension::TYPES[:degenerate]
       "#{label_fragment} #{direction}"
     end

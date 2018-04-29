@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module ActiveReporting
   class Dimension
-    TYPES = { degenerate: :degenerate,
-              standard: :standard }.freeze
+    TYPES = { degenerate: :degenerate, standard: :standard }.freeze
     attr_reader :name
 
     # @param model [ActiveRecord::Base]
@@ -33,11 +34,7 @@ module ActiveReporting
     #
     # @return [Boolean]
     def datetime?
-      @datetime ||= if type == TYPES[:degenerate]
-                      model.column_for_attribute(@name).type == :datetime
-                    else
-                      false
-                    end
+      @datetime ||= type == TYPES[:degenerate] && model.column_for_attribute(@name).type == :datetime
     end
 
     # Tells if the dimension is hierarchical
@@ -66,7 +63,7 @@ module ActiveReporting
     #
     # @return [ActiveRecord::Reflection]
     def association
-      @association_info ||= model.reflect_on_association(@name)
+      @association ||= model.reflect_on_association(@name)
     end
   end
 end

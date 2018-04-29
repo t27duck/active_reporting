@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ActiveReporting
   class DimensionFilter
     attr_reader :name, :type, :body

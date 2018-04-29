@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'forwardable'
 module ActiveReporting
-  AGGREGATES = %i(count sum max min avg).freeze
+  AGGREGATES = %i[count sum max min avg].freeze
 
   class Metric
     extend Forwardable
