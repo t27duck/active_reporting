@@ -76,17 +76,19 @@ module ActiveReporting
     private ####################################################################
 
     def determine_label(label)
-      @label = label.to_sym if label.present? && validate_hierarchical_label(label)
-      @label ||= dimension_fact_model.dimension_label || Configuration.default_dimension_label
+      @label = if label.present? && validate_hierarchical_label(label)
+                 label.to_sym
+               else
+                 dimension_fact_model.dimension_label || Configuration.default_dimension_label
+               end
     end
 
     def validate_hierarchical_label(hierarchical_label)
-      validate_dimension_is_hierachical(hierarchical_label) unless datetime?
       if datetime?
         validate_supported_database_for_datetime_hierarchies
         validate_against_datetime_hierarchies(hierarchical_label)
-        @datetime_hierarchical_label = true
       else
+        validate_dimension_is_hierachical(hierarchical_label)
         validate_against_fact_model_properties(hierarchical_label)
       end
       true
@@ -115,19 +117,13 @@ module ActiveReporting
     end
 
     def degenerate_fragment
-      if @datetime_hierarchical_label
-        "#{name}_#{@label}"
-      else
-        "#{model.quoted_table_name}.#{name}"
-      end
+      return "#{name}_#{@label}" if datetime?
+      "#{model.quoted_table_name}.#{name}"
     end
 
     def degenerate_select_fragment
-      if @datetime_hierarchical_label
-        "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}"
-      else
-        "#{model.quoted_table_name}.#{name}"
-      end
+      return "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}" if datetime?
+      "#{model.quoted_table_name}.#{name}"
     end
 
     def identifier_fragment
