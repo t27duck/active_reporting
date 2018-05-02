@@ -1,8 +1,12 @@
-## 0.4.0 (Unreleased)
+## 0.4.0 (2018-05-02)
+
+### Breaking Changes
+
+* Gemspec now requires Ruby 2.3 and later to install
 
 ### Features
 
-* Dimension off of `datetime` columns by date parts in PostgreSQL (#10) - *niborg*
+* Dimension off of `datetime` columns by date parts in PostgreSQL (See README for details) (#10) - *niborg*
 
 ## 0.3.0 (2018-04-12)
 
