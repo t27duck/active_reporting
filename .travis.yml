@@ -7,6 +7,7 @@ rvm:
 env:
   - RAILS=5-2 DB=sqlite
   - RAILS=5-2 DB=pg
+  - RAILS=5-2 DB=mysql
   - RAILS=5-1 DB=sqlite
   - RAILS=5-1 DB=pg
   - RAILS=5-1 DB=mysql
