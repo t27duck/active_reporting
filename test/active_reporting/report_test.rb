@@ -32,6 +32,33 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert data.all? { |r| r.key?('a_metric') }
   end
 
+  def test_report_runs_aggregate_with_expression
+    metric = ActiveReporting::Metric.new(
+      :a_metric,
+      fact_model: FigureFactModel,
+      dimensions: [:kind],
+      aggregate: { count: :kind_is_card }
+    )
+    report = ActiveReporting::Report.new(metric)
+    data = report.run
+    data.reject { |d| d['kind'] == 'amiibo card' }.each do |d|
+      assert d['a_metric'].zero?
+    end
+    assert(data.find { |d| d['kind'] == 'amiibo card' }['a_metric'] == 552)
+  end
+
+  def test_report_count_is_zero_with_aggregate_expression
+    metric = ActiveReporting::Metric.new(
+      :a_metric,
+      fact_model: FigureFactModel,
+      dimensions: [:kind],
+      aggregate: { count: :kind_is_foo }
+    )
+    report = ActiveReporting::Report.new(metric)
+    data = report.run
+    assert data.all? { |r| r['a_metric'].zero? }
+  end
+
   def test_report_runs_with_a_date_grouping
     if ENV['DB'] == 'pg'
       metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
@@ -45,5 +72,20 @@ class ActiveReporting::ReportTest < Minitest::Test
         report = ActiveReporting::Report.new(metric)
       end
     end
+  end
+
+  def test_report_sum_is_520_x_20_with_aggregate_expression
+    metric = ActiveReporting::Metric.new(
+      :a_metric,
+      fact_model: FigureFactModel,
+      dimensions: [:kind],
+      aggregate: { sum: :return_20_when_card }
+    )
+    report = ActiveReporting::Report.new(metric)
+    data = report.run
+    data.reject { |d| d['kind'] == 'amiibo card' }.each do |d|
+      assert d['a_metric'].zero?
+    end
+    assert(data.find { |d| d['kind'] == 'amiibo card' }['a_metric'] == 552 * 20)
   end
 end

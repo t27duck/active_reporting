@@ -34,11 +34,12 @@ module ActiveReporting
     klass.constantize.lookup(name)
   end
 
-  BadMetricLookupClass    = Class.new(StandardError)
-  InvalidDimensionLabel   = Class.new(StandardError)
-  RansackNotAvailable     = Class.new(StandardError)
-  UnknownAggregate        = Class.new(StandardError)
-  UnknownDimension        = Class.new(StandardError)
-  UnknownDimensionFilter  = Class.new(StandardError)
-  UnknownMetric           = Class.new(StandardError)
+  BadMetricLookupClass       = Class.new(StandardError)
+  InvalidDimensionLabel      = Class.new(StandardError)
+  RansackNotAvailable        = Class.new(StandardError)
+  UnknownAggregate           = Class.new(StandardError)
+  UnknownAggregateExpression = Class.new(StandardError)
+  UnknownDimension           = Class.new(StandardError)
+  UnknownDimensionFilter     = Class.new(StandardError)
+  UnknownMetric              = Class.new(StandardError)
 end
