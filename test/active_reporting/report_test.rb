@@ -42,7 +42,7 @@ class ActiveReporting::ReportTest < Minitest::Test
     report = ActiveReporting::Report.new(metric)
     data = report.run
     data.reject { |d| d['kind'] == 'amiibo card' }.each do |d|
-      assert d['a_metric'].zero?
+      assert d['a_metric'].to_i == 0
     end
     assert(data.find { |d| d['kind'] == 'amiibo card' }['a_metric'] == 552)
   end
@@ -56,7 +56,7 @@ class ActiveReporting::ReportTest < Minitest::Test
     )
     report = ActiveReporting::Report.new(metric)
     data = report.run
-    assert data.all? { |r| r['a_metric'].zero? }
+    assert data.all? { |r| r['a_metric'].to_i == 0 }
   end
 
   def test_report_runs_with_a_date_grouping
@@ -84,7 +84,7 @@ class ActiveReporting::ReportTest < Minitest::Test
     report = ActiveReporting::Report.new(metric)
     data = report.run
     data.reject { |d| d['kind'] == 'amiibo card' }.each do |d|
-      assert d['a_metric'].zero?
+      assert d['a_metric'].to_i == 0
     end
     assert(data.find { |d| d['kind'] == 'amiibo card' }['a_metric'] == 552 * 20)
   end
