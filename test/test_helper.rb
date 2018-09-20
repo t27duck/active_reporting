@@ -25,6 +25,8 @@ when 'mysql'
   ActiveRecord::Base.establish_connection(
     adapter:  'mysql2',
     database: 'active_reporting_test',
+    username: 'Nick',
+    password: 'password',
     encoding: 'utf8'
   )
 when 'sqlite'

@@ -33,12 +33,28 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_report_runs_with_a_date_grouping
-    if ENV['DB'] == 'pg'
-      metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
-      report = ActiveReporting::Report.new(metric)
-      data = report.run
-      assert data.all? { |r| r.key?('created_at_month') }
-      assert data.size == 5
+    db = ENV['DB']
+    if db == 'pg' || db == 'mysql'
+      function_adapter = if db == 'pg'
+                           ActiveReporting::FunctionAdapters::Postgresql
+                         else
+                           ActiveReporting::FunctionAdapters::Mysql
+                         end
+      function_adapter.datetime_precision_values.each do |precision_value|
+        metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: precision_value}])
+        report = ActiveReporting::Report.new(metric)
+        data = report.run
+        assert data.all? { |r| r.key?("created_at_#{precision_value}") }
+        expected_size = case precision_value
+                        when :quarter
+                          2
+                        when :year, :decade, :centry, :millenium
+                          1
+                        else
+                          5
+                        end
+        data.size == expected_size
+      end
     else
       assert_raises ActiveReporting::InvalidDimensionLabel do
         metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
