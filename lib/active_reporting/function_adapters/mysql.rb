@@ -49,6 +49,12 @@ module ActiveReporting
             RETURNS datetime(6)
             DETERMINISTIC
             BEGIN
+              -- Short-circut in the week, month, or year, since those computations are straightforward
+              IF field IN ('week') THEN RETURN STR_TO_DATE(CONCAT(YEARWEEK(source, 2), ' Sunday'), '%X%V %W'); END IF;
+              IF field IN ('month') THEN RETURN DATE_FORMAT(source, '%Y-%m-01'); END IF;
+              IF field IN ('year') THEN RETURN DATE_FORMAT(source, '%Y-01-01'); END IF;
+
+              -- Otherwise, we need to build the appropriate result
               IF field IN ('millisecond') THEN SET source = source - INTERVAL MICROSECOND(source) % 1000 MICROSECOND; END IF;
               IF field NOT IN ('microsecond', 'millisecond') THEN SET source = source - INTERVAL MICROSECOND(source) MICROSECOND; END IF;
               IF field NOT IN ('microsecond', 'millisecond', 'second') THEN SET source = source - INTERVAL SECOND(source) SECOND; END IF;

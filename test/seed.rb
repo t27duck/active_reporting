@@ -3,13 +3,9 @@
 end
 
 (1..5).each do |i|
-  user = User.create!(
-    created_at: Time.now - i.months,
-    username: "user_#{i}"
-  )
+  user = User.create!(username: "user_#{i}")
 
   Profile.create!(
-    created_at: Time.now - i.months,
     user: user,
     favorite_pokemon: 'Pikachu'
   )
