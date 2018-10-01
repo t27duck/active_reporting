@@ -28,7 +28,11 @@ module ActiveReporting
       #
       def self.date_truncate(datetime_precision_value, quoted_table_name, column_name)
         create_date_trunc_function unless date_trunc_function_exists?
-        "ACTIVE_REPORTING_DATE_TRUNC('#{datetime_precision_value}', #{quoted_table_name}.#{column_name})"
+        _active_reporting_date_trunc(datetime_precision_value, "#{quoted_table_name}.#{column_name}")
+      end
+
+      def self._active_reporting_date_trunc(datetime_precision_value, value)
+        "ACTIVE_REPORTING_DATE_TRUNC('#{datetime_precision_value}', #{value})"
       end
 
       def self.date_trunc_function_exists?
@@ -50,7 +54,7 @@ module ActiveReporting
             DETERMINISTIC
             BEGIN
               -- Short-circuit in the week, month, or year, since those computations are straightforward
-              IF field IN ('week') THEN RETURN STR_TO_DATE(CONCAT(YEARWEEK(source, 2), ' Sunday'), '%X%V %W'); END IF;
+              IF field IN ('week') THEN RETURN STR_TO_DATE(CONCAT(YEARWEEK(source, 2), ' Monday'), '%X%V %W'); END IF;
               IF field IN ('month') THEN RETURN DATE_FORMAT(source, '%Y-%m-01'); END IF;
               IF field IN ('year') THEN RETURN DATE_FORMAT(source, '%Y-01-01'); END IF;
 
