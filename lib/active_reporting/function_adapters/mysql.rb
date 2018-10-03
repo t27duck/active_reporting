@@ -54,7 +54,7 @@ module ActiveReporting
             DETERMINISTIC
             BEGIN
               -- Short-circuit in the week, month, or year, since those computations are straightforward
-              IF field IN ('week') THEN RETURN STR_TO_DATE(CONCAT(YEARWEEK(source, 2), ' Monday'), '%X%V %W'); END IF;
+              IF field IN ('week') THEN RETURN STR_TO_DATE(CONCAT(YEARWEEK(source, 5), ' Monday'), '%x%v %W'); END IF;
               IF field IN ('month') THEN RETURN DATE_FORMAT(source, '%Y-%m-01'); END IF;
               IF field IN ('year') THEN RETURN DATE_FORMAT(source, '%Y-01-01'); END IF;
 
