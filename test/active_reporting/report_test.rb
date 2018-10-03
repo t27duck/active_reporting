@@ -6,6 +6,24 @@ class ActiveReporting::ReportTest < Minitest::Test
     @report = ActiveReporting::Report.new(@metric)
   end
 
+  def users_created_in_different_testable_time_periods
+    t = User.last.created_at # Existing seed users a good reference point
+    users = [User.create(username: 'user_minute', created_at: t - 1.minute)]
+    users << User.create(username: 'user_hour', created_at: t - 1.hour)
+    users << User.create(username: 'user_day', created_at: t - 1.day)
+    users << User.create(username: 'user_week', created_at: t - 1.week)
+    users << User.create(username: 'user_month', created_at: t - 1.month)
+    users << User.create(username: 'user_quarter', created_at: t - 3.months)
+    users << User.create(username: 'user_year', created_at: t - 1.year)
+    users << User.create(username: 'user_decade', created_at: t - 10.years)
+    users << User.create(username: 'user_century', created_at: t - 100.years)
+    users << User.create(username: 'user_millennium', created_at: t - 1000.years)
+  end
+
+  def datetime_testable_periods
+    %i[minute hour day week month quarter year decade century millennium]
+  end
+
   def test_run_returns_an_array
     assert @report.run.is_a?(Array), 'result is not an array'
   end
@@ -33,12 +51,24 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_report_runs_with_a_date_grouping
-    if ENV['DB'] == 'pg'
-      metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
-      report = ActiveReporting::Report.new(metric)
-      data = report.run
-      assert data.all? { |r| r.key?('created_at_month') }
-      assert data.size == 5
+    if %w[pg mysql].include?(ENV['DB'])
+      users = users_created_in_different_testable_time_periods
+      # Based on the 5 users created in seed.rb and the 10 just created,
+      # we can expect 11 different data segments when dimensioning by minute.
+      expected_result_size_when_dimensioning_by_minute = 11
+      datetime_testable_periods.each_with_index do |period, i|
+        metric = ActiveReporting::Metric.new(
+          :a_metric,
+          fact_model: UserFactModel,
+          dimensions: [{created_at: period}]
+        )
+        report = ActiveReporting::Report.new(metric)
+        data = report.run
+        assert data.all? { |r| r.key?("created_at_#{period}") }
+        # As we expand the time period dimension, we can expect one less result
+        assert data.size == expected_result_size_when_dimensioning_by_minute - i
+      end
+      users.each(&:destroy!) # Cleanup
     else
       assert_raises ActiveReporting::InvalidDimensionLabel do
         metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])

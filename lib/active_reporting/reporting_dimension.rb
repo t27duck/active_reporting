@@ -1,14 +1,10 @@
 # frozen_string_literal: true
 
 require 'forwardable'
+require 'active_reporting/function_adapters/mappings'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
-    SUPPORTED_DBS = %w[PostgreSQL PostGIS].freeze
-    # Values for the Postgres `date_trunc` method.
-    # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-    DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
-                              century millennium].freeze
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
     def self.build_from_dimensions(fact_model, dimensions)
@@ -100,14 +96,14 @@ module ActiveReporting
     end
 
     def validate_supported_database_for_datetime_hierarchies
-      return if SUPPORTED_DBS.include?(model.connection.adapter_name)
+      return if function_adapter_supported?
       raise InvalidDimensionLabel,
             "Cannot utilize datetime grouping for #{name}; " \
             "database #{model.connection.adapter_name} is not supported"
     end
 
     def validate_against_datetime_hierarchies(hierarchical_label)
-      return if DATETIME_HIERARCHIES.include?(hierarchical_label.to_sym)
+      return if function_adapter.valid_datetime_precision_value?(hierarchical_label.to_sym)
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a valid datetime grouping label in #{name}"
     end
 
@@ -122,8 +118,11 @@ module ActiveReporting
     end
 
     def degenerate_select_fragment
-      return "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}" if datetime?
-      "#{model.quoted_table_name}.#{name}"
+      if datetime?
+        "#{function_adapter.date_truncate(@label, model.quoted_table_name, name)} AS #{name}_#{@label}"
+      else
+        "#{model.quoted_table_name}.#{name}"
+      end
     end
 
     def identifier_fragment
@@ -136,6 +135,14 @@ module ActiveReporting
 
     def dimension_fact_model
       @dimension_fact_model ||= klass.fact_model
+    end
+
+    def function_adapter
+      @function_adapter ||= FunctionAdapters::MAPPINGS[model.connection.adapter_name]
+    end
+
+    def function_adapter_supported?
+      function_adapter.present?
     end
   end
 end
