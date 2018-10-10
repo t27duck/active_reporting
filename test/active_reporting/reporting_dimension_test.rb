@@ -10,6 +10,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
     @release_date_released_on_dimension           = ActiveReporting::Dimension.new(ReleaseDateFactModel, name: :released_on)
 
+    @game_platform_dimension                      = ActiveReporting::Dimension.new(GameFactModel, name: :platform)
     @game_compatability_platform_dimension        = ActiveReporting::Dimension.new(GameCompatabilityFactModel, name: :platform)
     @game_compatability_fact_model_default_label  = GameCompatabilityFactModel.dimension_label
 
@@ -36,6 +37,24 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
   def test_select_statement_is_just_column_if_degenerate
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
     assert_equal ["#{Figure.quoted_table_name}.kind"], subject.select_statement
+  end
+
+  def test_select_statement_can_have_custom_label_name_if_standard
+    custom_label_name = 'custom_label_name'
+    build_label_name = "platform_#{custom_label_name}"
+    subject = ActiveReporting::ReportingDimension.new(
+      @game_platform_dimension,
+      label: :name,
+      label_name: custom_label_name
+    )
+    expected = [
+      "#{Platform.quoted_table_name}.#{PlatformFactModel.dimension_label} AS #{build_label_name}",
+      "#{Platform.quoted_table_name}.#{Platform.primary_key} AS platform_identifier"
+    ]
+    assert_equal expected, subject.select_statement
+
+    expected = ["#{Platform.quoted_table_name}.#{PlatformFactModel.dimension_label} AS #{build_label_name}"]
+    assert_equal expected, subject.select_statement(with_identifier: false)
   end
 
   def test_select_statement_can_include_identifier_if_standard
