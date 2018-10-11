@@ -4,11 +4,6 @@ require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
-    SUPPORTED_DBS = %w[PostgreSQL PostGIS].freeze
-    # Values for the Postgres `date_trunc` method.
-    # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-    DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
-                              century millennium].freeze
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
     def self.build_from_dimensions(fact_model, dimensions)
@@ -108,7 +103,6 @@ module ActiveReporting
 
     def validate_hierarchical_label(hierarchical_label)
       if datetime?
-        validate_supported_database_for_datetime_hierarchies
         validate_against_datetime_hierarchies(hierarchical_label)
       else
         validate_dimension_is_hierachical(hierarchical_label)
@@ -119,34 +113,35 @@ module ActiveReporting
 
     def validate_dimension_is_hierachical(hierarchical_label)
       return if hierarchical?
+
       raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"
     end
 
-    def validate_supported_database_for_datetime_hierarchies
-      return if SUPPORTED_DBS.include?(model.connection.adapter_name)
-      raise InvalidDimensionLabel,
-            "Cannot utilize datetime grouping for #{name}; " \
-            "database #{model.connection.adapter_name} is not supported"
-    end
-
     def validate_against_datetime_hierarchies(hierarchical_label)
-      return if DATETIME_HIERARCHIES.include?(hierarchical_label.to_sym)
+      return if Configuration.db_adapter.allowed_datetime_hierarchy?(hierarchical_label)
+
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a valid datetime grouping label in #{name}"
     end
 
     def validate_against_fact_model_properties(hierarchical_label)
       return if dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
+
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
     end
 
     def degenerate_fragment
       return "#{name}_#{@label}" if datetime?
+
       "#{model.quoted_table_name}.#{name}"
     end
 
     def degenerate_select_fragment
-      return "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}" if datetime?
-      "#{model.quoted_table_name}.#{name}"
+      return "#{model.quoted_table_name}.#{name}" unless datetime?
+
+      date_trunc = Configuration.db_adapter.date_trunc(
+        @label, "#{model.quoted_table_name}.#{name}"
+      )
+      "#{date_trunc} AS #{name}_#{@label}"
     end
 
     def identifier_fragment

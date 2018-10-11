@@ -45,6 +45,7 @@ end
 class SaleFactModel < ActiveReporting::FactModel
   self.measure= :total
 
+  dimension :created_at
   dimension :placed_at
   dimension :item
 end

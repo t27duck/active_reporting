@@ -12,6 +12,7 @@ require 'minitest/autorun'
 require 'minitest/pride'
 
 db = ENV['DB'] || 'sqlite'
+db_user = ENV['DB_USER']
 case db
 when 'pg'
   ActiveRecord::Base.establish_connection(
@@ -21,12 +22,15 @@ when 'pg'
     # password: 'postgres', # Uncomment if you need this
     min_messages: 'warning'
   )
+  ActiveReporting::Configuration.db_adapter = :postgresql
 when 'mysql'
   ActiveRecord::Base.establish_connection(
     adapter:  'mysql2',
     database: 'active_reporting_test',
-    encoding: 'utf8'
+    encoding: 'utf8',
+    username: db_user
   )
+  ActiveReporting::Configuration.db_adapter = :mysql2
 when 'sqlite'
   ActiveRecord::Base.establish_connection(
     adapter: 'sqlite3',
@@ -34,6 +38,11 @@ when 'sqlite'
   )
 else
   raise "Unknown ENV['DB']: '#{db}'"
+end
+
+# Check in spec if it's a valid adapter
+def valid_db_adapter?
+  ENV['DB'] == 'pg' || ENV['DB'] == 'mysql'
 end
 
 require 'schema'

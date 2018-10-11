@@ -23,6 +23,7 @@ end
     base_price: base,
     taxes: tax,
     total: base + tax,
+    created_at: Time.now - i.days,
     placed_at: DateDimension.find("201603#{(rand(30)+1).to_s.rjust(2, '0')}")
   )
 end
