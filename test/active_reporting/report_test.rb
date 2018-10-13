@@ -1,4 +1,5 @@
 require 'test_helper'
+
 class ActiveReporting::ReportTest < Minitest::Test
   def setup
     @metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])

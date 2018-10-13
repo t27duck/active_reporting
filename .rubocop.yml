@@ -4,6 +4,9 @@ AllCops:
     - Gemfile
   TargetRubyVersion: 2.3
 
+Metrics/ClassLength:
+  Max: 150
+
 Metrics/LineLength:
   Max: 120
 

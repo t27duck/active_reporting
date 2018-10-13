@@ -11,36 +11,29 @@ module ActiveReporting
                               century millennium].freeze
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
-    class << self
-      def build_from_dimensions(fact_model, dimensions)
-        Array(dimensions).map do |dim|
-          dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
-          found_dimension = fact_model.dimensions[dimension_name.to_sym]
+    def self.build_from_dimensions(fact_model, dimensions)
+      Array(dimensions).map do |dim|
+        dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
+        found_dimension = fact_model.dimensions[dimension_name.to_sym]
 
-          if found_dimension.nil?
-            raise(
-              UnknownDimension,
-              "Dimension '#{dim}' not found on fact model '#{fact_model}'"
-            )
-          end
+        raise(UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'") if found_dimension.nil?
 
-          new(found_dimension, label_config(label))
-        end
+        new(found_dimension, label_config(label))
       end
+    end
 
-      # If you pass a symbol it means you just indicate
-      # the field on that dimension. With a hash you can
-      # customize the name of the label
-      #
-      # @param [Symbol|Hash] label
-      def label_config(label)
-        return { label: label } unless label.is_a?(Hash)
+    # If you pass a symbol it means you just indicate
+    # the field on that dimension. With a hash you can
+    # customize the name of the label
+    #
+    # @param [Symbol|Hash] label
+    def self.label_config(label)
+      return { label: label } unless label.is_a?(Hash)
 
-        {
-          label: label[:field],
-          label_name: label[:name]
-        }
-      end
+      {
+        label: label[:field],
+        label_name: label[:name]
+      }
     end
 
     # @param dimension [ActiveReporting::Dimension]
