@@ -285,7 +285,7 @@ my_metric = ActiveReporting::Metric.new(
 
 `aggregate` - The SQL aggregate used to calculate the metric. Supported aggregates include count, max, min, avg, and sum. (Default: `:count`)
 
-`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {order_date: :month}]`)
+`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {order_date: :month}]`). In hierarchies you can customize the label in this way: `[{order_date: { label: :month, name: :a_custom_name_for_month }}]`. If you use a hash instead of a Symbol to define a hierarchy the `label` item must be a valid field in your table. The `name` can be whatever you want.
 
 `dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
 
@@ -342,7 +342,7 @@ metric = ActiveReporting::Metric.new(
   dimension_filter: {months_ago: 1}
 )
 
-report = ActiveReporting.new(metric, dimension_filter: {from_region: 'North'}, dimension_identifiers: false)
+report = ActiveReporting::Report.new(metric, dimension_filter: {from_region: 'North'}, dimension_identifiers: false)
 report.run
 => [{order_count: 17, sales_rep: 'Mary Sue'}]
 ```

@@ -11,20 +11,46 @@ module ActiveReporting
                               century millennium].freeze
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
-    def self.build_from_dimensions(fact_model, dimensions)
-      Array(dimensions).map do |dim|
-        dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
-        found_dimension = fact_model.dimensions[dimension_name.to_sym]
-        raise UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'" if found_dimension.nil?
-        new(found_dimension, label: label)
+    class << self
+      def build_from_dimensions(fact_model, dimensions)
+        Array(dimensions).map do |dim|
+          dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
+          found_dimension = fact_model.dimensions[dimension_name.to_sym]
+
+          if found_dimension.nil?
+            raise(
+              UnknownDimension,
+              "Dimension '#{dim}' not found on fact model '#{fact_model}'"
+            )
+          end
+
+          new(found_dimension, label_config(label))
+        end
+      end
+
+      # If you pass a symbol it means you just indicate
+      # the field on that dimension. With a hash you can
+      # customize the name of the label
+      #
+      # @param [Symbol|Hash] label
+      def label_config(label)
+        return { label: label } unless label.is_a?(Hash)
+
+        {
+          label: label[:field],
+          label_name: label[:name]
+        }
       end
     end
 
     # @param dimension [ActiveReporting::Dimension]
-    # @option label [Symbol] Hierarchical dimension to be used as a label
-    def initialize(dimension, label: nil)
+    # @option label [Maybe<Symbol>] Hierarchical dimension to be used as a label
+    # @option label_name [Maybe<Symbol|String>] Hierarchical dimension custom name
+    def initialize(dimension, label: nil, label_name: nil)
       @dimension = dimension
-      determine_label(label)
+
+      determine_label_field(label)
+      determine_label_name(label_name)
     end
 
     # The foreign key to use in queries
@@ -40,7 +66,7 @@ module ActiveReporting
     def select_statement(with_identifier: true)
       return [degenerate_select_fragment] if type == Dimension::TYPES[:degenerate]
 
-      ss = ["#{label_fragment} AS #{name}"]
+      ss = ["#{label_fragment} AS #{@label_name}"]
       ss << "#{identifier_fragment} AS #{name}_identifier" if with_identifier
       ss
     end
@@ -75,12 +101,16 @@ module ActiveReporting
 
     private ####################################################################
 
-    def determine_label(label)
-      @label = if label.present? && validate_hierarchical_label(label)
-                 label.to_sym
+    def determine_label_field(label_field)
+      @label = if label_field.present? && validate_hierarchical_label(label_field)
+                 label_field.to_sym
                else
                  dimension_fact_model.dimension_label || Configuration.default_dimension_label
                end
+    end
+
+    def determine_label_name(label_name)
+      @label_name = label_name ? "#{name}_#{label_name}" : name
     end
 
     def validate_hierarchical_label(hierarchical_label)
