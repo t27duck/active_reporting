@@ -1,3 +1,9 @@
+## 0.4.1 (Unreleased)
+
+### Features
+
+* Hierarchical dimensions may now have custom keys in result (#16) - *andresgutgon*
+
 ## 0.4.0 (2018-05-02)
 
 ### Breaking Changes
