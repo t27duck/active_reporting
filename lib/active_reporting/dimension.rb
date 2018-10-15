@@ -3,6 +3,7 @@
 module ActiveReporting
   class Dimension
     TYPES = { degenerate: :degenerate, standard: :standard }.freeze
+    TIME_COLUMN_TYPES = %i[datetime date].freeze
     attr_reader :name
 
     # @param model [ActiveRecord::Base]
@@ -30,11 +31,13 @@ module ActiveReporting
                 end
     end
 
-    # Whether the dimension is a datetime column
+    # Whether the dimension is a datetime or date column
     #
     # @return [Boolean]
     def datetime?
-      @datetime ||= type == TYPES[:degenerate] && model.column_for_attribute(@name).type == :datetime
+      @datetime ||= type == TYPES[:degenerate] && TIME_COLUMN_TYPES.include?(
+        model.column_for_attribute(@name).type
+      )
     end
 
     # Tells if the dimension is hierarchical
