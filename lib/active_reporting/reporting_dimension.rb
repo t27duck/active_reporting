@@ -26,7 +26,7 @@ module ActiveReporting
       return { label: label } unless label.is_a?(Hash)
 
       {
-        label: label[:field],
+        label: label[:label],
         label_name: label[:name]
       }
     end
