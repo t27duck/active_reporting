@@ -30,7 +30,7 @@ Or install it yourself as:
 
 ## What is "Reporting"?
 
-Reporting is the collection and presentation data so that it can be analyzed. Our databases only store one thing: data. Data is great for computers but mostly worthless to humans. What ActiveReoprting does is turn that *data* into *information* to help humans make decisions.
+Reporting is the collection and presentation data so that it can be analyzed. Our databases only store one thing: data. Data is great for computers but mostly worthless to humans. What ActiveReporting does is turn that *data* into *information* to help humans make decisions.
 
 ## Terminology
 
