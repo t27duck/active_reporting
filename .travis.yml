@@ -4,6 +4,7 @@ rvm:
   - 2.3.8
   - 2.4.6
   - 2.5.5
+  - 2.6.3
 env:
   - RAILS=5-2 DB=sqlite
   - RAILS=5-2 DB=pg
@@ -14,6 +15,9 @@ env:
   - RAILS=4-2 DB=sqlite
   - RAILS=4-2 DB=pg
   - RAILS=4-2 DB=mysql
+  - RAILS=4-1 DB=sqlite
+  - RAILS=4-1 DB=pg
+  - RAILS=4-1 DB=mysql
 before_script:
   - psql -c 'create database active_reporting_test;' -U postgres
   - mysql -e 'create database active_reporting_test collate utf8_general_ci;'
