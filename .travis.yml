@@ -5,6 +5,9 @@ rvm:
   - 2.5.5
   - 2.6.3
 env:
+  - RAILS=6-0 DB=sqlite
+  - RAILS=6-0 DB=pg
+  - RAILS=6-0 DB=mysql
   - RAILS=5-2 DB=sqlite
   - RAILS=5-2 DB=pg
   - RAILS=5-2 DB=mysql
