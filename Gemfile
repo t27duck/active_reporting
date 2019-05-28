@@ -19,7 +19,7 @@ when '5-2'
 end
 
 case rails
-when '4-2' || '4-1'
+when '4-2'
   case ENV['DB']
   when 'pg'
     gem 'pg', '~> 0.18'
@@ -28,4 +28,14 @@ when '4-2' || '4-1'
   when 'sqlite'
     gem 'sqlite3', '~> 1.3.0'
   end
+when '4-1'
+  case ENV['DB']
+  when 'pg'
+    gem 'pg', '0.11.0'
+  when 'mysql'
+    gem 'mysql2', '0.3.13'
+  when 'sqlite'
+    gem 'sqlite3', '1.3.6'
+  end
+
 end
