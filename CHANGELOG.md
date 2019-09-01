@@ -2,6 +2,7 @@
 
 ### Misc
 
+* Test against Rails 6.0 final
 * Fixed deprecated call to `to_hash` - *joshforbes*
 * Corrected readme entry for `dimesions` option for `ActiveReporting::Metric` - *joshforbes*
 
