@@ -1,3 +1,10 @@
+## 0.4.2 (Unreleased)
+
+### Misc
+
+* Fixed deprecated call to `to_hash` - *joshforbes*
+* Corrected readme entry for `dimesions` option for `ActiveReporting::Metric` - *joshforbes*
+
 ## 0.4.1 (2019-05-28)
 
 ### Features
