@@ -36,7 +36,7 @@ module ActiveReporting
     private ######################################################################
 
     def build_data
-      @data = model.connection.exec_query(statement.to_sql).to_hash
+      @data = model.connection.exec_query(statement.to_sql).to_a
       apply_dimension_callbacks
       @data
     end
