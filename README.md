@@ -49,8 +49,8 @@ Rails: ActiveRecord model
 A dimension is a point of data used to "slice and dice" data from a fact model. It's either a column that lives on the fact table or a foreign key to another table.
 
 Examples:
-* A sales rep on a fact table of orders
-* A state of an order on a state machine
+* A sales rep on a fact table of sales
+* A state of an sale on a state machine
 * The manufacture on a fact table of widgets
 
 SQL Equivalent: JOIN, GROUP BY
@@ -178,7 +178,7 @@ end
 ActiveReporting assumes the column of a fact model used for summing, averaging, etc. is called `value`. This may be changed on a fact model using `measure=`. You may pass in a string or symbol of the column you wish to use for aggregations.
 
 ```ruby
-class OrderFactModel < ActiveReporting::FactModel
+class SaleFactModel < ActiveReporting::FactModel
   self.measure = :total
 end
 ```
@@ -273,8 +273,8 @@ A `Metric` is the basic building block used to describe a question you want to a
 
 ```ruby
 my_metric = ActiveReporting::Metric.new(
-  :order_total,
-  fact_model: OrderFactModel,
+  :sale_total,
+  fact_model: SaleFactModel,
   aggregate: :sum
 )
 ```
@@ -285,7 +285,7 @@ my_metric = ActiveReporting::Metric.new(
 
 `aggregate` - The SQL aggregate used to calculate the metric. Supported aggregates include count, max, min, avg, and sum. (Default: `:count`)
 
-`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {order_date: :month}]`). In hierarchies you can customize the label in this way: `[{order_date: { field: :month, name: :a_custom_name_for_month }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table. The `name` can be whatever label you want.
+`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {sale_date: :month}]`). In hierarchies you can customize the label in this way: `[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table. The `name` can be whatever label you want.
 
 `dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
 
@@ -313,20 +313,20 @@ A `Report` takes an `ActiveReporting::Metric` and ties everything together. It i
 
 ```ruby
 metric = ActiveReporting::Metric.new(
-  :order_count,
-  fact_model: OrderFactModel,
+  :sale_count,
+  fact_model: SaleFactModel,
   dimensions: [:sales_rep],
   dimension_filter: {months_ago: 1}
 )
 
 report = ActiveReporting::Report.new(metric)
 report.run
-=> [{order_count: 12, sales_rep: 'Fred Jones', sales_rep_identifier: 123},{order_count: 17, sales_rep: 'Mary Sue', sales_rep_identifier: 123}]
+=> [{sale_count: 12, sales_rep: 'Fred Jones', sales_rep_identifier: 123},{sale_count: 17, sales_rep: 'Mary Sue', sales_rep_identifier: 123}]
 ```
 
 A `Report` may also take additional arguments to merge with the `Metric`'s information. This can be user input for additional filters, or to expand on a base `Metric`.
 
-`dimension_identifiers` - When true, the result will include the database identifier columns of the dimensions. For example, when running a report for the total number of orders dimensioned by sales rep, the rep's IDs from the `sales_reps` table will be included. (Default `true`)
+`dimension_identifiers` - When true, the result will include the database identifier columns of the dimensions. For example, when running a report for the total number of sales dimensioned by sales rep, the rep's IDs from the `sales_reps` table will be included. (Default `true`)
 
 `dimension_filter` - A hash that will be merged with the `Metric`'s dimension filters.
 
@@ -336,15 +336,15 @@ A `Report` may also take additional arguments to merge with the `Metric`'s infor
 
 ```ruby
 metric = ActiveReporting::Metric.new(
-  :order_count,
-  fact_model: OrderFactModel,
+  :sale_count,
+  fact_model: SaleFactModel,
   dimensions: [:sales_rep],
   dimension_filter: {months_ago: 1}
 )
 
 report = ActiveReporting::Report.new(metric, dimension_filter: {from_region: 'North'}, dimension_identifiers: false)
 report.run
-=> [{order_count: 17, sales_rep: 'Mary Sue'}]
+=> [{sale_count: 17, sales_rep: 'Mary Sue'}]
 ```
 
 It may be more DRY to store ready-made metrics in a database table or stored in memory to use as the bases for various reports. You can pass a string or symbol into a `Report` instead of a `Metric` to look up an pre-made metric. This is done by passing the symbol or string into the `lookup` class method on the constant defined in `ActiveReporting::Configuration.metric_lookup_class`.
