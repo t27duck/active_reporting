@@ -96,6 +96,30 @@ module ActiveReporting
       @dimensions[name.to_sym] = Dimension.new(self, name: name)
     end
 
+    # Declares an aggregate expression that can be used in a Metric. See, e.g.:
+    # https://www.postgresql.org/docs/8.2/static/functions-aggregate.html
+    #
+    # @param name [String, Symbol]
+    # @param expression [String] SQL expression
+    #
+    # @example
+    #   class FooFactModel < ActiveReporting::FactModel
+    #     aggregate_expression :bar_is_5, "CASE WHEN bar = '5' THEN 1 END"
+    #   end
+    #
+    #   m = ActiveReporting::Metric.new(:bar_count,
+    #                                   fact_model: FooFactModel,
+    #                                   aggregate: { count: :bar_is_5 } )
+    #
+    def self.aggregate_expression(name, expression)
+      @aggregate_expressions ||= {}
+      @aggregate_expressions[name.to_sym] = expression
+    end
+
+    def self.aggregate_expressions
+      @aggregate_expressions || {}
+    end
+
     # Returns a hash of dimension label to callback mappings
     #
     # @return [Hash]
