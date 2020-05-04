@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 require 'active_record'
+require 'active_reporting/database_adapters/base'
+require 'active_reporting/database_adapters/sqlite_adapter'
+require 'active_reporting/database_adapters/mysql_adapter'
+require 'active_reporting/database_adapters/postgresql_adapter'
+require 'active_reporting/database_adapters/factory'
 require 'active_reporting/active_record_adaptor'
 require 'active_reporting/configuration'
 require 'active_reporting/dimension'

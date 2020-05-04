@@ -142,6 +142,8 @@ ActiveReporting::Configuration.setting = value
 
 `metric_lookup_class` - The name of a constant used to lookup prebuilt `Reporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. (Default: `::Metric`)
 
+`db_adapter` - Each database has a diferent way of doing the same thing on SQL. This is an abstraction layer on each database. For example `PostgreSQL` have a native `date_trunc` while `MySQL` doesn't so we do the same in another way. Make sure to choose your database's adapter (Default: `:sqlite3`). If you want MySQL put `:mysql2` and if you want PostGreSQL put `:postgresql`.
+
 
 ## ActiveReporting::FactModel
 
@@ -219,7 +221,7 @@ class PhoneFactModel < ActiveReporting::FactModel
 end
 ```
 
-### Implicit hierarchies with datetime columns (PostgreSQL support only)
+### Implicit hierarchies with datetime columns (PostgreSQL and MySQL support only)
 
 The fastest approach to group by certain date metrics is to create so-called "date dimensions". For
 those Postgres users that are restricted from organizing their data in this way, Postgres provides
@@ -235,7 +237,6 @@ end
 
 When creating a metric, ActiveReporting will recognize implicit hierarchies for this dimension. The hierarchies correspond to the [values](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC) supported by PostgreSQL. (See example under the metric section, below.)
 
-*NOTE*: PRs welcomed to support this functionality in other databases.
 
 ## Configuring Dimension Filters
 

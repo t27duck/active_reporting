@@ -13,6 +13,22 @@ module ActiveReporting
       yield self
     end
 
+    # Set database adapter. There are some SQL functions that are only
+    # available in some databases. You need to specify adapter
+    #
+    # Default db_adapter: SqliteAdapter
+    def self.db_adapter
+      @db_adapter ||= DatabaseAdapters::Factory.for_database(:sqlite3)
+    end
+
+    # Set database adapter. There are some SQL functions that are only
+    # available in some databases. You need to specify adapter
+    #
+    # @param [Symbol] adapter_name
+    def self.db_adapter=(adapter_name)
+      @db_adapter = DatabaseAdapters::Factory.for_database(adapter_name)
+    end
+
     # The default label used by all dimensions if not set otherwise
     #
     # Default value is `:name`
@@ -57,6 +73,7 @@ module ActiveReporting
     # @return [Boolean]
     def self.ransack_fallback=(fallback)
       raise RansackNotAvailable unless ransack_available
+
       @ransack_fallback = fallback
     end
 

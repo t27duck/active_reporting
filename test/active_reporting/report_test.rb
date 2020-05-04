@@ -32,8 +32,23 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert data.all? { |r| r.key?('a_metric') }
   end
 
-  def test_report_runs_with_a_date_grouping
-    if ENV['DB'] == 'pg'
+  def test_report_runs_with_week_date_grouping
+    if valid_db_adapter?
+      metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, dimensions: [{created_at: :week}])
+      report = ActiveReporting::Report.new(metric)
+      data = report.run
+      assert data.all? { |r| r.key?('created_at_week') }
+      assert data.size == 4
+    else
+      assert_raises ActiveReporting::InvalidDimensionLabel do
+        metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, dimensions: [{created_at: :week}])
+        report = ActiveReporting::Report.new(metric)
+      end
+    end
+  end
+
+  def test_report_runs_with_month_date_grouping
+    if valid_db_adapter?
       metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
       report = ActiveReporting::Report.new(metric)
       data = report.run
@@ -46,4 +61,5 @@ class ActiveReporting::ReportTest < Minitest::Test
       end
     end
   end
+
 end
