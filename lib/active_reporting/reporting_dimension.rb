@@ -59,8 +59,8 @@ module ActiveReporting
     def select_statement(with_identifier: true)
       return [degenerate_select_fragment] if type == Dimension::TYPES[:degenerate]
 
-      ss = ["#{label_fragment} AS #{@label_name}"]
-      ss << "#{identifier_fragment} AS #{name}_identifier" if with_identifier
+      ss = ["#{label_fragment} AS #{model.connection.quote_column_name(@label_name)}"]
+      ss << "#{identifier_fragment} AS #{model.connection.quote_column_name("#{name}_identifier")}" if with_identifier
       ss
     end
 
@@ -150,11 +150,11 @@ module ActiveReporting
     end
 
     def identifier_fragment
-      "#{klass.quoted_table_name}.#{klass.primary_key}"
+      "#{klass.quoted_table_name}.#{model.connection.quote_column_name(klass.primary_key)}"
     end
 
     def label_fragment
-      "#{klass.quoted_table_name}.#{@label}"
+      "#{klass.quoted_table_name}.#{model.connection.quote_column_name(@label)}"
     end
 
     def dimension_fact_model
