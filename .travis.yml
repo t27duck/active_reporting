@@ -7,6 +7,7 @@ addons:
 rvm:
   - 2.5.8
   - 2.6.6
+  - 2.7.1
 env:
   - RAILS=6-0 DB=sqlite
   - RAILS=6-0 DB=pg

@@ -6,7 +6,7 @@
 
 ### Misc
 
-* Update matrix to only supported Rubies and Rails versions
+* Update matrix to only supported Rubies and Rails versions. Rails 5.2+ and Ruby 2.5+ are officially supported now.
 
 ## 0.4.2 (2019-11-01)
 
