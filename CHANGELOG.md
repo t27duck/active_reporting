@@ -1,4 +1,4 @@
-## 0.5.1 (Unreleased)
+## 0.5.1 (2020-06-31)
 
 ### Features
 
@@ -6,8 +6,8 @@
 
 ### Misc
 
-* Fixed warning about initialized variable
-* Fix Ruby 2.7 warning
+* Fixed warning about initialized variables
+* Fixed Ruby 2.7 warning
 
 ## 0.5.0 (2020-06-30)
 
