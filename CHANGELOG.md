@@ -7,6 +7,7 @@
 ### Misc
 
 * Fixed warning about initialized variable
+* Fix Ruby 2.7 warning
 
 ## 0.5.0 (2020-06-30)
 

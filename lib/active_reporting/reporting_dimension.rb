@@ -21,7 +21,7 @@ module ActiveReporting
 
         raise(UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'") if found_dimension.nil?
 
-        new(found_dimension, label_config(label))
+        new(found_dimension, **label_config(label))
       end
     end
 
