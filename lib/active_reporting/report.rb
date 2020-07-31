@@ -53,6 +53,7 @@ module ActiveReporting
       parts = {
         select: select_statement,
         joins: dimension_joins,
+        left_outer_joins: dimension_joins(ReportingDimension::JOIN_METHODS[:left_outer_joins]),
         group: group_by_statement,
         having: having_statement,
         order: order_by_statement
@@ -84,8 +85,10 @@ module ActiveReporting
       end
     end
 
-    def dimension_joins
-      @dimensions.select { |d| d.type == :standard }.map { |d| d.name.to_sym }
+    def dimension_joins(join_method = ReportingDimension::JOIN_METHODS[:joins])
+      @dimensions.select { |d| d.type == Dimension::TYPES[:standard] }.
+                  select { |d| d.join_method == join_method }.
+                  map { |d| d.name.to_sym }
     end
 
     def group_by_statement

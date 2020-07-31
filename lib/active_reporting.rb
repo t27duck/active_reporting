@@ -41,4 +41,5 @@ module ActiveReporting
   UnknownDimension        = Class.new(StandardError)
   UnknownDimensionFilter  = Class.new(StandardError)
   UnknownMetric           = Class.new(StandardError)
+  UnknownJoinMethod       = Class.new(StandardError)
 end
