@@ -5,9 +5,9 @@ services:
 addons:
   postgresql: "9.6"
 rvm:
-  - 2.4.6
-  - 2.5.5
-  - 2.6.3
+  - 2.5.8
+  - 2.6.6
+  - 2.7.1
 env:
   - RAILS=6-0 DB=sqlite
   - RAILS=6-0 DB=pg
@@ -15,20 +15,6 @@ env:
   - RAILS=5-2 DB=sqlite
   - RAILS=5-2 DB=pg
   - RAILS=5-2 DB=mysql
-  - RAILS=5-1 DB=sqlite
-  - RAILS=5-1 DB=pg
-  - RAILS=5-1 DB=mysql
-  - RAILS=4-2 DB=sqlite
-  - RAILS=4-2 DB=pg
-  - RAILS=4-2 DB=mysql
-matrix:
-  exclude:
-    - rvm: 2.4.6
-      env: RAILS=6-0 DB=mysql
-    - rvm: 2.4.6
-      env: RAILS=6-0 DB=pg
-    - rvm: 2.4.6
-      env: RAILS=6-0 DB=sqlite
 before_script:
   - psql -c 'create database active_reporting_test;' -U postgres
   - mysql -e 'create database active_reporting_test collate utf8_general_ci;'

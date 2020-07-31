@@ -1,3 +1,13 @@
+## 0.5.0 (2020-06-30)
+
+### Bug Fixes
+
+* Fix Missing quotation marks in column names causing SLQ errors on MYSQL - *germanotm*
+
+### Misc
+
+* Update matrix to only supported Rubies and Rails versions. Rails 5.2+ and Ruby 2.5+ are officially supported now.
+
 ## 0.4.2 (2019-11-01)
 
 ### Misc
