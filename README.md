@@ -285,7 +285,7 @@ my_metric = ActiveReporting::Metric.new(
 
 `aggregate` - The SQL aggregate used to calculate the metric. Supported aggregates include count, max, min, avg, and sum. (Default: `:count`)
 
-`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {sale_date: :month}]`). In hierarchies you can customize the label in this way: `[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table. The `name` can be whatever label you want.
+`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {sale_date: :month}]`). In hierarchies you can customize the label in this way: `[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table. The `name` can be whatever label you want. You can choose the join_method with the dimension. The default value for join_method is :joins which does a standard "INNER JOIN", but you can pass a :left_outer_joins to use "LEFT OUTER JOIN" instead. Ex: `[{sales_rep: { join_method: :left_outer_joins }}]`
 
 `dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
 

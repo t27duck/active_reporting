@@ -9,6 +9,9 @@ module ActiveReporting
     # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
                               century millennium].freeze
+    JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
+    attr_reader :join_method
+
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
 
     def self.build_from_dimensions(fact_model, dimensions)
@@ -32,18 +35,20 @@ module ActiveReporting
 
       {
         label: label[:field],
-        label_name: label[:name]
+        label_name: label[:name],
+        join_method: label[:join_method]
       }
     end
 
     # @param dimension [ActiveReporting::Dimension]
     # @option label [Maybe<Symbol>] Hierarchical dimension to be used as a label
     # @option label_name [Maybe<Symbol|String>] Hierarchical dimension custom name
-    def initialize(dimension, label: nil, label_name: nil)
+    def initialize(dimension, label: nil, label_name: nil, join_method: nil)
       @dimension = dimension
 
       determine_label_field(label)
       determine_label_name(label_name)
+      determine_join_method(join_method)
     end
 
     # The foreign key to use in queries
@@ -104,6 +109,16 @@ module ActiveReporting
 
     def determine_label_name(label_name)
       @label_name = label_name ? "#{name}_#{label_name}" : name
+    end
+
+    def determine_join_method(join_method)
+      if join_method.blank?
+        @join_method = ReportingDimension::JOIN_METHODS[:joins]
+      elsif ReportingDimension::JOIN_METHODS.include?(join_method)
+        @join_method = join_method
+      else
+        raise UnknownJoinMethod, "Method '#{join_method}' not included in '#{ReportingDimension::JOIN_METHODS.values}'"
+      end
     end
 
     def validate_hierarchical_label(hierarchical_label)

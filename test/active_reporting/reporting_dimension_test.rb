@@ -145,4 +145,10 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
       subject.order_by_statement(direction: :invalid)
     end
   end
+
+  def test_raise_exception_with_invalid_join_method
+    assert_raises ActiveReporting::UnknownJoinMethod do
+      ActiveReporting::ReportingDimension.new(@figure_kind_dimension, join_method: :invalid_join_method)
+    end
+  end
 end
