@@ -85,6 +85,7 @@ module ActiveReporting
     #
     # @return [Symbol]
     def self.dimension_label
+      @dimension_label ||= nil
       @dimension_label || Configuration.default_dimension_label
     end
 

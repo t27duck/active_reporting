@@ -4,6 +4,10 @@
 
 * Allow dimensions defined in a `Metric` to use LEFT OUTER JOINs via a new `:join_method` option (#32) - *germanotm*
 
+### Misc
+
+* Fixed warning about initialized variable
+
 ## 0.5.0 (2020-06-30)
 
 ### Bug Fixes
