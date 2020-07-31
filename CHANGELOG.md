@@ -1,8 +1,14 @@
+## 0.5.1 (Unreleased)
+
+### Features
+
+* Allow dimensions defined in a `Metric` to use LEFT OUTER JOINs via a new `:join_method` option (#32) - *germanotm*
+
 ## 0.5.0 (2020-06-30)
 
 ### Bug Fixes
 
-* Fix Missing quotation marks in column names causing SLQ errors on MYSQL - *germanotm*
+* Fix Missing quotation marks in column names causing SQL errors on MYSQL (#30) - *germanotm*
 
 ### Misc
 
