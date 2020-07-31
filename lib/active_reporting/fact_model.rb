@@ -156,6 +156,7 @@ module ActiveReporting
     #
     # @return [Boolean]
     def self.ransack_fallback
+      @ransack_fallback ||= false
       @ransack_fallback || Configuration.ransack_fallback
     end
     private_class_method :ransack_fallback
