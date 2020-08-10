@@ -46,4 +46,10 @@ class ActiveReporting::ReportTest < Minitest::Test
       end
     end
   end
+
+  def test_accept_dimension_join_method_option
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: GameFactModel, dimensions: [{ platform: { join_method: :left_outer_joins }}], aggregate: :sum)
+    report = ActiveReporting::Report.new(metric)
+    assert report.send(:statement).to_sql.include?("LEFT OUTER JOIN")
+  end
 end

@@ -48,21 +48,26 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
       label_name: custom_label_name
     )
     expected = [
-      "#{Platform.quoted_table_name}.#{PlatformFactModel.dimension_label} AS #{build_label_name}",
-      "#{Platform.quoted_table_name}.#{Platform.primary_key} AS platform_identifier"
+      "#{Platform.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(PlatformFactModel.dimension_label)} AS #{ActiveRecord::Base.connection.quote_column_name(build_label_name)}",
+      "#{Platform.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(Platform.primary_key)} AS #{ActiveRecord::Base.connection.quote_column_name(:platform_identifier)}"
     ]
     assert_equal expected, subject.select_statement
 
-    expected = ["#{Platform.quoted_table_name}.#{PlatformFactModel.dimension_label} AS #{build_label_name}"]
+    expected = ["#{Platform.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(PlatformFactModel.dimension_label)} AS #{ActiveRecord::Base.connection.quote_column_name(build_label_name)}"]
     assert_equal expected, subject.select_statement(with_identifier: false)
   end
 
   def test_select_statement_can_include_identifier_if_standard
     subject = ActiveReporting::ReportingDimension.new(@figure_series_dimension)
-    expected = ["#{Series.quoted_table_name}.#{@series_fact_model_default_label} AS series", "#{Series.quoted_table_name}.#{Series.primary_key} AS series_identifier"]
+    expected = [
+      "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(@series_fact_model_default_label)} AS #{ActiveRecord::Base.connection.quote_column_name(:series)}",
+      "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(Series.primary_key)} AS #{ActiveRecord::Base.connection.quote_column_name(:series_identifier)}"
+    ]
     assert_equal expected, subject.select_statement
 
-    expected = ["#{Series.quoted_table_name}.#{@series_fact_model_default_label} AS series"]
+    expected = [
+      "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(@series_fact_model_default_label)} AS #{ActiveRecord::Base.connection.quote_column_name(:series)}"
+    ]
     assert_equal expected, subject.select_statement(with_identifier: false)
   end
 
@@ -73,16 +78,19 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_group_by_statement_can_include_identifier_if_standard
     subject = ActiveReporting::ReportingDimension.new(@figure_series_dimension)
-    expected = ["#{Series.quoted_table_name}.#{@series_fact_model_default_label}", "#{Series.quoted_table_name}.#{Series.primary_key}"]
+    expected = [
+      "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(@series_fact_model_default_label)}",
+      "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(Series.primary_key)}"
+    ]
     assert_equal expected, subject.group_by_statement
 
-    expected = ["#{Series.quoted_table_name}.#{@series_fact_model_default_label}"]
+    expected = ["#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(@series_fact_model_default_label)}"]
     assert_equal expected, subject.group_by_statement(with_identifier: false)
   end
 
-  def test_gorup_by_statement_includes_label
+  def test_group_by_statement_includes_label
     subject = ActiveReporting::ReportingDimension.new(@release_date_released_on_dimension, label: :month)
-    assert_includes subject.group_by_statement, "#{DateDimension.quoted_table_name}.month"
+    assert_includes subject.group_by_statement, "#{DateDimension.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(:month)}"
   end
 
   def test_label_may_be_passed_for_hierarchical_dimension
@@ -128,13 +136,19 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     assert_equal "#{Figure.quoted_table_name}.kind ASC", subject.order_by_statement(direction: :asc)
 
     subject = ActiveReporting::ReportingDimension.new(@figure_series_dimension)
-    assert_equal "#{Series.quoted_table_name}.#{@series_fact_model_default_label} DESC", subject.order_by_statement(direction: :desc)
+    assert_equal "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(@series_fact_model_default_label)} DESC", subject.order_by_statement(direction: :desc)
   end
 
   def test_order_by_statement_must_have_a_valid_direction
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
     assert_raises RuntimeError do
       subject.order_by_statement(direction: :invalid)
+    end
+  end
+
+  def test_raise_exception_with_invalid_join_method
+    assert_raises ActiveReporting::UnknownJoinMethod do
+      ActiveReporting::ReportingDimension.new(@figure_kind_dimension, join_method: :invalid_join_method)
     end
   end
 end

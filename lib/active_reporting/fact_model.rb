@@ -85,6 +85,7 @@ module ActiveReporting
     #
     # @return [Symbol]
     def self.dimension_label
+      @dimension_label ||= nil
       @dimension_label || Configuration.default_dimension_label
     end
 
@@ -155,6 +156,7 @@ module ActiveReporting
     #
     # @return [Boolean]
     def self.ransack_fallback
+      @ransack_fallback ||= false
       @ransack_fallback || Configuration.ransack_fallback
     end
     private_class_method :ransack_fallback
