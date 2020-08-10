@@ -33,7 +33,7 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_report_runs_with_a_date_grouping
-    if ENV['DB'] == 'pg'
+    if ['pq','mysql'].include?(ENV['DB'])
       metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
       report = ActiveReporting::Report.new(metric)
       data = report.run
