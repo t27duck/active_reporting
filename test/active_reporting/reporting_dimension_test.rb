@@ -106,7 +106,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
   def test_label_can_be_passed_in_if_dimension_is_datetime
     refute @user_dimension.hierarchical?
     assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
-    if ['pq','mysql'].include?(ENV['DB'])
+    if ['pg','mysql'].include?(ENV['DB'])
       ActiveReporting::ReportingDimension.new(@user_dimension, label: :year)
     else
       assert_raises ActiveReporting::InvalidDimensionLabel do
