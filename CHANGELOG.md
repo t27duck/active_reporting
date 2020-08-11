@@ -1,3 +1,9 @@
+## Unreleased (unreleased)
+
+### Features
+
+* Support to implicit hierarchical on datetime columns in MySQL (#33) - *germantom*
+
 ## 0.5.1 (2020-06-31)
 
 ### Features
