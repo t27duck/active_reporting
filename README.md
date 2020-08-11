@@ -219,11 +219,11 @@ class PhoneFactModel < ActiveReporting::FactModel
 end
 ```
 
-### Implicit hierarchies with datetime columns (PostgreSQL support only)
+### Implicit hierarchies with datetime columns
 
 The fastest approach to group by certain date metrics is to create so-called "date dimensions". For
 those Postgres users that are restricted from organizing their data in this way, Postgres provides
-a way to group by `datetime` column data on the fly using the `date_trunc` function.
+a way to group by `datetime` column data on the fly using the [`date_trunc` function](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). On Mysql this can be done using [Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html).
 
 To use, declare a datetime dimension on a fact model as normal:
 
@@ -233,7 +233,24 @@ class UserFactModel < ActiveReporting::FactModel
 end
 ```
 
-When creating a metric, ActiveReporting will recognize implicit hierarchies for this dimension. The hierarchies correspond to the [values](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC) supported by PostgreSQL. (See example under the metric section, below.)
+When creating a metric, ActiveReporting will recognize implicit hierarchies for this dimension.
+The valid values are:
+
+- microseconds
+- milliseconds
+- second
+- minute
+- hour
+- day
+- week
+- month
+- quarter
+- year
+- decade
+- century
+- millennium
+
+(See example under the metric section, below.)
 
 *NOTE*: PRs welcomed to support this functionality in other databases.
 

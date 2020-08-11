@@ -4,7 +4,7 @@ require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
-    SUPPORTED_DBS = %w[PostgreSQL PostGIS].freeze
+    SUPPORTED_DBS = %w[PostgreSQL PostGIS Mysql2].freeze
     # Values for the Postgres `date_trunc` method.
     # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
@@ -160,8 +160,51 @@ module ActiveReporting
     end
 
     def degenerate_select_fragment
-      return "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}" if datetime?
+      if datetime?
+        if model.connection.adapter_name == "Mysql2"
+          return degenerate_select_fragment_mysql
+        else # Postgress
+          return degenerate_select_fragment_postgress
+        end
+      end
       "#{model.quoted_table_name}.#{name}"
+    end
+
+    def degenerate_select_fragment_postgress
+      "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}"
+    end
+
+    def degenerate_select_fragment_mysql
+      field = "#{model.quoted_table_name}.#{model.connection.quote_column_name(name)}"
+      modifier = case @label.to_sym
+      when :microseconds
+        "MICROSECOND(#{field})"
+      when :milliseconds
+        "MICROSECOND(#{field}) DIV 1000"
+      when :second
+        "SECOND(#{field})"
+      when :minute
+        "MINUTE(#{field})"
+      when :hour
+        "HOUR(#{field})"
+      when :day
+        "DAY(#{field})"
+      when :week
+        "WEEKDAY(#{field})"
+      when :month
+        "MONTH(#{field})"
+      when :quarter
+        "QUARTER(#{field})"
+      when :year
+        "YEAR(#{field})"
+      when :decade
+        "YEAR(#{field}) DIV 10"
+      when :century
+        "YEAR(#{field}) DIV 100"
+      when :millennium
+        "YEAR(#{field}) DIV 1000"
+      end
+      "#{modifier} AS #{name}_#{@label}"
     end
 
     def identifier_fragment
