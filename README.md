@@ -49,6 +49,7 @@ Rails: ActiveRecord model
 A dimension is a point of data used to "slice and dice" data from a fact model. It's either a column that lives on the fact table or a foreign key to another table.
 
 Examples:
+
 * A sales rep on a fact table of sales
 * A state of an sale on a state machine
 * The manufacture on a fact table of widgets
@@ -62,6 +63,7 @@ Rails: ActiveRecord relation or attribute
 A hierarchy for a dimension is related attributes that live on a dimension table used to drill down and drill up through a dimension.
 
 Examples:
+
 * Dates: Date, Month, Year, Quarter
 * Mobile Phone: Model, Manufacture, OS, Wireless Technology
 
@@ -70,6 +72,7 @@ Examples:
 This is information related to a dimension. When the dimension lives on the fact table, the label is the column used. When the dimension is a related table, the label is a column representing the hierarchy level.
 
 Examples:
+
 * When dimensioning blog posts by category, the dimension is the category_id which leads to the categories table. The label would be the category name.
 
 ### Dimension Filter (or just "filter")
@@ -85,6 +88,7 @@ Rails: `where()`, scopes, etc.
 A measure is a column in a fact table (usually a numeric value) used in aggregations such as sum, maximum, average, etc.
 
 Examples:
+
 * Total amount in a sale
 * Number of units used in a transaction
 
@@ -219,11 +223,9 @@ class PhoneFactModel < ActiveReporting::FactModel
 end
 ```
 
-### Implicit hierarchies with datetime columns
+### Drill down / Roll up (Drill up) with datetime columns
 
-The fastest approach to group by certain date metrics is to create so-called "date dimensions". For
-those Postgres users that are restricted from organizing their data in this way, Postgres provides
-a way to group by `datetime` column data on the fly using the [`date_trunc` function](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). On Mysql this can be done using [Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html).
+The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way,  ActiveRporting provides a `datetime_drill`  option that can be passed along dimension at metric definition to drill datetime columns.
 
 To use, declare a datetime dimension on a fact model as normal:
 
@@ -233,8 +235,7 @@ class UserFactModel < ActiveReporting::FactModel
 end
 ```
 
-When creating a metric, ActiveReporting will recognize implicit hierarchies for this dimension.
-The valid values are:
+When creating a metric, ActiveReporting will recognize the following datetime hierarchies: (See example under the metric section, below.)
 
 - microseconds
 - milliseconds
@@ -250,7 +251,7 @@ The valid values are:
 - century
 - millennium
 
-(See example under the metric section, below.)
+Under the hood Active Reporting uses specific database functions to manipulate datetime columns. Postgres provides a way to group by `datetime` column data on the fly using the [`date_trunc` function](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). On Mysql this can be done using [Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html).
 
 *NOTE*: PRs welcomed to support this functionality in other databases.
 
@@ -302,7 +303,17 @@ my_metric = ActiveReporting::Metric.new(
 
 `aggregate` - The SQL aggregate used to calculate the metric. Supported aggregates include count, max, min, avg, and sum. (Default: `:count`)
 
-`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension. You may specify a hierarchy level by using a hash. (Examples: `[:sales_rep, {sale_date: :month}]`). In hierarchies you can customize the label in this way: `[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table. The `name` can be whatever label you want. You can choose the join_method with the dimension. The default value for join_method is :joins which does a standard "INNER JOIN", but you can pass a :left_outer_joins to use "LEFT OUTER JOIN" instead. Ex: `[{sales_rep: { join_method: :left_outer_joins }}]`
+`dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension.
+
+You may pass a hash instead of a symbol to customize the dimension options. The  avaliable options are:
+
+- `field` - Specify the hierarchy level that should be used instead the default dimension label. Ex: `[:sales_rep, {mobile_phone: { field :manufacture }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table.
+
+- `name` - You may costumize the label alias, by default the dimension name will be used. The `name` can be whatever label you want. Ex :`[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`.
+
+- `join_method` - You may choose the join_method with the dimension. The default value for join_method is :joins which does a standard "INNER JOIN", but you can pass a :left_outer_joins to use "LEFT OUTER JOIN" instead. Ex: `[{sales_rep: { join_method: :left_outer_joins }}]`
+
+- `datetime_drill` - To drill up and down over datetime column you may pass a `datetime_drill`. Ex: `[:sales_rep, { order: { field: :created_at, datetime_drill: :month }}]`
 
 `dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
 
@@ -320,7 +331,7 @@ end
 my_metric = ActiveReporting::Metric.new(
   :my_total,
   fact_model: UserFactModel,
-  dimensions: [{ created_at: :quarter } ]
+  dimensions: [{ created_at: { datetime_drill: :quarter }} ]
 )
 ```
 
@@ -392,7 +403,6 @@ appropriate `DB` environment variable, e.g. `DB=pg rake test`.
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/active_reporting. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 
 ## License
 

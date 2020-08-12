@@ -145,7 +145,7 @@ module ActiveReporting
         callback = dimension.label_callback
         next unless callback
         @data.each do |hash|
-          hash[dimension.name.to_s] = callback.call(hash[dimension.name.to_s])
+          hash["#{dimension.name}_#{dimension.label}"] = callback.call(hash["#{dimension.name}_#{dimension.label}"])
         end
       end
     end
