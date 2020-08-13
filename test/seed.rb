@@ -5,6 +5,7 @@ end
 (1..5).each do |i|
   user = User.create!(
     created_at: Time.now - i.months,
+    birthday_on: (10 + i).years.ago ,
     username: "user_#{i}"
   )
 

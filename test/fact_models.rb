@@ -39,6 +39,7 @@ end
 
 class UserFactModel < ActiveReporting::FactModel
   default_dimension_label :username
+  dimension :birthday_on
   dimension :created_at
 end
 
