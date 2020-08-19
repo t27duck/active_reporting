@@ -225,7 +225,7 @@ end
 
 ### Drill down / Roll up (Drill up) with datetime columns
 
-The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way,  ActiveRporting provides a `datetime_drill`  option that can be passed along dimension at metric definition to drill datetime columns.
+The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way,  ActiveRporting provides a `datetime_drill` option that can be passed with the dimension on the metric definition to drill datetime columns.
 
 To use, declare a datetime dimension on a fact model as normal:
 
@@ -305,7 +305,7 @@ my_metric = ActiveReporting::Metric.new(
 
 `dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension.
 
-You may pass a hash instead of a symbol to customize the dimension options. The  avaliable options are:
+You may pass a hash instead of a symbol to customize the dimension options (example: { dimension_name: { option1: value, option2: value}}). The avaliable options are:
 
 - `field` - Specify the hierarchy level that should be used instead the default dimension label. Ex: `[:sales_rep, {mobile_phone: { field :manufacture }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table.
 
@@ -313,7 +313,7 @@ You may pass a hash instead of a symbol to customize the dimension options. The 
 
 - `join_method` - You may choose the join_method with the dimension. The default value for join_method is :joins which does a standard "INNER JOIN", but you can pass a :left_outer_joins to use "LEFT OUTER JOIN" instead. Ex: `[{sales_rep: { join_method: :left_outer_joins }}]`
 
-- `datetime_drill` - To drill up and down over datetime column you may pass a `datetime_drill`. Ex: `[:sales_rep, { order: { field: :created_at, datetime_drill: :month }}]`
+- `datetime_drill` - To drill up and down over datetime column you may pass a `datetime_drill`. Ex: `[:sales_rep, { order: { field: :created_at, datetime_drill: :month }}]`. This option will perform an implicit drill over datetime columns and not a date dimension relationship.
 
 `dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
 

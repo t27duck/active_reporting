@@ -23,7 +23,10 @@ module ActiveReporting
 
         # Ambiguous behavior with string option for degenerate and standard dimension
         if !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
-          warn "[DEPRECATION] direct use of implict hierarchies is deprecated. Please use `:datetime_drill` option instead."
+          ActiveSupport::Deprecation.warn <<~EOS
+            direct use of implict hierarchies is deprecated and will be removed in future versions. \
+            Please use `:datetime_drill` option instead.
+          EOS
           options = { datetime_drill: options }
         end
         new(found_dimension, **label_config(options))
@@ -176,46 +179,46 @@ module ActiveReporting
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
     end
 
-    def datetime_drill_label_fragment(select_statement)
+    def datetime_drill_label_fragment(column)
       if model.connection.adapter_name == "Mysql2"
-        datetime_drill_mysql(select_statement)
+        datetime_drill_mysql(column)
       else # Postgress
-        datetime_drill_postgress(select_statement)
+        datetime_drill_postgress(column)
       end
     end
 
-    def datetime_drill_postgress(select_statement)
-      "DATE_TRUNC('#{@datetime_drill}', #{select_statement})"
+    def datetime_drill_postgress(column)
+      "DATE_TRUNC('#{@datetime_drill}', #{column})"
     end
 
-    def datetime_drill_mysql(select_statement)
+    def datetime_drill_mysql(column)
       case @datetime_drill.to_sym
       when :microseconds
-        "MICROSECOND(#{select_statement})"
+        "MICROSECOND(#{column})"
       when :milliseconds
-        "MICROSECOND(#{select_statement}) DIV 1000"
+        "MICROSECOND(#{column}) DIV 1000"
       when :second
-        "SECOND(#{select_statement})"
+        "SECOND(#{column})"
       when :minute
-        "MINUTE(#{select_statement})"
+        "MINUTE(#{column})"
       when :hour
-        "HOUR(#{select_statement})"
+        "HOUR(#{column})"
       when :day
-        "DAY(#{select_statement})"
+        "DAY(#{column})"
       when :week
-        "WEEKDAY(#{select_statement})"
+        "WEEKDAY(#{column})"
       when :month
-        "MONTH(#{select_statement})"
+        "MONTH(#{column})"
       when :quarter
-        "QUARTER(#{select_statement})"
+        "QUARTER(#{column})"
       when :year
-        "YEAR(#{select_statement})"
+        "YEAR(#{column})"
       when :decade
-        "YEAR(#{select_statement}) DIV 10"
+        "YEAR(#{column}) DIV 10"
       when :century
-        "YEAR(#{select_statement}) DIV 100"
+        "YEAR(#{column}) DIV 100"
       when :millennium
-        "YEAR(#{select_statement}) DIV 1000"
+        "YEAR(#{column}) DIV 1000"
       end
     end
 
@@ -228,9 +231,9 @@ module ActiveReporting
     end
 
     def label_fragment
-      ss = "#{klass.quoted_table_name}.#{model.connection.quote_column_name(@label)}"
-      ss = datetime_drill_label_fragment(ss) if @datetime_drill
-      ss
+      fragment = "#{klass.quoted_table_name}.#{model.connection.quote_column_name(@label)}"
+      fragment = datetime_drill_label_fragment(fragment) if @datetime_drill
+      fragment
     end
 
     def label_fragment_alias
