@@ -2,7 +2,7 @@
 
 ### Features
 
-* Support to implicit hierarchical on datetime columns in MySQL (#33) - *germantom*
+* Support to implicit hierarchical on datetime columns in MySQL (#33) - *germanotm*
 
 ## 0.5.1 (2020-06-31)
 

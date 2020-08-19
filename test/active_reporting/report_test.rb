@@ -20,7 +20,7 @@ class ActiveReporting::ReportTest < Minitest::Test
     data   = report.run
 
     refute data.empty?
-    assert data.all? { |r| r['released_on'].to_s.match(/\AQ\d+/) }
+    assert data.all? { |r| r['released_on_quarter'].to_s.match(/\AQ\d+/) }
   end
 
   def test_report_runs_with_an_aggregate_other_than_count

@@ -36,12 +36,12 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_select_statement_is_just_column_if_degenerate
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
-    assert_equal ["#{Figure.quoted_table_name}.kind"], subject.select_statement
+    assert_equal ["#{Figure.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name("kind")} AS #{ActiveRecord::Base.connection.quote_column_name("kind")}"], subject.select_statement
   end
 
   def test_select_statement_can_have_custom_label_name_if_standard
     custom_label_name = 'custom_label_name'
-    build_label_name = "platform_#{custom_label_name}"
+    build_label_name = "#{custom_label_name}"
     subject = ActiveReporting::ReportingDimension.new(
       @game_platform_dimension,
       label: :name,
@@ -73,7 +73,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_group_by_statement_is_just_column_if_degenerate
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
-    assert_equal ["#{Figure.quoted_table_name}.kind"], subject.group_by_statement
+    assert_equal ["#{Figure.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name("kind")}"], subject.group_by_statement
   end
 
   def test_group_by_statement_can_include_identifier_if_standard
@@ -115,10 +115,10 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     refute @user_dimension.hierarchical?
     assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
     if ['pg','mysql'].include?(ENV['DB'])
-      ActiveReporting::ReportingDimension.new(@user_dimension, label: :year)
+      ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :year)
     else
       assert_raises ActiveReporting::InvalidDimensionLabel do
-        ActiveReporting::ReportingDimension.new(@user_dimension, label: :year)
+        ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :year)
       end
     end
   end
@@ -133,7 +133,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_order_by_statement_is_dimensions_column_sql_snippet
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
-    assert_equal "#{Figure.quoted_table_name}.kind ASC", subject.order_by_statement(direction: :asc)
+    assert_equal "#{Figure.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name("kind")} ASC", subject.order_by_statement(direction: :asc)
 
     subject = ActiveReporting::ReportingDimension.new(@figure_series_dimension)
     assert_equal "#{Series.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(@series_fact_model_default_label)} DESC", subject.order_by_statement(direction: :desc)

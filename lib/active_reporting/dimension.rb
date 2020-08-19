@@ -30,13 +30,6 @@ module ActiveReporting
                 end
     end
 
-    # Whether the dimension is a datetime column
-    #
-    # @return [Boolean]
-    def datetime?
-      @datetime ||= type == TYPES[:degenerate] && model.column_for_attribute(@name).type == :datetime
-    end
-
     # Tells if the dimension is hierarchical
     #
     # @return [Boolean]

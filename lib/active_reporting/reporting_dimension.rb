@@ -10,18 +10,26 @@ module ActiveReporting
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
                               century millennium].freeze
     JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
-    attr_reader :join_method
+    attr_reader :join_method, :label
 
-    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :datetime?
+    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?
 
     def self.build_from_dimensions(fact_model, dimensions)
       Array(dimensions).map do |dim|
-        dimension_name, label = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
+        dimension_name, options = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
         found_dimension = fact_model.dimensions[dimension_name.to_sym]
 
-        raise(UnknownDimension, "Dimension '#{dim}' not found on fact model '#{fact_model}'") if found_dimension.nil?
+        raise(UnknownDimension, "Dimension '#{dimension_name}' not found on fact model '#{fact_model}'") if found_dimension.nil?
 
-        new(found_dimension, **label_config(label))
+        # Ambiguous behavior with string option for degenerate and standard dimension
+        if !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
+          ActiveSupport::Deprecation.warn <<~EOS
+            direct use of implict hierarchies is deprecated and will be removed in future versions. \
+            Please use `:datetime_drill` option instead.
+          EOS
+          options = { datetime_drill: options }
+        end
+        new(found_dimension, **label_config(options))
       end
     end
 
@@ -29,24 +37,28 @@ module ActiveReporting
     # the field on that dimension. With a hash you can
     # customize the name of the label
     #
-    # @param [Symbol|Hash] label
-    def self.label_config(label)
-      return { label: label } unless label.is_a?(Hash)
+    # @param [Symbol|Hash] options
+    def self.label_config(options)
+      unless options.is_a?(Hash)
+        return { label: options }
+      end
 
       {
-        label: label[:field],
-        label_name: label[:name],
-        join_method: label[:join_method]
+        label: options[:field],
+        label_name: options[:name],
+        join_method: options[:join_method],
+        datetime_drill: options[:datetime_drill]
       }
     end
 
     # @param dimension [ActiveReporting::Dimension]
     # @option label [Maybe<Symbol>] Hierarchical dimension to be used as a label
     # @option label_name [Maybe<Symbol|String>] Hierarchical dimension custom name
-    def initialize(dimension, label: nil, label_name: nil, join_method: nil)
+    def initialize(dimension, label: nil, label_name: nil, join_method: nil, datetime_drill: nil)
       @dimension = dimension
 
       determine_label_field(label)
+      determine_datetime_drill(datetime_drill)
       determine_label_name(label_name)
       determine_join_method(join_method)
     end
@@ -62,10 +74,8 @@ module ActiveReporting
     #
     # @return [Array]
     def select_statement(with_identifier: true)
-      return [degenerate_select_fragment] if type == Dimension::TYPES[:degenerate]
-
-      ss = ["#{label_fragment} AS #{model.connection.quote_column_name(@label_name)}"]
-      ss << "#{identifier_fragment} AS #{model.connection.quote_column_name("#{name}_identifier")}" if with_identifier
+      ss = ["#{label_fragment} AS #{label_fragment_alias}"]
+      ss << "#{identifier_fragment} AS #{identifier_fragment_alias}" if with_identifier && type == Dimension::TYPES[:standard]
       ss
     end
 
@@ -73,10 +83,8 @@ module ActiveReporting
     #
     # @return [Array]
     def group_by_statement(with_identifier: true)
-      return [degenerate_fragment] if type == Dimension::TYPES[:degenerate]
-
       group = [label_fragment]
-      group << identifier_fragment if with_identifier
+      group << identifier_fragment if with_identifier && type == Dimension::TYPES[:standard]
       group
     end
 
@@ -86,7 +94,6 @@ module ActiveReporting
     def order_by_statement(direction:)
       direction = direction.to_s.upcase
       raise "Ording direction should be 'asc' or 'desc'" unless %w[ASC DESC].include?(direction)
-      return "#{degenerate_fragment} #{direction}" if type == Dimension::TYPES[:degenerate]
       "#{label_fragment} #{direction}"
     end
 
@@ -101,14 +108,32 @@ module ActiveReporting
 
     def determine_label_field(label_field)
       @label = if label_field.present? && validate_hierarchical_label(label_field)
-                 label_field.to_sym
+                 type == Dimension::TYPES[:degenerate] ? name : label_field.to_sym
+               elsif type == Dimension::TYPES[:degenerate]
+                 name
                else
                  dimension_fact_model.dimension_label || Configuration.default_dimension_label
                end
     end
 
     def determine_label_name(label_name)
-      @label_name = label_name ? "#{name}_#{label_name}" : name
+
+      if label_name
+        @label_name = label_name
+      else
+        @label_name = name
+        @label_name += "_#{@label}" if (type == Dimension::TYPES[:standard] && @label != :name)
+        @label_name += "_#{@datetime_drill}" if @datetime_drill
+      end
+      @label_name
+    end
+
+    def determine_datetime_drill(datetime_drill)
+      return unless datetime_drill
+      validate_supported_database_for_datetime_hierarchies
+      validate_against_datetime_hierarchies(datetime_drill)
+      validate_label_is_datetime
+      @datetime_drill = datetime_drill
     end
 
     def determine_join_method(join_method)
@@ -122,13 +147,8 @@ module ActiveReporting
     end
 
     def validate_hierarchical_label(hierarchical_label)
-      if datetime?
-        validate_supported_database_for_datetime_hierarchies
-        validate_against_datetime_hierarchies(hierarchical_label)
-      else
-        validate_dimension_is_hierachical(hierarchical_label)
-        validate_against_fact_model_properties(hierarchical_label)
-      end
+      validate_dimension_is_hierachical(hierarchical_label)
+      validate_against_fact_model_properties(hierarchical_label)
       true
     end
 
@@ -149,70 +169,75 @@ module ActiveReporting
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a valid datetime grouping label in #{name}"
     end
 
+    def validate_label_is_datetime
+      return if dimension_fact_model.model.column_for_attribute(@label).type == :datetime
+      raise InvalidDimensionLabel, "'#{@label}' is not a datetime column"
+    end
+
     def validate_against_fact_model_properties(hierarchical_label)
       return if dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
     end
 
-    def degenerate_fragment
-      return "#{name}_#{@label}" if datetime?
-      "#{model.quoted_table_name}.#{name}"
-    end
-
-    def degenerate_select_fragment
-      if datetime?
-        if model.connection.adapter_name == "Mysql2"
-          return degenerate_select_fragment_mysql
-        else # Postgress
-          return degenerate_select_fragment_postgress
-        end
+    def datetime_drill_label_fragment(column)
+      if model.connection.adapter_name == "Mysql2"
+        datetime_drill_mysql(column)
+      else # Postgress
+        datetime_drill_postgress(column)
       end
-      "#{model.quoted_table_name}.#{name}"
     end
 
-    def degenerate_select_fragment_postgress
-      "DATE_TRUNC('#{@label}', #{model.quoted_table_name}.#{name}) AS #{name}_#{@label}"
+    def datetime_drill_postgress(column)
+      "DATE_TRUNC('#{@datetime_drill}', #{column})"
     end
 
-    def degenerate_select_fragment_mysql
-      field = "#{model.quoted_table_name}.#{model.connection.quote_column_name(name)}"
-      modifier = case @label.to_sym
+    def datetime_drill_mysql(column)
+      case @datetime_drill.to_sym
       when :microseconds
-        "MICROSECOND(#{field})"
+        "MICROSECOND(#{column})"
       when :milliseconds
-        "MICROSECOND(#{field}) DIV 1000"
+        "MICROSECOND(#{column}) DIV 1000"
       when :second
-        "SECOND(#{field})"
+        "SECOND(#{column})"
       when :minute
-        "MINUTE(#{field})"
+        "MINUTE(#{column})"
       when :hour
-        "HOUR(#{field})"
+        "HOUR(#{column})"
       when :day
-        "DAY(#{field})"
+        "DAY(#{column})"
       when :week
-        "WEEKDAY(#{field})"
+        "WEEKDAY(#{column})"
       when :month
-        "MONTH(#{field})"
+        "MONTH(#{column})"
       when :quarter
-        "QUARTER(#{field})"
+        "QUARTER(#{column})"
       when :year
-        "YEAR(#{field})"
+        "YEAR(#{column})"
       when :decade
-        "YEAR(#{field}) DIV 10"
+        "YEAR(#{column}) DIV 10"
       when :century
-        "YEAR(#{field}) DIV 100"
+        "YEAR(#{column}) DIV 100"
       when :millennium
-        "YEAR(#{field}) DIV 1000"
+        "YEAR(#{column}) DIV 1000"
       end
-      "#{modifier} AS #{name}_#{@label}"
     end
 
     def identifier_fragment
       "#{klass.quoted_table_name}.#{model.connection.quote_column_name(klass.primary_key)}"
     end
 
+    def identifier_fragment_alias
+      "#{model.connection.quote_column_name("#{name}_identifier")}"
+    end
+
     def label_fragment
-      "#{klass.quoted_table_name}.#{model.connection.quote_column_name(@label)}"
+      fragment = "#{klass.quoted_table_name}.#{model.connection.quote_column_name(@label)}"
+      fragment = datetime_drill_label_fragment(fragment) if @datetime_drill
+      fragment
+    end
+
+    def label_fragment_alias
+      "#{model.connection.quote_column_name(@label_name)}"
     end
 
     def dimension_fact_model
