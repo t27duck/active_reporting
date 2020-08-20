@@ -1,8 +1,12 @@
-## Unreleased (unreleased)
+## 0.6.0 (Unreleased)
 
 ### Features
 
 * Support to implicit hierarchical on datetime columns in MySQL (#33) - *germanotm*
+* Added `{ datetime_drill: :month }` option for reporting dimentions to explicitly -  *germanotm*
+
+  This depricates the use of key-value only use for report dimension options (ie, `dimensions: [{ dim: single_option }]`).
+  Instead, use `dimensions: [{ dim: { option: value} }]` See the README for all reporting dimension options.
 
 ## 0.5.1 (2020-06-31)
 
