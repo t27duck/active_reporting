@@ -250,6 +250,7 @@ When creating a metric, ActiveReporting will recognize the following datetime hi
 - decade
 - century
 - millennium
+- date
 
 Under the hood Active Reporting uses specific database functions to manipulate datetime columns. Postgres provides a way to group by `datetime` column data on the fly using the [`date_trunc` function](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). On Mysql this can be done using [Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html).
 
