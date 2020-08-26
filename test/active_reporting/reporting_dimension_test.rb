@@ -123,6 +123,18 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     end
   end
 
+  def test_date_is_valid_datetime_drill
+    refute @user_dimension.hierarchical?
+    assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
+    if ['pg','mysql'].include?(ENV['DB'])
+      ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :date)
+    else
+      assert_raises ActiveReporting::InvalidDimensionLabel do
+        ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :date)
+      end
+    end
+  end
+
   def test_invalid_label_cannot_be_passed_in_if_dimension_is_datetime
     refute @user_dimension.hierarchical?
     assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]

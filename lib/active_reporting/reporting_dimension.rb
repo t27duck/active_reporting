@@ -8,7 +8,7 @@ module ActiveReporting
     # Values for the Postgres `date_trunc` method.
     # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
-                              century millennium].freeze
+                              century millennium date].freeze
     JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
     attr_reader :join_method, :label
 
@@ -188,7 +188,12 @@ module ActiveReporting
     end
 
     def datetime_drill_postgress(column)
-      "DATE_TRUNC('#{@datetime_drill}', #{column})"
+      case @datetime_drill.to_sym
+      when :date
+        "DATE('#{column}')"
+      else
+        "DATE_TRUNC('#{@datetime_drill}', #{column})"
+      end
     end
 
     def datetime_drill_mysql(column)
@@ -219,6 +224,8 @@ module ActiveReporting
         "YEAR(#{column}) DIV 100"
       when :millennium
         "YEAR(#{column}) DIV 1000"
+      when :date
+        "DATE(#{column})"
       end
     end
 
