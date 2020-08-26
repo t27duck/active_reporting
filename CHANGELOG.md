@@ -1,3 +1,9 @@
+## 0.6.1 (Unreleased)
+
+### Misc
+
+* Add `date` as an option for datetime drills - *germanotm*
+
 ## 0.6.0 (2020-08-21)
 
 ### Features
