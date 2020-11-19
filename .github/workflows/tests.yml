@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  PGPASSWORD: postgres
+  POSTGRES_HOST: localhost
+
+jobs:
+  tests:
+    services:
+      pg:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        mysql:
+      mysql:
+        image: mysql:5.7
+        env:
+            MYSQL_ALLOW_EMPTY_PASSWORD: yes
+            MYSQL_DATABASE: active_reporting_test
+        ports:
+            - 3306
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: '2.5'
+            gemfile: '5.2'
+            db: 'mysql'
+
+          - ruby: '2.5'
+            gemfile: '5.2'
+            db: 'postgresql'
+
+          - ruby: '2.5'
+            gemfile: '5.2'
+            db: 'sqlite'
+
+          - ruby: '2.5'
+            gemfile: '6.0'
+            db: 'mysql'
+
+          - ruby: '2.5'
+            gemfile: '6.0'
+            db: 'postgresql'
+
+          - ruby: '2.5'
+            gemfile: '6.0'
+            db: 'sqlite'
+
+          - ruby: '2.6'
+            gemfile: '5.2'
+            db: 'mysql'
+
+          - ruby: '2.6'
+            gemfile: '5.2'
+            db: 'postgresql'
+
+          - ruby: '2.6'
+            gemfile: '5.2'
+            db: 'sqlite'
+
+          - ruby: '2.6'
+            gemfile: '6.0'
+            db: 'mysql'
+
+          - ruby: '2.6'
+            gemfile: '6.0'
+            db: 'postgresql'
+
+          - ruby: '2.6'
+            gemfile: '6.0'
+            db: 'sqlite'
+
+          - ruby: '2.7'
+            gemfile: '5.2'
+            db: 'mysql'
+
+          - ruby: '2.7'
+            gemfile: '5.2'
+            db: 'postgresql'
+
+          - ruby: '2.7'
+            gemfile: '5.2'
+            db: 'sqlite'
+
+          - ruby: '2.7'
+            gemfile: '6.0'
+            db: 'mysql'
+
+          - ruby: '2.7'
+            gemfile: '6.0'
+            db: 'postgresql'
+
+          - ruby: '2.7'
+            gemfile: '6.0'
+            db: 'sqlite'
+
+    name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, db ${{ matrix.db }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: false
+
+    - name: Bundle install
+      run: |
+        bundle config set gemfile "${GITHUB_WORKSPACE}/gemfiles/${{ matrix.gemfile }}.gemfile"
+        bundle install --jobs 4 --retry 3
+    - name: Create PG DB
+      run: |
+        psql -c 'create database active_reporting_test;' -U postgres -h localhost
+    - name: Run tests
+      env:
+        DB: ${{ matrix.db }}
+        RAILS: ${{ matrix.gemfile }}
+      run: |
+        bundle exec rake test

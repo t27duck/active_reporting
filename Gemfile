@@ -4,12 +4,12 @@ gemspec
 
 gem 'simplecov', require: false
 
-rails = ENV['RAILS'] || '5-2'
+rails = ENV['RAILS'] || '5.2'
 db = ENV['DB'] || 'sqlite'
 
 case rails
-when '5-2'
+when '5.2'
   gem 'activerecord', '~> 5.2.0'
-when '6-0'
+when '6.0'
   gem 'activerecord', '~> 6.0.0'
 end
