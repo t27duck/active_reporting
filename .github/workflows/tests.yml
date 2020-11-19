@@ -14,6 +14,7 @@ env:
   PGPASSWORD: postgres
   POSTGRES_HOST: localhost
   MYSQL_HOST: '127.0.0.1'
+  MYSQL_PORT: '3306'
 
 jobs:
   tests:
@@ -121,6 +122,9 @@ jobs:
         bundler-cache: false
 
     - name: Bundle install
+      env:
+        DB: ${{ matrix.db }}
+        RAILS: ${{ matrix.gemfile }}
       run: |
         bundle install --jobs 4 --retry 3
     - name: Create PG DB

@@ -22,6 +22,7 @@ when 'pg'
 when 'mysql'
   db_config = { adapter:  'mysql2', database: 'active_reporting_test', encoding: 'utf8' }
   db_config[:host] = ENV['MYSQL_HOST'] if ENV.key?('MYSQL_HOST')
+  db_config[:port] = ENV['MYSQL_PORT'] if ENV.key?('MYSQL_PORT')
   ActiveRecord::Base.establish_connection(**db_config)
 when 'sqlite'
   ActiveRecord::Base.establish_connection(
