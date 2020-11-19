@@ -13,6 +13,7 @@ env:
   POSTGRES_PASSWORD: postgres
   PGPASSWORD: postgres
   POSTGRES_HOST: localhost
+  MYSQL_HOST: '127.0.0.1'
 
 jobs:
   tests:
@@ -42,7 +43,7 @@ jobs:
 
           - ruby: '2.5'
             gemfile: '5.2'
-            db: 'postgresql'
+            db: 'pg'
 
           - ruby: '2.5'
             gemfile: '5.2'
@@ -54,7 +55,7 @@ jobs:
 
           - ruby: '2.5'
             gemfile: '6.0'
-            db: 'postgresql'
+            db: 'pg'
 
           - ruby: '2.5'
             gemfile: '6.0'
@@ -66,7 +67,7 @@ jobs:
 
           - ruby: '2.6'
             gemfile: '5.2'
-            db: 'postgresql'
+            db: 'pg'
 
           - ruby: '2.6'
             gemfile: '5.2'
@@ -78,7 +79,7 @@ jobs:
 
           - ruby: '2.6'
             gemfile: '6.0'
-            db: 'postgresql'
+            db: 'pg'
 
           - ruby: '2.6'
             gemfile: '6.0'
@@ -90,7 +91,7 @@ jobs:
 
           - ruby: '2.7'
             gemfile: '5.2'
-            db: 'postgresql'
+            db: 'pg'
 
           - ruby: '2.7'
             gemfile: '5.2'
@@ -102,13 +103,13 @@ jobs:
 
           - ruby: '2.7'
             gemfile: '6.0'
-            db: 'postgresql'
+            db: 'pg'
 
           - ruby: '2.7'
             gemfile: '6.0'
             db: 'sqlite'
 
-    name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, db ${{ matrix.db }}
+    name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, ${{ matrix.db }}
 
     steps:
     - uses: actions/checkout@v2

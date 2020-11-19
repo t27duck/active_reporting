@@ -20,11 +20,9 @@ when 'pg'
   db_config[:host] = ENV['POSTGRES_HOST'] if ENV.key?('POSTGRES_HOST')
   ActiveRecord::Base.establish_connection(**db_config)
 when 'mysql'
-  ActiveRecord::Base.establish_connection(
-    adapter:  'mysql2',
-    database: 'active_reporting_test',
-    encoding: 'utf8'
-  )
+  db_config = { adapter:  'mysql2', database: 'active_reporting_test', encoding: 'utf8' }
+  db_config[:host] = ENV['MYSQL_HOST'] if ENV.key?('MYSQL_HOST')
+  ActiveRecord::Base.establish_connection(**db_config)
 when 'sqlite'
   ActiveRecord::Base.establish_connection(
     adapter: 'sqlite3',
