@@ -14,7 +14,6 @@ env:
   PGPASSWORD: postgres
   POSTGRES_HOST: localhost
   MYSQL_HOST: '127.0.0.1'
-  MYSQL_PORT: '3306'
 
 jobs:
   tests:
@@ -132,6 +131,7 @@ jobs:
         psql -c 'create database active_reporting_test;' -U postgres -h localhost
     - name: Run tests
       env:
+        MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
         DB: ${{ matrix.db }}
         RAILS: ${{ matrix.gemfile }}
       run: |
