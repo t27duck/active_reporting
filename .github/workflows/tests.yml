@@ -62,6 +62,18 @@ jobs:
             gemfile: '6.0'
             db: 'sqlite'
 
+          - ruby: '2.5'
+            gemfile: '6.1'
+            db: 'mysql'
+
+          - ruby: '2.5'
+            gemfile: '6.1'
+            db: 'pg'
+
+          - ruby: '2.5'
+            gemfile: '6.1'
+            db: 'sqlite'
+
           - ruby: '2.6'
             gemfile: '5.2'
             db: 'mysql'
@@ -86,6 +98,18 @@ jobs:
             gemfile: '6.0'
             db: 'sqlite'
 
+          - ruby: '2.6'
+            gemfile: '6.1'
+            db: 'mysql'
+
+          - ruby: '2.6'
+            gemfile: '6.1'
+            db: 'pg'
+
+          - ruby: '2.6'
+            gemfile: '6.1'
+            db: 'sqlite'
+
           - ruby: '2.7'
             gemfile: '5.2'
             db: 'mysql'
@@ -108,6 +132,18 @@ jobs:
 
           - ruby: '2.7'
             gemfile: '6.0'
+            db: 'sqlite'
+
+          - ruby: '2.7'
+            gemfile: '6.1'
+            db: 'mysql'
+
+          - ruby: '2.7'
+            gemfile: '6.1'
+            db: 'pg'
+
+          - ruby: '2.7'
+            gemfile: '6.1'
             db: 'sqlite'
 
     name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, ${{ matrix.db }}

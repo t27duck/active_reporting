@@ -12,4 +12,6 @@ when '5.2'
   gem 'activerecord', '~> 5.2.0'
 when '6.0'
   gem 'activerecord', '~> 6.0.0'
+when '6.1'
+  gem 'activerecord', '~> 6.1.0'
 end
