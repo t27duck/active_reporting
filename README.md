@@ -8,7 +8,7 @@ ActiveReporting officially supports MySQL, PostgreSQL, and SQLite.
 
 ActiveReporting officially supports Ruby 2.5 and later. Other versions may work, but are not supported.
 
-ActiveReporting officially supports Rails 5.2, and 6.0. Other versions may work, but are not supported.
+ActiveReporting officially supports Rails 5.2, 6.0, and 6.1. Other versions may work, but are not supported.
 
 ## Installation
 
