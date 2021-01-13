@@ -146,6 +146,18 @@ jobs:
             gemfile: '6.1'
             db: 'sqlite'
 
+          - ruby: '3.0'
+            gemfile: '6.1'
+            db: 'mysql'
+
+          - ruby: '3.0'
+            gemfile: '6.1'
+            db: 'pg'
+
+          - ruby: '3.0'
+            gemfile: '6.1'
+            db: 'sqlite'
+    
     name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, ${{ matrix.db }}
 
     steps:
