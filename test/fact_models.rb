@@ -20,6 +20,10 @@ end
 class GameFactModel < ActiveReporting::FactModel
   default_dimension_label :title
   dimension :platform
+  dimension :genre
+end
+
+class GenreFactModel < ActiveReporting::FactModel
 end
 
 class SeriesFactModel < ActiveReporting::FactModel

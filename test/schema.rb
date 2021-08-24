@@ -20,8 +20,14 @@ ActiveRecord::Schema.define do
   create_table :games, force: true do |t|
     t.string :title, null: false
     t.integer :platform_id, null: false
+    t.integer :genre_id, null: false
   end
   add_index :games, :platform_id
+  add_index :games, :genre_id
+
+  create_table :genres, force: true do |t|
+    t.string :display_name, null: false
+  end
 
   create_table :figures, force: true do |t|
     t.integer :series_id, null: false

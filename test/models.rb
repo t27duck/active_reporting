@@ -15,7 +15,12 @@ end
 
 class Game < ActiveRecord::Base
   belongs_to :platform
+  belongs_to :genre
   has_many :game_compatabilities
+end
+
+class Genre < ActiveRecord::Base
+  has_many :games
 end
 
 class Figure < ActiveRecord::Base

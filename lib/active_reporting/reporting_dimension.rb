@@ -12,7 +12,7 @@ module ActiveReporting
     JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
     attr_reader :join_method, :label
 
-    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?
+    def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?, :label_column
 
     def self.build_from_dimensions(fact_model, dimensions)
       Array(dimensions).map do |dim|
@@ -107,7 +107,9 @@ module ActiveReporting
     private ####################################################################
 
     def determine_label_field(label_field)
-      @label = if label_field.present? && validate_hierarchical_label(label_field)
+      @label = if @dimension.label_column.present?
+                 @dimension.label_column
+               elsif label_field.present? && validate_hierarchical_label(label_field)
                  type == Dimension::TYPES[:degenerate] ? name : label_field.to_sym
                elsif type == Dimension::TYPES[:degenerate]
                  name
@@ -117,12 +119,11 @@ module ActiveReporting
     end
 
     def determine_label_name(label_name)
-
       if label_name
         @label_name = label_name
       else
         @label_name = name
-        @label_name += "_#{@label}" if (type == Dimension::TYPES[:standard] && @label != :name)
+        @label_name += "_#{@label}" if type == Dimension::TYPES[:standard] && @label != :name && @dimension.label_column.blank?
         @label_name += "_#{@datetime_drill}" if @datetime_drill
       end
       @label_name

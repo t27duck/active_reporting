@@ -11,6 +11,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     @release_date_released_on_dimension           = ActiveReporting::Dimension.new(ReleaseDateFactModel, name: :released_on)
 
     @game_platform_dimension                      = ActiveReporting::Dimension.new(GameFactModel, name: :platform)
+    @game_genre_dimension                         = ActiveReporting::Dimension.new(GameFactModel, name: :genre, label_column: :display_name)
     @game_compatability_platform_dimension        = ActiveReporting::Dimension.new(GameCompatabilityFactModel, name: :platform)
     @game_compatability_fact_model_default_label  = GameCompatabilityFactModel.dimension_label
 
@@ -54,6 +55,16 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     assert_equal expected, subject.select_statement
 
     expected = ["#{Platform.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name(PlatformFactModel.dimension_label)} AS #{ActiveRecord::Base.connection.quote_column_name(build_label_name)}"]
+    assert_equal expected, subject.select_statement(with_identifier: false)
+  end
+
+  def test_select_statement_can_label_custom_column
+    subject = ActiveReporting::ReportingDimension.new(@game_genre_dimension)
+
+    expected = [
+      "#{Genre.quoted_table_name}.#{ActiveRecord::Base.connection.quote_column_name('display_name')} AS #{ActiveRecord::Base.connection.quote_column_name(:genre)}"
+    ]
+
     assert_equal expected, subject.select_statement(with_identifier: false)
   end
 

@@ -26,4 +26,9 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
     subject = ActiveReporting::Dimension.new(ReleaseDateFactModel, name: :released_on)
     assert subject.hierarchical?
   end
+
+  def test_dimension_can_have_label_column
+    subject = ActiveReporting::Dimension.new(FigureFactModel, name: :series, label_column: :title)
+    assert_equal :title, subject.label_column
+  end
 end

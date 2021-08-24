@@ -4,12 +4,15 @@ module ActiveReporting
   class Dimension
     TYPES = { degenerate: :degenerate, standard: :standard }.freeze
     attr_reader :name
+    attr_reader :label_column
 
     # @param model [ActiveRecord::Base]
     # @param name [Symbol]
-    def initialize(fact_model, name:)
-      @fact_model = fact_model
-      @name       = name.to_s
+    # @param label_column [Symbol]
+    def initialize(fact_model, name:, label_column: nil)
+      @fact_model   = fact_model
+      @name         = name.to_s
+      @label_column = label_column
     end
 
     # Determins the type of the dimension
