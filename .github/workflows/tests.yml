@@ -38,42 +38,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - ruby: '2.5'
-            gemfile: '5.2'
-            db: 'mysql'
-
-          - ruby: '2.5'
-            gemfile: '5.2'
-            db: 'pg'
-
-          - ruby: '2.5'
-            gemfile: '5.2'
-            db: 'sqlite'
-
-          - ruby: '2.5'
-            gemfile: '6.0'
-            db: 'mysql'
-
-          - ruby: '2.5'
-            gemfile: '6.0'
-            db: 'pg'
-
-          - ruby: '2.5'
-            gemfile: '6.0'
-            db: 'sqlite'
-
-          - ruby: '2.5'
-            gemfile: '6.1'
-            db: 'mysql'
-
-          - ruby: '2.5'
-            gemfile: '6.1'
-            db: 'pg'
-
-          - ruby: '2.5'
-            gemfile: '6.1'
-            db: 'sqlite'
-
           - ruby: '2.6'
             gemfile: '5.2'
             db: 'mysql'
@@ -157,7 +121,31 @@ jobs:
           - ruby: '3.0'
             gemfile: '6.1'
             db: 'sqlite'
-    
+
+          - ruby: '2.7'
+            gemfile: '7.0'
+            db: 'mysql'
+
+          - ruby: '2.7'
+            gemfile: '7.0'
+            db: 'pg'
+
+          - ruby: '2.7'
+            gemfile: '7.0'
+            db: 'sqlite'
+
+          - ruby: '3.0'
+            gemfile: '7.0'
+            db: 'mysql'
+
+          - ruby: '3.0'
+            gemfile: '7.0'
+            db: 'pg'
+
+          - ruby: '3.0'
+            gemfile: '7.0'
+            db: 'sqlite'
+
     name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, ${{ matrix.db }}
 
     steps:
