@@ -306,7 +306,7 @@ my_metric = ActiveReporting::Metric.new(
 
 You may pass a hash instead of a symbol to customize the dimension options (example: { dimension_name: { option1: value, option2: value}}). The avaliable options are:
 
-- `field` - Specify the hierarchy level that should be used instead the default dimension label. Ex: `[:sales_rep, {mobile_phone: { field :manufacture }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table.
+- `field` - Specify the hierarchy level that should be used instead the default dimension label. Ex: `[:sales_rep, {mobile_phone: { field: :manufacture }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table.
 
 - `name` - You may costumize the label alias, by default the dimension name will be used. The `name` can be whatever label you want. Ex :`[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`.
 
