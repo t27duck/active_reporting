@@ -40,8 +40,12 @@ module ActiveReporting
       @data = model.connection.exec_query(statement.to_sql).to_a
       apply_dimension_callbacks
       if @group_results
-        dimension_label_names = @dimensions.map { |d| d.label_name.to_s }
-        @data = Hash[@data.map { |r| [ r.fetch_values(*dimension_label_names), r.fetch(@metric.name.to_s)] }]
+        if @dimensions.any?
+          dimension_label_names = @dimensions.map { |d| d.label_name.to_s }
+          @data = Hash[@data.map { |r| [ r.fetch_values(*dimension_label_names), r.fetch(@metric.name.to_s)] }]
+        else
+          @data = Hash[@data.map { |r| [ r.keys, r.fetch(@metric.name.to_s)] }]
+        end
       end
       @data
     end
