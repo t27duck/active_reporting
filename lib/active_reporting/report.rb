@@ -14,7 +14,7 @@ module ActiveReporting
     extend Forwardable
     def_delegators :@metric, :fact_model, :model
 
-    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {})
+    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {}, raw_results: false)
       @metric = metric.is_a?(Metric) ? metric : ActiveReporting.fetch_metric(metric)
       raise UnknownMetric, "Unknown metric #{metric}" if @metric.nil?
 
@@ -24,6 +24,7 @@ module ActiveReporting
       @metric_filter          = @metric.metric_filter.merge(metric_filter)
       @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
+      @raw_results            = raw_results
     end
 
     # Builds and executes a query, returning the raw result
@@ -36,8 +37,11 @@ module ActiveReporting
     private ######################################################################
 
     def build_data
-      @data = model.connection.exec_query(statement.to_sql).to_a
-      apply_dimension_callbacks
+      @data = model.connection.exec_query(statement.to_sql)
+      unless @raw_results
+        @data = @data.to_a
+        apply_dimension_callbacks
+      end
       @data
     end
 
