@@ -14,7 +14,7 @@ module ActiveReporting
     extend Forwardable
     def_delegators :@metric, :fact_model, :model
 
-    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {}, group_results: false)
+    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {}, data_format: :standard)
       @metric = metric.is_a?(Metric) ? metric : ActiveReporting.fetch_metric(metric)
       raise UnknownMetric, "Unknown metric #{metric}" if @metric.nil?
 
@@ -24,7 +24,7 @@ module ActiveReporting
       @metric_filter          = @metric.metric_filter.merge(metric_filter)
       @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
-      @group_results          = group_results
+      @data_format            = data_format
     end
 
     # Builds and executes a query, returning the raw result
@@ -39,15 +39,22 @@ module ActiveReporting
     def build_data
       @data = model.connection.exec_query(statement.to_sql).to_a
       apply_dimension_callbacks
-      if @group_results
+      format_data unless @data_format == :standard
+      @data
+    end
+
+    def format_data
+      case @data_format
+      when :grouped
         if @dimensions.any?
           dimension_label_names = @dimensions.map { |d| d.label_name.to_s }
           @data = Hash[@data.map { |r| [ r.fetch_values(*dimension_label_names), r.fetch(@metric.name.to_s)] }]
         else
           @data = Hash[@data.map { |r| [ r.keys, r.fetch(@metric.name.to_s)] }]
         end
+      else
+        raise UnknownDataFormat
       end
-      @data
     end
 
     def partition_dimension_filters(user_dimension_filter)
