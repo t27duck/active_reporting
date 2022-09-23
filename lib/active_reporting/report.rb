@@ -29,9 +29,12 @@ module ActiveReporting
 
     # Builds and executes a query, returning the raw result
     #
-    # @return [Array]
+    # @return [Array, Hash]
     def run
       @run ||= build_data
+
+      # Pass format as a block
+      block_given? ? yield(@metric, @dimensions, @run) : @run
     end
 
     private ######################################################################
