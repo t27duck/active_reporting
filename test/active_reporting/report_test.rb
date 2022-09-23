@@ -52,4 +52,52 @@ class ActiveReporting::ReportTest < Minitest::Test
     report = ActiveReporting::Report.new(metric)
     assert report.send(:statement).to_sql.include?("LEFT OUTER JOIN")
   end
+
+  ### test_data_format_grouped
+  # The standard data format returns an array of hashes (records).
+  # Specifying 'data_format: grouped' should return  metric values grouped by metric dimensions e.g.
+  # ----- Data Format: Standard -----
+  # [{"a_metric"=>26, "platform"=>"3DS"}, {"a_metric"=>1, "platform"=>"Switch"}, {"a_metric"=>20, "platform"=>"Wii U"}]
+  # ----- Data Format: Grouped -----
+  # {["3DS"]=>26, ["Switch"]=>1, ["Wii U"]=>20}
+  def test_data_format_grouped_single_dimension
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: GameFactModel, dimensions: [:platform], aggregate: :count)
+    standard_report = ActiveReporting::Report.new(metric, dimension_identifiers: false)
+    standard_data = standard_report.run
+    assert standard_data.is_a?(Array)
+
+    grouped_report = ActiveReporting::Report.new(metric, dimension_identifiers: false, data_format: :grouped)
+    grouped_data = grouped_report.run
+    assert grouped_data.is_a?(Hash)
+
+    # Group the standard result so we can check we have the right result
+    metric_name = metric.instance_variable_get(:@name)
+    dimension_names = standard_report.instance_variable_get(:@dimensions).map { |d| d.instance_variable_get(:@label_name).to_s }
+    standard_grouped = Hash[standard_data.map { |r| [ r.fetch_values(*dimension_names), r.fetch(metric_name.to_s)] }]
+
+    assert_equal standard_grouped, grouped_data
+  end
+
+  def test_run_with_a_block
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: GameFactModel, dimensions: [:platform], aggregate: :count)
+    report = ActiveReporting::Report.new(metric, dimension_identifiers: false)
+    standard_data = report.run
+    assert standard_data.is_a?(Array)
+
+    grouped_data = report.run do |metric, dimensions, data|
+      if dimensions.any?
+        dimension_label_names = dimensions.map { |d| d.label_name.to_s }
+        Hash[data.map { |r| [ r.fetch_values(*dimension_label_names), r.fetch(metric.name.to_s)] }]
+      else
+        Hash[data.map { |r| [ r.keys, r.fetch(metric.name.to_s)] }]
+      end
+    end
+    assert grouped_data.is_a?(Hash)
+
+    # Group the standard result so we can check we have the right result
+    metric_name = metric.instance_variable_get(:@name)
+    dimension_names = report.instance_variable_get(:@dimensions).map { |d| d.instance_variable_get(:@label_name).to_s }
+    standard_grouped = Hash[standard_data.map { |r| [ r.fetch_values(*dimension_names), r.fetch(metric_name.to_s)] }]
+    assert_equal standard_grouped, grouped_data
+  end
 end
