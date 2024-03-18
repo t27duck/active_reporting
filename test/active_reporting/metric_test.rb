@@ -45,4 +45,14 @@ class ActiveReporting::MetricTest < Minitest::Test
     assert metric.order_by_dimension.is_a?(Hash)
     assert_equal({:kind => :asc}, metric.order_by_dimension)
   end
+
+  def test_metric_can_define_a_measure
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: :taxes)
+    assert_equal :taxes, metric.measure
+  end
+
+  def test_metric_does_not_define_a_measure_by_default
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel)
+    assert_nil metric.measure
+  end
 end

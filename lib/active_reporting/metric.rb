@@ -7,7 +7,8 @@ module ActiveReporting
   class Metric
     extend Forwardable
     def_delegators :@fact_model, :model
-    attr_reader :fact_model, :name, :dimensions, :dimension_filter, :aggregate, :metric_filter, :order_by_dimension
+    attr_reader :fact_model, :name, :dimensions, :dimension_filter, :aggregate
+    attr_reader :metric_filter, :order_by_dimension, :measure
 
     def initialize(
       name,
@@ -16,7 +17,8 @@ module ActiveReporting
       dimensions: [],
       dimension_filter: {},
       metric_filter: {},
-      order_by_dimension: {}
+      order_by_dimension: {},
+      measure: nil
     )
       @name               = name.to_sym
       @fact_model         = fact_model
@@ -25,6 +27,7 @@ module ActiveReporting
       @metric_filter      = metric_filter
       @dimensions         = ReportingDimension.build_from_dimensions(@fact_model, Array(dimensions))
       @order_by_dimension = order_by_dimension
+      @measure            = measure
       check_dimension_filter
     end
 

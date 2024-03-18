@@ -81,8 +81,12 @@ module ActiveReporting
       when :count
         'COUNT(*)'
       else
-        "#{@metric.aggregate.to_s.upcase}(#{fact_model.measure})"
+        "#{@metric.aggregate.to_s.upcase}(#{measure})"
       end
+    end
+
+    def measure
+      @metric.measure || fact_model.measure
     end
 
     def dimension_joins(join_method)

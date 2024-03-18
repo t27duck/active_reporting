@@ -52,4 +52,15 @@ class ActiveReporting::ReportTest < Minitest::Test
     report = ActiveReporting::Report.new(metric)
     assert report.send(:statement).to_sql.include?("LEFT OUTER JOIN")
   end
+
+  def test_report_runs_with_an_aggregate_other_than_count
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: :taxes, aggregate: :sum)
+    report = ActiveReporting::Report.new(metric)
+    assert report.send(:statement).to_sql.include?("taxes)")
+
+    data   = report.run
+
+    refute data.empty?
+    assert_equal Sale.sum(:taxes).to_i, data[0]["a_metric"].to_i
+  end
 end
