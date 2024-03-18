@@ -318,6 +318,8 @@ You may pass a hash instead of a symbol to customize the dimension options (exam
 
 `metric_filter` - An additional HAVING clause to be tacked on to the end of the query. This allows for the further filtering of the end results based on the value of the aggregate. (Examples: `{gt: 3}`, `{eq: 5}`, `{lte: 7}`)
 
+`measure` - Override the measure on the `ActiveReporting::Factmodel` used.
+
 `order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. (Examples: `{author: :desc}`, `{sales_ref: :asc}`)
 
 For those using Postgres, you can take advantage of implicit hierarchies in `datetime` columns, as mentioned above:

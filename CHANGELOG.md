@@ -1,3 +1,9 @@
+## 0.6.2 (2024-03-18)
+
+### Features
+
+* `Metric` can now take an optional `measure` argument to override the measure that would normally be used.
+
 ## 0.6.1 (2020-08-29)
 
 ### Misc
