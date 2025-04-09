@@ -38,88 +38,88 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - ruby: '3.0'
-            gemfile: '6.1'
-            db: 'mysql'
-
-          - ruby: '3.0'
-            gemfile: '6.1'
-            db: 'pg'
-
-          - ruby: '3.0'
-            gemfile: '6.1'
-            db: 'sqlite'
-
-          - ruby: '3.0'
-            gemfile: '7.0'
-            db: 'mysql'
-
-          - ruby: '3.0'
-            gemfile: '7.0'
-            db: 'pg'
-
-          - ruby: '3.0'
-            gemfile: '7.0'
-            db: 'sqlite'
-
-          - ruby: '3.1'
-            gemfile: '7.0'
-            db: 'mysql'
-
-          - ruby: '3.1'
-            gemfile: '7.0'
-            db: 'pg'
-
-          - ruby: '3.1'
-            gemfile: '7.0'
-            db: 'sqlite'
-
           - ruby: '3.2'
-            gemfile: '7.0'
+            gemfile: '8.0'
             db: 'mysql'
 
           - ruby: '3.2'
-            gemfile: '7.0'
+            gemfile: '8.0'
             db: 'pg'
 
           - ruby: '3.2'
-            gemfile: '7.0'
+            gemfile: '8.0'
             db: 'sqlite'
 
           - ruby: '3.3'
-            gemfile: '7.0'
+            gemfile: '8.0'
             db: 'mysql'
 
           - ruby: '3.3'
-            gemfile: '7.0'
+            gemfile: '8.0'
             db: 'pg'
 
           - ruby: '3.3'
-            gemfile: '7.0'
+            gemfile: '8.0'
+            db: 'sqlite'
+
+          - ruby: '3.4'
+            gemfile: '8.0'
+            db: 'mysql'
+
+          - ruby: '3.4'
+            gemfile: '8.0'
+            db: 'pg'
+
+          - ruby: '3.4'
+            gemfile: '8.0'
             db: 'sqlite'
 
           - ruby: '3.2'
-            gemfile: '7.1'
+            gemfile: '7.2'
             db: 'mysql'
 
           - ruby: '3.2'
-            gemfile: '7.1'
+            gemfile: '7.2'
             db: 'pg'
 
           - ruby: '3.2'
-            gemfile: '7.1'
+            gemfile: '7.2'
             db: 'sqlite'
 
           - ruby: '3.3'
-            gemfile: '7.1'
+            gemfile: '7.2'
             db: 'mysql'
 
           - ruby: '3.3'
-            gemfile: '7.1'
+            gemfile: '7.2'
             db: 'pg'
 
           - ruby: '3.3'
-            gemfile: '7.1'
+            gemfile: '7.2'
+            db: 'sqlite'
+
+          - ruby: '3.3'
+            gemfile: '7.2'
+            db: 'mysql'
+
+          - ruby: '3.3'
+            gemfile: '7.2'
+            db: 'pg'
+
+          - ruby: '3.3'
+            gemfile: '7.2'
+            db: 'sqlite'
+
+          - ruby: '3.4'
+            gemfile: '7.2'
+            db: 'mysql'
+
+          - ruby: '3.4'
+            gemfile: '7.2'
+            db: 'pg'
+
+          - ruby: '3.4'
+            gemfile: '7.2'
             db: 'sqlite'
     name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, ${{ matrix.db }}
 
