@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport'
 
   spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'minitest'
+  spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'mysql2'
   spec.add_development_dependency 'pg'
   spec.add_development_dependency 'rake'
