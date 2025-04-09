@@ -23,7 +23,8 @@ module ActiveReporting
 
         # Ambiguous behavior with string option for degenerate and standard dimension
         if !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
-          ActiveSupport::Deprecation.warn <<~EOS
+          deprecation = ActiveSupport::Deprecation.new("0.7.0", "active_reporting")
+          deprecation.warn(<<~EOS)
             direct use of implict hierarchies is deprecated and will be removed in future versions. \
             Please use `:datetime_drill` option instead.
           EOS
