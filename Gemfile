@@ -4,12 +4,10 @@ gemspec
 
 gem 'simplecov', require: false
 
-rails = ENV['RAILS'] || '8.0'
+rails = ENV['RAILS'] || '8.1'
 # db = ENV['DB'] || 'sqlite'
 
 case rails
-when '8.0'
-  gem 'activerecord', '~> 8.0.0'
-when '7.2'
-  gem 'activerecord', '~> 7.2.0'
+when '8.1'
+  gem 'activerecord', '~> 8.1.0'
 end

@@ -13,8 +13,8 @@ env:
   POSTGRES_PASSWORD: postgres
   PGPASSWORD: postgres
   POSTGRES_HOST: localhost
-  MYSQL_HOST: '127.0.0.1'
-  MYSQL_USER: 'root'
+  MYSQL_HOST: "127.0.0.1"
+  MYSQL_USER: "root"
 
 jobs:
   tests:
@@ -24,127 +24,63 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
       mysql:
         image: mysql:5.7
         env:
-            MYSQL_ALLOW_EMPTY_PASSWORD: yes
-            MYSQL_DATABASE: active_reporting_test
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: active_reporting_test
         ports:
-            - 3306
+          - 3306
 
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - ruby: '3.2'
-            gemfile: '8.0'
-            db: 'mysql'
+          - ruby: "3.3"
+            gemfile: "8.1"
+            db: "sqlite"
 
-          - ruby: '3.2'
-            gemfile: '8.0'
-            db: 'pg'
+          - ruby: "3.4"
+            gemfile: "8.1"
+            db: "sqlite"
 
-          - ruby: '3.2'
-            gemfile: '8.0'
-            db: 'sqlite'
+          - ruby: "4.0"
+            gemfile: "8.1"
+            db: "mysql"
 
-          - ruby: '3.3'
-            gemfile: '8.0'
-            db: 'mysql'
+          - ruby: "4.0"
+            gemfile: "8.1"
+            db: "pg"
 
-          - ruby: '3.3'
-            gemfile: '8.0'
-            db: 'pg'
-
-          - ruby: '3.3'
-            gemfile: '8.0'
-            db: 'sqlite'
-
-          - ruby: '3.4'
-            gemfile: '8.0'
-            db: 'mysql'
-
-          - ruby: '3.4'
-            gemfile: '8.0'
-            db: 'pg'
-
-          - ruby: '3.4'
-            gemfile: '8.0'
-            db: 'sqlite'
-
-          - ruby: '3.2'
-            gemfile: '7.2'
-            db: 'mysql'
-
-          - ruby: '3.2'
-            gemfile: '7.2'
-            db: 'pg'
-
-          - ruby: '3.2'
-            gemfile: '7.2'
-            db: 'sqlite'
-
-          - ruby: '3.3'
-            gemfile: '7.2'
-            db: 'mysql'
-
-          - ruby: '3.3'
-            gemfile: '7.2'
-            db: 'pg'
-
-          - ruby: '3.3'
-            gemfile: '7.2'
-            db: 'sqlite'
-
-          - ruby: '3.3'
-            gemfile: '7.2'
-            db: 'mysql'
-
-          - ruby: '3.3'
-            gemfile: '7.2'
-            db: 'pg'
-
-          - ruby: '3.3'
-            gemfile: '7.2'
-            db: 'sqlite'
-
-          - ruby: '3.4'
-            gemfile: '7.2'
-            db: 'mysql'
-
-          - ruby: '3.4'
-            gemfile: '7.2'
-            db: 'pg'
-
-          - ruby: '3.4'
-            gemfile: '7.2'
-            db: 'sqlite'
+          - ruby: "4.0"
+            gemfile: "8.1"
+            db: "sqlite"
     name: rails ${{ matrix.gemfile }}, ruby ${{ matrix.ruby }}, ${{ matrix.db }}
 
     steps:
-    - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: false
 
-    - name: Bundle install
-      env:
-        DB: ${{ matrix.db }}
-        RAILS: ${{ matrix.gemfile }}
-      run: |
-        bundle install --jobs 4 --retry 3
-    - name: Create PG DB
-      run: |
-        psql -c 'create database active_reporting_test;' -U postgres -h localhost
-    - name: Run tests
-      env:
-        MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
-        DB: ${{ matrix.db }}
-        RAILS: ${{ matrix.gemfile }}
-      run: |
-        bundle exec rake test
+      - name: Bundle install
+        env:
+          DB: ${{ matrix.db }}
+          RAILS: ${{ matrix.gemfile }}
+        run: |
+          bundle install --jobs 4 --retry 3
+      - name: Create PG DB
+        run: |
+          psql -c 'create database active_reporting_test;' -U postgres -h localhost
+      - name: Run tests
+        env:
+          MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
+          DB: ${{ matrix.db }}
+          RAILS: ${{ matrix.gemfile }}
+        run: |
+          bundle exec rake test

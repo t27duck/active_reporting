@@ -6,9 +6,9 @@ ActiveReporting implements various terminology used in Relational Online Analyti
 
 ActiveReporting officially supports MySQL, PostgreSQL, and SQLite.
 
-ActiveReporting officially supports Ruby 3.0 and later. Other versions may work, but are not supported.
+ActiveReporting officially supports [Ruby versions under official support](https://endoflife.date/ruby). Other versions may work, but are not supported.
 
-ActiveReporting officially supports Rails 6.1 - 7.1. Other versions may work, but are not supported.
+ActiveReporting officially supports [Rails versions under official support](https://endoflife.date/rails). Other versions may work, but are not supported.
 
 ## Installation
 
@@ -28,7 +28,7 @@ Or install it yourself as:
 
 ## What is "Reporting"?
 
-Reporting is the collection and presentation data so that it can be analyzed. Our databases only store one thing: data. Data is great for computers but mostly worthless to humans. What ActiveReoprting does is turn that *data* into *information* to help humans make decisions.
+Reporting is the collection and presentation data so that it can be analyzed. Our databases only store one thing: data. Data is great for computers but mostly worthless to humans. What ActiveReoprting does is turn that _data_ into _information_ to help humans make decisions.
 
 ## Terminology
 
@@ -48,9 +48,9 @@ A dimension is a point of data used to "slice and dice" data from a fact model. 
 
 Examples:
 
-* A sales rep on a fact table of sales
-* A state of an sale on a state machine
-* The manufacture on a fact table of widgets
+- A sales rep on a fact table of sales
+- A state of an sale on a state machine
+- The manufacture on a fact table of widgets
 
 SQL Equivalent: JOIN, GROUP BY
 
@@ -62,8 +62,8 @@ A hierarchy for a dimension is related attributes that live on a dimension table
 
 Examples:
 
-* Dates: Date, Month, Year, Quarter
-* Mobile Phone: Model, Manufacture, OS, Wireless Technology
+- Dates: Date, Month, Year, Quarter
+- Mobile Phone: Model, Manufacture, OS, Wireless Technology
 
 ### Dimension Member (also known as dimension labels)
 
@@ -71,7 +71,7 @@ This is information related to a dimension. When the dimension lives on the fact
 
 Examples:
 
-* When dimensioning blog posts by category, the dimension is the category_id which leads to the categories table. The label would be the category name.
+- When dimensioning blog posts by category, the dimension is the category_id which leads to the categories table. The label would be the category name.
 
 ### Dimension Filter (or just "filter")
 
@@ -87,8 +87,8 @@ A measure is a column in a fact table (usually a numeric value) used in aggregat
 
 Examples:
 
-* Total amount in a sale
-* Number of units used in a transaction
+- Total amount in a sale
+- Number of units used in a transaction
 
 SQL Equivalent: Column in the fact table used in an aggregation function
 
@@ -96,7 +96,7 @@ Rails: ActiveRecord attribute
 
 ### Metric
 
-A metric is a measured value and the subject of the report. It is the result of *the* question you want answered.
+A metric is a measured value and the subject of the report. It is the result of _the_ question you want answered.
 
 SQL Equivalent: A query result
 
@@ -143,7 +143,6 @@ ActiveReporting::Configuration.setting = value
 `ransack_fallback` - If the ransack gem is loaded, allow all unknown dimension filters to be delegated to ransack. (Default: `false`)
 
 `metric_lookup_class` - The name of a constant used to lookup prebuilt `Reporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. (Default: `::Metric`)
-
 
 ## ActiveReporting::FactModel
 
@@ -223,7 +222,7 @@ end
 
 ### Drill down / Roll up (Drill up) with datetime columns
 
-The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way,  ActiveRporting provides a `datetime_drill` option that can be passed with the dimension on the metric definition to drill datetime columns.
+The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way, ActiveRporting provides a `datetime_drill` option that can be passed with the dimension on the metric definition to drill datetime columns.
 
 To use, declare a datetime dimension on a fact model as normal:
 
@@ -252,7 +251,7 @@ When creating a metric, ActiveReporting will recognize the following datetime hi
 
 Under the hood Active Reporting uses specific database functions to manipulate datetime columns. Postgres provides a way to group by `datetime` column data on the fly using the [`date_trunc` function](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). On Mysql this can be done using [Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html).
 
-*NOTE*: PRs welcomed to support this functionality in other databases.
+_NOTE_: PRs welcomed to support this functionality in other databases.
 
 ## Configuring Dimension Filters
 

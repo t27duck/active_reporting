@@ -2,27 +2,25 @@ AllCops:
   Exclude:
     - test/**/*
     - Gemfile
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 3.2
+  NewCops: disable
 
 Metrics/ClassLength:
   Max: 150
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/ParameterLists:
   Max: 8
 
-MethodLength:
+Metrics/MethodLength:
   Max: 20
 
 Style/ClassAndModuleChildren:
   Enabled: false
 
 Style/Documentation:
-  Enabled: false
-
-Style/Name:
   Enabled: false
 
 Style/RaiseArgs:

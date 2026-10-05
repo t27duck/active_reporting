@@ -9,7 +9,6 @@ end
 require 'active_reporting'
 
 require 'minitest/autorun'
-require 'minitest/pride'
 
 db = ENV['DB'] || 'sqlite'
 case db
