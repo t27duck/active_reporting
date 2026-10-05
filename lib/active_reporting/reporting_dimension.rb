@@ -10,7 +10,7 @@ module ActiveReporting
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
                               century millennium date].freeze
     JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
-    attr_reader :join_method, :label
+    attr_reader :join_method, :label, :label_name
 
     def_delegators :@dimension, :name, :type, :klass, :association, :model, :hierarchical?
 
@@ -106,7 +106,7 @@ module ActiveReporting
     #
     # @return [Lambda, NilClass]
     def label_callback
-      klass.fact_model.dimension_label_callbacks[@label]
+      klass.fact_model.dimension_label_callbacks[@label.to_sym]
     end
 
     private ####################################################################

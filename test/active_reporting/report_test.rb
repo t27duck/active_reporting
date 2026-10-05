@@ -23,6 +23,34 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert data.all? { |r| r['released_on_quarter'].to_s.match(/\AQ\d+/) }
   end
 
+  def test_dimension_callback_is_applied_to_a_custom_label_name
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel, dimensions: [{ released_on: { field: :quarter, name: :release_quarter } }])
+    data = ActiveReporting::Report.new(metric).run
+
+    refute data.empty?
+    assert data.all? { |r| r['release_quarter'].to_s.match(/\AQ\d+/) }
+  end
+
+  def test_dimension_callback_is_applied_to_a_standard_dimension_using_the_name_label
+    with_dimension_label_callback(SeriesFactModel, :name, ->(n) { "Series: #{n}" }) do
+      metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:series])
+      data = ActiveReporting::Report.new(metric).run
+
+      refute data.empty?
+      assert data.all? { |r| r['series'].start_with?('Series: ') }
+    end
+  end
+
+  def test_dimension_callback_is_applied_to_a_degenerate_dimension
+    with_dimension_label_callback(FigureFactModel, :kind, ->(k) { k.upcase }) do
+      metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])
+      data = ActiveReporting::Report.new(metric).run
+
+      refute data.empty?
+      assert data.all? { |r| r['kind'] == r['kind'].upcase }
+    end
+  end
+
   def test_report_runs_with_an_aggregate_other_than_count
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, dimensions: [:item], aggregate: :sum)
     report = ActiveReporting::Report.new(metric)
@@ -72,5 +100,15 @@ class ActiveReporting::ReportTest < Minitest::Test
 
     refute data.empty?
     assert_equal Sale.sum(:taxes).to_i, data[0]["a_metric"].to_i
+  end
+
+  private
+
+  def with_dimension_label_callback(fact_model, column, callback)
+    original = fact_model.dimension_label_callbacks.dup
+    fact_model.dimension_label_callback(column, callback)
+    yield
+  ensure
+    fact_model.instance_variable_set(:@dimension_label_callbacks, original)
   end
 end

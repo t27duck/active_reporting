@@ -10,11 +10,8 @@ module ActiveReporting
     #
     # @return [ActiveReporting::FactModel]
     def fact_model
-      const_name = "#{name}FactModel"
-      @fact_model ||= begin
-        const_name.constantize
-      rescue NameError
-        const = Object.const_set(const_name, Class.new(ActiveReporting::FactModel))
+      @fact_model ||= "#{name}FactModel".safe_constantize || begin
+        const = module_parent.const_set("#{name.demodulize}FactModel", Class.new(ActiveReporting::FactModel))
         const.model = self
         const
       end
