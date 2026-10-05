@@ -2,8 +2,9 @@ AllCops:
   Exclude:
     - test/**/*
     - Gemfile
-  TargetRubyVersion: 3.2
+  TargetRubyVersion: 3.3
   NewCops: disable
+  SuggestExtensions: false
 
 Metrics/ClassLength:
   Max: 150

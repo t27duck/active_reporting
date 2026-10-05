@@ -19,11 +19,14 @@ module ActiveReporting
         dimension_name, options = dim.is_a?(Hash) ? Array(dim).flatten : [dim, nil]
         found_dimension = fact_model.dimensions[dimension_name.to_sym]
 
-        raise(UnknownDimension, "Dimension '#{dimension_name}' not found on fact model '#{fact_model}'") if found_dimension.nil?
+        if found_dimension.nil?
+          raise(UnknownDimension,
+                "Dimension '#{dimension_name}' not found on fact model '#{fact_model}'")
+        end
 
         # Ambiguous behavior with string option for degenerate and standard dimension
         if !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
-          deprecation = ActiveSupport::Deprecation.new("0.7.0", "active_reporting")
+          deprecation = ActiveSupport::Deprecation.new('0.7.0', 'active_reporting')
           deprecation.warn(<<~EOS)
             direct use of implict hierarchies is deprecated and will be removed in future versions. \
             Please use `:datetime_drill` option instead.
@@ -40,9 +43,7 @@ module ActiveReporting
     #
     # @param [Symbol|Hash] options
     def self.label_config(options)
-      unless options.is_a?(Hash)
-        return { label: options }
-      end
+      return { label: options } unless options.is_a?(Hash)
 
       {
         label: options[:field],
@@ -76,7 +77,9 @@ module ActiveReporting
     # @return [Array]
     def select_statement(with_identifier: true)
       ss = ["#{label_fragment} AS #{label_fragment_alias}"]
-      ss << "#{identifier_fragment} AS #{identifier_fragment_alias}" if with_identifier && type == Dimension::TYPES[:standard]
+      if with_identifier && type == Dimension::TYPES[:standard]
+        ss << "#{identifier_fragment} AS #{identifier_fragment_alias}"
+      end
       ss
     end
 
@@ -95,6 +98,7 @@ module ActiveReporting
     def order_by_statement(direction:)
       direction = direction.to_s.upcase
       raise "Ording direction should be 'asc' or 'desc'" unless %w[ASC DESC].include?(direction)
+
       "#{label_fragment} #{direction}"
     end
 
@@ -118,12 +122,11 @@ module ActiveReporting
     end
 
     def determine_label_name(label_name)
-
       if label_name
         @label_name = label_name
       else
         @label_name = name
-        @label_name += "_#{@label}" if (type == Dimension::TYPES[:standard] && @label != :name)
+        @label_name += "_#{@label}" if type == Dimension::TYPES[:standard] && @label != :name
         @label_name += "_#{@datetime_drill}" if @datetime_drill
       end
       @label_name
@@ -131,6 +134,7 @@ module ActiveReporting
 
     def determine_datetime_drill(datetime_drill)
       return unless datetime_drill
+
       validate_supported_database_for_datetime_hierarchies
       validate_against_datetime_hierarchies(datetime_drill)
       validate_label_is_datetime
@@ -155,11 +159,13 @@ module ActiveReporting
 
     def validate_dimension_is_hierachical(hierarchical_label)
       return if hierarchical?
+
       raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"
     end
 
     def validate_supported_database_for_datetime_hierarchies
       return if SUPPORTED_DBS.include?(model.connection.adapter_name)
+
       raise InvalidDimensionLabel,
             "Cannot utilize datetime grouping for #{name}; " \
             "database #{model.connection.adapter_name} is not supported"
@@ -167,21 +173,24 @@ module ActiveReporting
 
     def validate_against_datetime_hierarchies(hierarchical_label)
       return if DATETIME_HIERARCHIES.include?(hierarchical_label.to_sym)
+
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a valid datetime grouping label in #{name}"
     end
 
     def validate_label_is_datetime
       return if dimension_fact_model.model.column_for_attribute(@label).type == :datetime
+
       raise InvalidDimensionLabel, "'#{@label}' is not a datetime column"
     end
 
     def validate_against_fact_model_properties(hierarchical_label)
       return if dimension_fact_model.hierarchical_levels.include?(hierarchical_label.to_sym)
+
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
     end
 
     def datetime_drill_label_fragment(column)
-      if model.connection.adapter_name == "Mysql2"
+      if model.connection.adapter_name == 'Mysql2'
         datetime_drill_mysql(column)
       else # Postgress
         datetime_drill_postgress(column)
@@ -235,7 +244,7 @@ module ActiveReporting
     end
 
     def identifier_fragment_alias
-      "#{model.connection.quote_column_name("#{name}_identifier")}"
+      model.connection.quote_column_name("#{name}_identifier").to_s
     end
 
     def label_fragment
@@ -245,7 +254,7 @@ module ActiveReporting
     end
 
     def label_fragment_alias
-      "#{model.connection.quote_column_name(@label_name)}"
+      model.connection.quote_column_name(@label_name).to_s
     end
 
     def dimension_fact_model

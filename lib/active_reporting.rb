@@ -31,6 +31,7 @@ module ActiveReporting
     unless klass.constantize.respond_to?(:lookup)
       raise BadMetricLookupClass, "#{klass} needs to define a class method called 'lookup'"
     end
+
     klass.constantize.lookup(name)
   end
 

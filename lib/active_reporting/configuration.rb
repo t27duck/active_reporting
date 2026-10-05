@@ -57,6 +57,7 @@ module ActiveReporting
     # @return [Boolean]
     def self.ransack_fallback=(fallback)
       raise RansackNotAvailable unless ransack_available
+
       @ransack_fallback = fallback
     end
 

@@ -4,11 +4,11 @@ require 'forwardable'
 module ActiveReporting
   class Report
     AGGREGATE_FUNCTION_OPERATORS = {
-      eq:   '=',
-      gt:   '>',
-      gte:  '>=',
-      lt:   '<',
-      lte:  '<='
+      eq: '=',
+      gt: '>',
+      gte: '>=',
+      lt: '<',
+      lte: '<='
     }.freeze
 
     extend Forwardable
@@ -65,9 +65,7 @@ module ActiveReporting
 
       statement = process_scope_dimension_filter(statement)
       statement = process_lambda_dimension_filter(statement)
-      statement = process_ransack_dimension_filter(statement)
-
-      statement
+      process_ransack_dimension_filter(statement)
     end
 
     def select_statement
@@ -90,8 +88,8 @@ module ActiveReporting
     end
 
     def dimension_joins(join_method)
-      @dimensions.select { |d| d.type == Dimension::TYPES[:standard] && d.join_method == join_method }.
-                  map { |d| d.name.to_sym }
+      @dimensions.select { |d| d.type == Dimension::TYPES[:standard] && d.join_method == join_method }
+                 .map { |d| d.name.to_sym }
     end
 
     def group_by_statement
@@ -148,6 +146,7 @@ module ActiveReporting
       @dimensions.each do |dimension|
         callback = dimension.label_callback
         next unless callback
+
         key = "#{dimension.name}_#{dimension.label}"
         @data.each do |hash|
           hash[key] = callback.call(hash[key])

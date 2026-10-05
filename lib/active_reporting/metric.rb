@@ -41,13 +41,14 @@ module ActiveReporting
     private ####################################################################
 
     def check_dimension_filter
-      @dimension_filter.each do |name, _|
+      @dimension_filter.each_key do |name|
         @fact_model.find_dimension_filter(name)
       end
     end
 
     def determin_aggregate(agg)
       raise UnknownAggregate, "Unknown aggregate '#{agg}'" unless AGGREGATES.include?(agg)
+
       @aggregate = agg
     end
   end

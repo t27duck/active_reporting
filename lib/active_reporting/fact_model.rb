@@ -113,6 +113,7 @@ module ActiveReporting
     def self.dimension_label_callback(column, body)
       @dimension_label_callbacks ||= {}
       raise ArgumentError, 'Dimension label callback body must be a callable object' unless body.respond_to?(:call)
+
       @dimension_label_callbacks[column.to_sym] = body
     end
 
@@ -149,6 +150,7 @@ module ActiveReporting
       unless Configuration.ransack_available
         raise RansackNotAvailable, 'Ransack not available. Please include it in your Gemfile.'
       end
+
       @ransack_fallback = true
     end
 
@@ -170,6 +172,7 @@ module ActiveReporting
       dm = @dimension_filters[name.to_sym]
       return dm if dm.present?
       return @dimension_filters[name.to_sym] = DimensionFilter.build(name, :ransack) if ransack_fallback
+
       raise UnknownDimensionFilter, "Dimension filter '#{name}' not found on fact model '#{self.name}'"
     end
   end
