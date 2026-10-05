@@ -397,8 +397,10 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Testing
 
-You can run the test suite using `rake test`. To test against a particular database, you'll need to set the
-appropriate `DB` environment variable, e.g. `DB=pg rake test`.
+You can run the test suite using `rake test`. To test against a particular database, set the `DB` environment
+variable (`sqlite` (default), `pg`, or `mysql`) when installing and running, e.g. `DB=pg bundle install && DB=pg rake test`.
+Only the adapter gem for the chosen database is installed. Set `RAILS` (e.g. `RAILS=8.0`) the same way to test against
+a specific Rails version.
 
 ## Contributing
 

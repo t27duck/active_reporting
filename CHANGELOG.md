@@ -2,6 +2,7 @@
 
 ### Breaking Changes
 
+- Require ActiveRecord and ActiveSupport 8.0 or newer (previously any version was allowed)
 - `Configuration.metric_lookup_class=` no longer singularizes the given name. `metric_lookup_class = StoredMetrics` now resolves to `::StoredMetrics` (previously `::StoredMetric`). If you relied on the old behavior (e.g. `metric_lookup_class = :metrics` to mean `::Metric`), pass the singular name instead.
 
 ### Bug Fixes
@@ -14,7 +15,8 @@
 
 ### Misc
 
-* `Dimension#hierarchical?` and `Dimension#association` now cache `false`/`nil` results instead of recomputing them on every call
+- `Dimension#hierarchical?` and `Dimension#association` now cache `false`/`nil` results instead of recomputing them on every call
+- Add gem metadata (changelog, source, and bug tracker links) and require MFA for releases
 
 ## 0.6.2 (2024-03-18)
 
