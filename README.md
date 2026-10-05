@@ -106,7 +106,7 @@ Rails: The result of an ActiveRecord query
 
 Star schema is a way of structuring your relational data. It is one of the most common forms of organization for relational data warehousing. The layout of a star schema consists of a fact table referencing one or more dimension tables. When laid out in an entity relationship diagram, it resembles a star.
 
-[TODO: ADD PICTURE HERE]
+![Star schema: a sales fact table in the center references four dimension tables: sales_reps, phones, sale_dates, and stores](docs/images/star_schema.svg)
 
 More information: https://en.wikipedia.org/wiki/Star_schema
 
@@ -114,7 +114,7 @@ More information: https://en.wikipedia.org/wiki/Star_schema
 
 Snowflake schema is a super class of star schema. A fact table still resides in the middle of the diagram, but dimension tables are normalized out into multiple tables resulting in the resemblance of a snowflake.
 
-[TODO: ADD PICTURE HERE]
+![Snowflake schema: the same sales fact table, with sales_reps, phones, and stores normalized out into regions, manufacturers, operating_systems, cities, and states](docs/images/snowflake_schema.svg)
 
 More information: https://en.wikipedia.org/wiki/Snowflake_schema
 

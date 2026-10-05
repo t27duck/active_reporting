@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 842 600" width="842" height="600" role="img" aria-labelledby="title desc">
+<title id="title">Star schema</title>
+<desc id="desc">A sales fact table in the center references four dimension tables: sales_reps, phones, sale_dates, and stores.</desc>
+<style>
+  .bg { fill: none; }
+  .box { stroke: #cbd5e1; stroke-width: 1; }
+  .body { fill: #ffffff; }
+  .h-fact { fill: #1d4ed8; } .h-dim { fill: #0f766e; } .h-sub { fill: #99f6e4; }
+  .t-fact, .t-dim { fill: #ffffff; } .t-sub { fill: #134e4a; }
+  .title { font: 600 14px system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; }
+  .col { font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace; fill: #0f172a; }
+  .tag { font: 600 10px system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; letter-spacing: .04em; }
+  .tag-pk { fill: #b45309; } .tag-fk { fill: #0f766e; } .tag-measure { fill: #1d4ed8; }
+  .sep { stroke: #e2e8f0; stroke-width: 1; }
+  .edge { fill: none; stroke: #64748b; stroke-width: 1.5; }
+  .dot { fill: #64748b; }
+  .legend { font: 12px system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #475569; }
+  @media (prefers-color-scheme: dark) {
+    .box { stroke: #475569; }
+    .body { fill: #0f172a; }
+    .h-fact { fill: #2563eb; } .h-dim { fill: #0d9488; } .h-sub { fill: #134e4a; }
+    .t-sub { fill: #ccfbf1; }
+    .col { fill: #e2e8f0; }
+    .tag-pk { fill: #fbbf24; } .tag-fk { fill: #5eead4; } .tag-measure { fill: #93c5fd; }
+    .sep { stroke: #1e293b; }
+    .edge { stroke: #94a3b8; }
+    .dot { fill: #94a3b8; }
+    .legend { fill: #94a3b8; }
+  }
+</style>
+<path class="edge" d="M330,238.0 C239.0,238.0 239.0,74.0 148,74.0"/><circle class="dot" cx="330" cy="238.0" r="3.5"/><circle class="dot" cx="148" cy="74.0" r="3.5"/>
+<path class="edge" d="M496,262.0 C568.0,262.0 568.0,74.0 640,74.0"/><circle class="dot" cx="496" cy="262.0" r="3.5"/><circle class="dot" cx="640" cy="74.0" r="3.5"/>
+<path class="edge" d="M330,286.0 C239.0,286.0 239.0,424.0 148,424.0"/><circle class="dot" cx="330" cy="286.0" r="3.5"/><circle class="dot" cx="148" cy="424.0" r="3.5"/>
+<path class="edge" d="M496,310.0 C568.0,310.0 568.0,424.0 640,424.0"/><circle class="dot" cx="496" cy="310.0" r="3.5"/><circle class="dot" cx="640" cy="424.0" r="3.5"/>
+<g>
+<rect class="box body" x="330" y="170" width="166" height="200" rx="6"/>
+<rect class="h-fact" x="330" y="170" width="166" height="32" rx="6"/>
+<rect class="h-fact" x="330" y="196" width="166" height="6"/>
+<rect class="box" fill="none" x="330" y="170" width="166" height="200" rx="6"/>
+<text class="title t-fact" x="342" y="191">sales</text>
+<text class="col" x="342" y="218.5">id</text>
+<text class="tag tag-pk" x="484" y="218" text-anchor="end">PK</text>
+<line class="sep" x1="331" y1="226" x2="495" y2="226"/>
+<text class="col" x="342" y="242.5">sales_rep_id</text>
+<text class="tag tag-fk" x="484" y="242" text-anchor="end">FK</text>
+<line class="sep" x1="331" y1="250" x2="495" y2="250"/>
+<text class="col" x="342" y="266.5">phone_id</text>
+<text class="tag tag-fk" x="484" y="266" text-anchor="end">FK</text>
+<line class="sep" x1="331" y1="274" x2="495" y2="274"/>
+<text class="col" x="342" y="290.5">sale_date_id</text>
+<text class="tag tag-fk" x="484" y="290" text-anchor="end">FK</text>
+<line class="sep" x1="331" y1="298" x2="495" y2="298"/>
+<text class="col" x="342" y="314.5">store_id</text>
+<text class="tag tag-fk" x="484" y="314" text-anchor="end">FK</text>
+<line class="sep" x1="331" y1="322" x2="495" y2="322"/>
+<text class="col" x="342" y="338.5">quantity</text>
+<text class="tag tag-measure" x="484" y="338" text-anchor="end">MEASURE</text>
+<line class="sep" x1="331" y1="346" x2="495" y2="346"/>
+<text class="col" x="342" y="362.5">total</text>
+<text class="tag tag-measure" x="484" y="362" text-anchor="end">MEASURE</text>
+</g>
+<g>
+<rect class="box body" x="30" y="30" width="118" height="104" rx="6"/>
+<rect class="h-dim" x="30" y="30" width="118" height="32" rx="6"/>
+<rect class="h-dim" x="30" y="56" width="118" height="6"/>
+<rect class="box" fill="none" x="30" y="30" width="118" height="104" rx="6"/>
+<text class="title t-dim" x="42" y="51">sales_reps</text>
+<text class="col" x="42" y="78.5">id</text>
+<text class="tag tag-pk" x="136" y="78" text-anchor="end">PK</text>
+<line class="sep" x1="31" y1="86" x2="147" y2="86"/>
+<text class="col" x="42" y="102.5">name</text>
+<line class="sep" x1="31" y1="110" x2="147" y2="110"/>
+<text class="col" x="42" y="126.5">region</text>
+</g>
+<g>
+<rect class="box body" x="640" y="30" width="182" height="152" rx="6"/>
+<rect class="h-dim" x="640" y="30" width="182" height="32" rx="6"/>
+<rect class="h-dim" x="640" y="56" width="182" height="6"/>
+<rect class="box" fill="none" x="640" y="30" width="182" height="152" rx="6"/>
+<text class="title t-dim" x="652" y="51">phones</text>
+<text class="col" x="652" y="78.5">id</text>
+<text class="tag tag-pk" x="810" y="78" text-anchor="end">PK</text>
+<line class="sep" x1="641" y1="86" x2="821" y2="86"/>
+<text class="col" x="652" y="102.5">model_name</text>
+<line class="sep" x1="641" y1="110" x2="821" y2="110"/>
+<text class="col" x="652" y="126.5">manufacturer</text>
+<line class="sep" x1="641" y1="134" x2="821" y2="134"/>
+<text class="col" x="652" y="150.5">os</text>
+<line class="sep" x1="641" y1="158" x2="821" y2="158"/>
+<text class="col" x="652" y="174.5">wireless_technology</text>
+</g>
+<g>
+<rect class="box body" x="30" y="380" width="118" height="152" rx="6"/>
+<rect class="h-dim" x="30" y="380" width="118" height="32" rx="6"/>
+<rect class="h-dim" x="30" y="406" width="118" height="6"/>
+<rect class="box" fill="none" x="30" y="380" width="118" height="152" rx="6"/>
+<text class="title t-dim" x="42" y="401">sale_dates</text>
+<text class="col" x="42" y="428.5">id</text>
+<text class="tag tag-pk" x="136" y="428" text-anchor="end">PK</text>
+<line class="sep" x1="31" y1="436" x2="147" y2="436"/>
+<text class="col" x="42" y="452.5">date</text>
+<line class="sep" x1="31" y1="460" x2="147" y2="460"/>
+<text class="col" x="42" y="476.5">month</text>
+<line class="sep" x1="31" y1="484" x2="147" y2="484"/>
+<text class="col" x="42" y="500.5">quarter</text>
+<line class="sep" x1="31" y1="508" x2="147" y2="508"/>
+<text class="col" x="42" y="524.5">year</text>
+</g>
+<g>
+<rect class="box body" x="640" y="380" width="84" height="128" rx="6"/>
+<rect class="h-dim" x="640" y="380" width="84" height="32" rx="6"/>
+<rect class="h-dim" x="640" y="406" width="84" height="6"/>
+<rect class="box" fill="none" x="640" y="380" width="84" height="128" rx="6"/>
+<text class="title t-dim" x="652" y="401">stores</text>
+<text class="col" x="652" y="428.5">id</text>
+<text class="tag tag-pk" x="712" y="428" text-anchor="end">PK</text>
+<line class="sep" x1="641" y1="436" x2="723" y2="436"/>
+<text class="col" x="652" y="452.5">name</text>
+<line class="sep" x1="641" y1="460" x2="723" y2="460"/>
+<text class="col" x="652" y="476.5">city</text>
+<line class="sep" x1="641" y1="484" x2="723" y2="484"/>
+<text class="col" x="652" y="500.5">state</text>
+</g>
+<rect class="h-fact box" x="20" y="572" width="14" height="14" rx="3"/>
+<text class="legend" x="40" y="583">fact table</text>
+<rect class="h-dim box" x="128.0" y="572" width="14" height="14" rx="3"/>
+<text class="legend" x="148.0" y="583">dimension table</text>
+<path class="edge" d="M269.0,579 h34"/><circle class="dot" cx="269.0" cy="579" r="3.5"/><circle class="dot" cx="303.0" cy="579" r="3.5"/>
+<text class="legend" x="311.0" y="583">foreign key → primary key</text>
+</svg>

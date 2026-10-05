@@ -2,6 +2,7 @@
 
 ### Breaking Changes
 
+- Only support supported versions of Ruby and Rails.
 - Require ActiveRecord and ActiveSupport 8.0 or newer (previously any version was allowed)
 - `Configuration.metric_lookup_class=` no longer singularizes the given name. `metric_lookup_class = StoredMetrics` now resolves to `::StoredMetrics` (previously `::StoredMetric`). If you relied on the old behavior (e.g. `metric_lookup_class = :metrics` to mean `::Metric`), pass the singular name instead.
 
