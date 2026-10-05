@@ -5,6 +5,7 @@ gemspec
 rails = ENV.fetch('RAILS', '8.1')
 gem 'activerecord', "~> #{rails}.0"
 gem 'activesupport', "~> #{rails}.0"
+gem 'railties', "~> #{rails}.0" # to test code reloading in a Rails app
 
 gem 'minitest'
 gem 'rake'

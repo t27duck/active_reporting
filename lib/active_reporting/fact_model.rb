@@ -27,7 +27,7 @@ module ActiveReporting
                else
                  model
                end
-      @model.instance_variable_set('@fact_model', self)
+      FactModelRegistry.register(@model, self)
       @model
     end
 
@@ -172,7 +172,7 @@ module ActiveReporting
       return dm if dm.present?
       return @dimension_filters[name.to_sym] = DimensionFilter.build(name, :ransack) if ransack_fallback
 
-      raise UnknownDimensionFilter, "Dimension filter '#{name}' not found on fact model '#{self.name}'"
+      raise UnknownDimensionFilter, "Dimension filter '#{name}' not found on fact model '#{self}'"
     end
   end
 end

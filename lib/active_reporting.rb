@@ -8,9 +8,11 @@ require 'active_reporting/dimension'
 require 'active_reporting/dimension_filter'
 require 'active_reporting/metric'
 require 'active_reporting/fact_model'
+require 'active_reporting/fact_model_registry'
 require 'active_reporting/report'
 require 'active_reporting/reporting_dimension'
 require 'active_reporting/version'
+require 'active_reporting/railtie' if defined?(Rails::Railtie)
 
 ActiveSupport.on_load(:active_record) { extend ActiveReporting::ActiveRecordAdaptor }
 

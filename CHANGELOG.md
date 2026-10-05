@@ -7,6 +7,7 @@
 - `Configuration.metric_lookup_class=` no longer singularizes the given name. `metric_lookup_class = StoredMetrics` now resolves to `::StoredMetrics` (previously `::StoredMetric`). If you relied on the old behavior (e.g. `metric_lookup_class = :metrics` to mean `::Metric`), pass the singular name instead.
 - Removed the `{ created_at: :month }` shorthand for datetime drills on degenerate dimensions, deprecated in 0.6.0. Use `{ created_at: { datetime_drill: :month } }` instead; the old form now raises `InvalidDimensionLabel` with the replacement syntax. This also removes the spurious deprecation warning that was printed for every plain degenerate dimension (e.g. `dimensions: [:kind]`)
 - Ransack is no longer required when the gem is loaded; it is loaded the first time a ransack feature is used
+- Fact models generated for models without a `[ModelName]FactModel` class are no longer assigned to a constant (previously `PostFactModel` was defined the first time `Post.fact_model` was called). Define the fact model class if you need to reference it
 - On MySQL, `datetime_drill` now truncates datetimes like PostgreSQL's `date_trunc` and returns `DATETIME` values, instead of extracting a part as an integer. For example, a `month` drill now returns `2026-09-01 00:00:00` instead of `9`, so the same month in different years is no longer grouped together. `week` now returns the Monday the week starts on (previously the day of the week) and `day` returns the date at midnight (previously the day of the month)
 
 ### Bug Fixes
@@ -20,6 +21,7 @@
 - An invalid `order_by_dimension` direction now raises `ActiveReporting::InvalidOrderDirection` (a `RuntimeError` subclass, so existing `rescue RuntimeError` code still works) with a message naming the dimension
 - Using a ransack dimension filter without ransack installed now raises `RansackNotAvailable` instead of `NoMethodError`
 - `Configuration.ransack_fallback = false` no longer raises `RansackNotAvailable` when ransack is not installed
+- Fact models are looked up again after Rails reloads code. Previously a generated fact model kept pointing to the model class from before the reload, and a model that isn't reloaded (e.g. from an engine) kept returning the old fact model
 
 ### Features
 

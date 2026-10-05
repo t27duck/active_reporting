@@ -148,7 +148,7 @@ ActiveReporting::Configuration.setting = value
 
 In ActiveReporting, a fact model stores configuration information on how it can be used in reports. We use the term fact model instead of fact table because this class "models how the fact table interacts with dimensions and other reporting features".
 
-You can put these classes anywhere you want in your app, though I recommend putting them in `app/fact_models`
+You can put these classes anywhere you want in your app, though I recommend putting them in `app/fact_models` so Rails autoloads and reloads them with your models
 
 ### Linking a fact model to an ActiveRecord model
 
@@ -173,6 +173,10 @@ class TicketFactModel < ActiveReporting::FactModel
   # self.model= 'SomeOtherModel'
 end
 ```
+
+If a model doesn't have a fact model, ActiveReporting generates one with the default configuration the first time it's needed (for example, when the model is used as a dimension). Generated fact models aren't assigned to a constant, so define a `[ModelName]FactModel` class if you need to refer to one.
+
+In Rails, fact models are looked up again after code is reloaded in development, so changes to models and fact models take effect without restarting the server.
 
 ### Configuring a fact model's measure
 
