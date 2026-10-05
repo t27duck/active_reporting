@@ -123,8 +123,12 @@ module ActiveReporting
       @dimension_filters[:ransack].each do |dm, value|
         ransack_hash[dm.name] = value
       end
-      chain = chain.ransack(ransack_hash).result if ransack_hash.present?
-      chain
+      return chain if ransack_hash.empty?
+      unless Configuration.ransack_available
+        raise RansackNotAvailable, 'Ransack not available. Please include it in your Gemfile.'
+      end
+
+      chain.ransack(ransack_hash).result
     end
 
     def having_statement

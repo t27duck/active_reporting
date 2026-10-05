@@ -12,13 +12,6 @@ require 'active_reporting/report'
 require 'active_reporting/reporting_dimension'
 require 'active_reporting/version'
 
-begin
-  require 'ransack'
-  ActiveReporting::Configuration.ransack_available = true
-rescue LoadError, StandardError
-  ActiveReporting::Configuration.ransack_available = false
-end
-
 ActiveSupport.on_load(:active_record) { extend ActiveReporting::ActiveRecordAdaptor }
 
 module ActiveReporting

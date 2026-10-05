@@ -11,6 +11,13 @@ class ActiveReportingTest < Minitest::Test
     assert_equal 'false', output, 'ActiveRecord::Base was loaded when requiring active_reporting'
   end
 
+  def test_requiring_the_gem_does_not_load_ransack
+    script = 'require "active_reporting"; print $LOADED_FEATURES.grep(%r{/ransack[./]}).any?; ' \
+             'print ActiveReporting::Configuration.ransack_available, defined?(Ransack).nil?'
+    output = IO.popen([RbConfig.ruby, '-Ilib', '-e', script], &:read)
+    assert_equal 'falsetruefalse', output, 'ransack should load on first use, not when requiring the gem'
+  end
+
   def test_metrics_can_be_fetched
     assert ActiveReporting.fetch_metric(:a_metric).is_a? ActiveReporting::Metric
     assert ActiveReporting.fetch_metric('a_metric').is_a? ActiveReporting::Metric
@@ -37,6 +44,6 @@ class ActiveReportingTest < Minitest::Test
     ActiveReporting::Configuration.metric_lookup_class = klass_name
     yield
   ensure
-    ActiveReporting::Configuration.instance_variable_set(:@metric_lookup_class, original)
+    ActiveReporting::Configuration.metric_lookup_class = original
   end
 end

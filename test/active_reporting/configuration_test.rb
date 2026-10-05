@@ -9,7 +9,7 @@ class ActiveReporting::ConfigurationTest < Minitest::Test
 
   def teardown
     ActiveReporting::Configuration.default_dimension_label = @default_dimension_label
-    ActiveReporting::Configuration.instance_variable_set(:@metric_lookup_class, @metric_lookup_class)
+    ActiveReporting::Configuration.metric_lookup_class = @metric_lookup_class
   end
 
   def test_configurations_can_be_set_in_a_block
@@ -50,5 +50,15 @@ class ActiveReporting::ConfigurationTest < Minitest::Test
 
     ActiveReporting::Configuration.metric_lookup_class = '::Reports::StoredMetrics'
     assert_equal '::Reports::StoredMetrics', ActiveReporting::Configuration.metric_lookup_class
+  end
+
+  def test_ransack_fallback_can_be_disabled_without_ransack
+    original = ActiveReporting::Configuration.ransack_available
+    ActiveReporting::Configuration.ransack_available = false
+
+    ActiveReporting::Configuration.ransack_fallback = false
+    assert_raises(ActiveReporting::RansackNotAvailable) { ActiveReporting::Configuration.ransack_fallback = true }
+  ensure
+    ActiveReporting::Configuration.ransack_available = original
   end
 end

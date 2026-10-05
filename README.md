@@ -140,7 +140,7 @@ ActiveReporting::Configuration.setting = value
 
 `default_measure` - If a fact model does not specify a measure to use for aggregates, this value will be used. (Default: `:value`)
 
-`ransack_fallback` - If the ransack gem is loaded, allow all unknown dimension filters to be delegated to ransack. (Default: `false`)
+`ransack_fallback` - If the ransack gem is available, allow all unknown dimension filters to be delegated to ransack. (Default: `false`)
 
 `metric_lookup_class` - The name of a constant used to lookup prebuilt `ActiveReporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. Accepts a class, string, or symbol; the name is used as-is (`:stored_metrics` becomes `::StoredMetrics`). (Default: `::Metric`)
 
@@ -275,7 +275,7 @@ The first example exposes the `Ticket.open` scope to the fact model allowing it 
 
 The second example defines a lambda to be invoked like a Rails scope. It joins against the `category` relationship on `Ticket` and filters by the category's name.
 
-The third example defines a filter called "subject_cont" and will delegate it to ransack when called.
+The third example defines a filter called "subject_cont" and will delegate it to ransack when called. Ransack is loaded the first time it's needed; add it to your Gemfile to use it. Ransack 4 and newer also require the model to allowlist searchable attributes with a `ransackable_attributes` class method (here, `Ticket.ransackable_attributes` must include `subject`).
 
 Only dimension filters defined in the fact model may be used. Whitelisting available filters allows for more control over what the user may filter by. Giving the user full control to call any scope or method from the ActiveRecord model could lead to unexpected results, poor performing queries, or possible security concerns.
 

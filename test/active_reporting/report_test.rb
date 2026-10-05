@@ -32,6 +32,28 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert data.all? { |r| r.key?('order') }
   end
 
+  def test_report_applies_a_ransack_dimension_filter
+    with_ransack_dimension_filter do
+      data = ActiveReporting::Report.new(@metric, dimension_filter: { kind_cont: 'card' }).run
+
+      refute data.empty?
+      assert data.all? { |r| r['kind'].include?('card') }
+    end
+  end
+
+  def test_ransack_dimension_filter_raises_when_ransack_is_not_available
+    original = ActiveReporting::Configuration.ransack_available
+    ActiveReporting::Configuration.ransack_available = false
+
+    with_ransack_dimension_filter do
+      assert_raises ActiveReporting::RansackNotAvailable do
+        ActiveReporting::Report.new(@metric, dimension_filter: { kind_cont: 'card' }).run
+      end
+    end
+  ensure
+    ActiveReporting::Configuration.ransack_available = original
+  end
+
   def test_result_contains_the_metric_name
     assert @report.run.all? { |r| r.key?(@metric.name.to_s) }, 'metric name not included'
   end
@@ -83,11 +105,18 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_report_runs_with_a_date_grouping
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: :month } }])
     report = ActiveReporting::Report.new(metric)
     data = report.run
     assert data.all? { |r| r.key?('created_at_month') }
     assert data.size == 5
+  end
+
+  def test_removed_datetime_drill_shorthand_raises_with_the_replacement_syntax
+    error = assert_raises ActiveReporting::InvalidDimensionLabel do
+      ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: :month }])
+    end
+    assert_includes error.message, '`{ created_at: { datetime_drill: :month } }`'
   end
 
   # Postgres and SQLite truncate like Postgres' `date_trunc`. MySQL extracts the part instead (e.g. MONTH() => 9).
@@ -131,6 +160,13 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   private
+
+  def with_ransack_dimension_filter
+    FigureFactModel.dimension_filter :kind_cont, :ransack
+    yield
+  ensure
+    FigureFactModel.dimension_filters.delete(:kind_cont)
+  end
 
   # Reference implementation of Postgres' `date_trunc` (and `DATE()` for :date)
   def date_trunc(drill, t)

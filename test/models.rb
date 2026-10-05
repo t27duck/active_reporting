@@ -21,6 +21,10 @@ end
 class Figure < ActiveRecord::Base
   belongs_to :series
   has_many :release_dates, foreign_key: :amiibo_id
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[kind name]
+  end
 end
 
 class ReleaseDate < ActiveRecord::Base

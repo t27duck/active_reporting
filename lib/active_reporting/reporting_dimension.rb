@@ -23,14 +23,12 @@ module ActiveReporting
                 "Dimension '#{dimension_name}' not found on fact model '#{fact_model}'")
         end
 
-        # Ambiguous behavior with string option for degenerate and standard dimension
-        if !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
-          deprecation = ActiveSupport::Deprecation.new('0.7.0', 'active_reporting')
-          deprecation.warn(<<~MSG)
-            direct use of implicit hierarchies is deprecated and will be removed in future versions. \
-            Please use `:datetime_drill` option instead.
-          MSG
-          options = { datetime_drill: options }
+        # The `{ created_at: :month }` shorthand for datetime drills was removed in 0.7.0
+        if options && !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
+          raise InvalidDimensionLabel,
+                "'#{dimension_name}' is not hierarchical. For a datetime drill, use " \
+                "`{ #{dimension_name}: { datetime_drill: :#{options} } }` " \
+                "instead of `{ #{dimension_name}: :#{options} }`"
         end
         new(found_dimension, **label_config(options))
       end

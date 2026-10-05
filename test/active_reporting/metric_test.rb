@@ -13,6 +13,13 @@ class ActiveReporting::MetricTest < Minitest::Test
     assert_equal Figure, @metric.model
   end
 
+  def test_plain_degenerate_dimension_does_not_emit_a_deprecation_warning
+    _, stderr = capture_io do
+      ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])
+    end
+    refute_match(/DEPRECATION/, stderr)
+  end
+
   def test_metric_makes_dimensions_available
     assert @metric.dimensions.is_a?(Array)
     assert @metric.dimensions.all?{ |d| d.is_a?(ActiveReporting::ReportingDimension) }

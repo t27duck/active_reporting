@@ -5,6 +5,8 @@
 - Only support supported versions of Ruby and Rails.
 - Require ActiveRecord and ActiveSupport 8.0 or newer (previously any version was allowed)
 - `Configuration.metric_lookup_class=` no longer singularizes the given name. `metric_lookup_class = StoredMetrics` now resolves to `::StoredMetrics` (previously `::StoredMetric`). If you relied on the old behavior (e.g. `metric_lookup_class = :metrics` to mean `::Metric`), pass the singular name instead.
+- Removed the `{ created_at: :month }` shorthand for datetime drills on degenerate dimensions, deprecated in 0.6.0. Use `{ created_at: { datetime_drill: :month } }` instead; the old form now raises `InvalidDimensionLabel` with the replacement syntax. This also removes the spurious deprecation warning that was printed for every plain degenerate dimension (e.g. `dimensions: [:kind]`)
+- Ransack is no longer required when the gem is loaded; it is loaded the first time a ransack feature is used
 
 ### Bug Fixes
 
@@ -15,6 +17,8 @@
 - A `NameError` raised while loading a defined fact model is no longer swallowed and replaced with an empty auto-generated fact model
 - Metric names are now quoted in the generated SQL, so metrics named after reserved words (e.g. `:order`) no longer produce invalid queries
 - An invalid `order_by_dimension` direction now raises `ActiveReporting::InvalidOrderDirection` (a `RuntimeError` subclass, so existing `rescue RuntimeError` code still works) with a message naming the dimension
+- Using a ransack dimension filter without ransack installed now raises `RansackNotAvailable` instead of `NoMethodError`
+- `Configuration.ransack_fallback = false` no longer raises `RansackNotAvailable` when ransack is not installed
 
 ### Features
 
@@ -29,6 +33,7 @@
 - Report queries now run through `select_all`, so they use the ActiveRecord query cache and appear as `ActiveReporting` in SQL logs and instrumentation
 - Datetime drill SQL moved to `ActiveReporting::DatetimeDrill`; `ReportingDimension::SUPPORTED_DBS` was removed
 - Fix typos and inaccurate descriptions in documentation comments, error messages, and the README
+- `Configuration` uses `mattr_reader` with defaults instead of hand-written getters
 
 ## 0.6.2 (2024-03-18)
 
