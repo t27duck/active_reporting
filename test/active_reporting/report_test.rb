@@ -10,6 +10,20 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert @report.run.is_a?(Array), 'result is not an array'
   end
 
+  def test_report_query_is_named_and_uses_the_query_cache
+    queries = []
+    callback = ->(_name, _start, _finish, _id, payload) { queries << payload if payload[:name] == 'ActiveReporting' }
+    ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+      ActiveRecord::Base.cache do
+        2.times { ActiveReporting::Report.new(@metric).run }
+      end
+    end
+
+    assert_equal 2, queries.size
+    refute queries.first[:cached]
+    assert queries.last[:cached], 'second report run did not use the query cache'
+  end
+
   def test_result_contains_the_metric_name
     assert @report.run.all? { |r| r.key?(@metric.name.to_s) }, 'metric name not included'
   end

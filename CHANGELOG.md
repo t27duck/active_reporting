@@ -18,6 +18,8 @@
 
 - `Dimension#hierarchical?` and `Dimension#association` now cache `false`/`nil` results instead of recomputing them on every call
 - Add gem metadata (changelog, source, and bug tracker links) and require MFA for releases
+- Requiring the gem no longer forces `ActiveRecord::Base` to load; models are extended via `ActiveSupport.on_load(:active_record)`
+- Report queries now run through `select_all`, so they use the ActiveRecord query cache and appear as `ActiveReporting` in SQL logs and instrumentation
 
 ## 0.6.2 (2024-03-18)
 

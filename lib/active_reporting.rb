@@ -18,7 +18,7 @@ rescue LoadError, StandardError
   ActiveReporting::Configuration.ransack_available = false
 end
 
-ActiveRecord::Base.extend(ActiveReporting::ActiveRecordAdaptor)
+ActiveSupport.on_load(:active_record) { extend ActiveReporting::ActiveRecordAdaptor }
 
 module ActiveReporting
   def self.fetch_metric(name)
