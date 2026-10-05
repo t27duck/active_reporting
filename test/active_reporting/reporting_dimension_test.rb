@@ -114,25 +114,25 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
   def test_label_can_be_passed_in_if_dimension_is_datetime
     refute @user_dimension.hierarchical?
     assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
-    if ['pg','mysql'].include?(ENV['DB'])
-      ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :year)
-    else
-      assert_raises ActiveReporting::InvalidDimensionLabel do
-        ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :year)
-      end
-    end
+    ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :year)
   end
 
   def test_date_is_valid_datetime_drill
     refute @user_dimension.hierarchical?
     assert @user_dimension.type == ActiveReporting::Dimension::TYPES[:degenerate]
-    if ['pg','mysql'].include?(ENV['DB'])
-      ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :date)
-    else
-      assert_raises ActiveReporting::InvalidDimensionLabel do
-        ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :date)
-      end
+    ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :date)
+  end
+
+  def test_datetime_drill_raises_for_an_unsupported_database
+    unsupported = Class.new(ActiveRecord::ConnectionAdapters::AbstractAdapter).allocate
+    User.define_singleton_method(:connection) { unsupported }
+
+    error = assert_raises(ActiveReporting::InvalidDimensionLabel) do
+      ActiveReporting::ReportingDimension.new(@user_dimension, datetime_drill: :year)
     end
+    assert_match(/database Abstract is not supported/, error.message)
+  ensure
+    User.singleton_class.remove_method(:connection)
   end
 
   def test_invalid_label_cannot_be_passed_in_if_dimension_is_datetime

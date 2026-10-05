@@ -18,8 +18,8 @@ when 'pg'
   db_config[:password] = ENV['POSTGRES_PASSWORD'] if ENV.key?('POSTGRES_PASSWORD')
   db_config[:host] = ENV['POSTGRES_HOST'] if ENV.key?('POSTGRES_HOST')
   ActiveRecord::Base.establish_connection(**db_config)
-when 'mysql'
-  db_config = { adapter:  'mysql2', database: 'active_reporting_test', encoding: 'utf8' }
+when 'mysql', 'trilogy'
+  db_config = { adapter: db == 'mysql' ? 'mysql2' : 'trilogy', database: 'active_reporting_test', encoding: 'utf8' }
   db_config[:username] = ENV['MYSQL_USER'] if ENV.key?('MYSQL_USER')
   db_config[:host] = ENV['MYSQL_HOST'] if ENV.key?('MYSQL_HOST')
   db_config[:port] = ENV['MYSQL_PORT'] if ENV.key?('MYSQL_PORT')

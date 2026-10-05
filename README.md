@@ -249,9 +249,13 @@ When creating a metric, ActiveReporting will recognize the following datetime hi
 - millennium
 - date
 
-Under the hood Active Reporting uses specific database functions to manipulate datetime columns. Postgres provides a way to group by `datetime` column data on the fly using the [`date_trunc` function](https://www.postgresql.org/docs/8.1/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). On Mysql this can be done using [Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html).
+Under the hood ActiveReporting uses database-specific functions to manipulate datetime columns, and the values returned differ between databases:
 
-_NOTE_: PRs welcomed to support this functionality in other databases.
+- **PostgreSQL** (including PostGIS) uses the [`date_trunc` function](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC), which truncates the datetime to the given level. A `month` drill on `2026-09-15 10:30:00` returns `2026-09-01 00:00:00`, so the same month in different years is grouped separately.
+- **SQLite** emulates `date_trunc`, returning the truncated datetime as `YYYY-MM-DD HH:MM:SS` text (`2026-09-01 00:00:00` for the example above).
+- **MySQL** (both the `mysql2` and `trilogy` adapters) uses [date and time functions](https://dev.mysql.com/doc/refman/8.4/en/date-and-time-functions.html) that extract a part of the datetime instead of truncating it. A `month` drill returns `9`, so September of every year is grouped together. Note that `day` returns the day of the month and `week` returns the day of the week (`WEEKDAY()`).
+
+The `date` drill returns the date portion of the datetime on all databases.
 
 ## Configuring Dimension Filters
 
@@ -398,7 +402,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Testing
 
 You can run the test suite using `rake test`. To test against a particular database, set the `DB` environment
-variable (`sqlite` (default), `pg`, or `mysql`) when installing and running, e.g. `DB=pg bundle install && DB=pg rake test`.
+variable (`sqlite` (default), `pg`, `mysql`, or `trilogy`) when installing and running, e.g. `DB=pg bundle install && DB=pg rake test`.
 Only the adapter gem for the chosen database is installed. Set `RAILS` (e.g. `RAILS=8.0`) the same way to test against
 a specific Rails version.
 

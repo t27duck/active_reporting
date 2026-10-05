@@ -75,23 +75,29 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_report_runs_with_a_date_grouping
-    if ['pg','mysql'].include?(ENV['DB'])
-      metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
-      report = ActiveReporting::Report.new(metric)
-      data = report.run
-      assert data.all? { |r| r.key?('created_at_month') }
-      assert data.size == 5
-    else
-      assert_raises ActiveReporting::InvalidDimensionLabel do
-        metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
-        report = ActiveReporting::Report.new(metric)
-      end
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{created_at: :month}])
+    report = ActiveReporting::Report.new(metric)
+    data = report.run
+    assert data.all? { |r| r.key?('created_at_month') }
+    assert data.size == 5
+  end
+
+  # Postgres and SQLite truncate like Postgres' `date_trunc`. MySQL extracts the part instead (e.g. MONTH() => 9).
+  def test_datetime_drills_truncate_like_date_trunc
+    skip 'MySQL datetime drills extract date parts instead of truncating' if %w[mysql trilogy].include?(ENV['DB'])
+
+    created_ats = User.pluck(:created_at).map(&:utc)
+    ActiveReporting::ReportingDimension::DATETIME_HIERARCHIES.each do |drill|
+      metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: drill } }])
+      data = ActiveReporting::Report.new(metric).run
+
+      expected = created_ats.map { |t| date_trunc(drill, t) }.uniq.sort
+      actual = data.map { |r| cast_time(r["created_at_#{drill}"]) }.sort
+      assert_equal expected, actual, "datetime_drill: #{drill}"
     end
   end
 
   def test_report_runs_with_a_date_datetime_drill
-    skip 'datetime drills require pg or mysql' unless ['pg','mysql'].include?(ENV['DB'])
-
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: :date } }])
     data = ActiveReporting::Report.new(metric).run
 
@@ -105,7 +111,7 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert report.send(:statement).to_sql.include?("LEFT OUTER JOIN")
   end
 
-  def test_report_runs_with_an_aggregate_other_than_count
+  def test_report_uses_the_metrics_measure_when_given
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: :taxes, aggregate: :sum)
     report = ActiveReporting::Report.new(metric)
     assert report.send(:statement).to_sql.include?("taxes)")
@@ -117,6 +123,30 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   private
+
+  # Reference implementation of Postgres' `date_trunc` (and `DATE()` for :date)
+  def date_trunc(drill, t)
+    case drill
+    when :microseconds then t
+    when :milliseconds then t.floor(3)
+    when :second then t.floor
+    when :minute then Time.utc(t.year, t.month, t.day, t.hour, t.min)
+    when :hour then Time.utc(t.year, t.month, t.day, t.hour)
+    when :day, :date then Time.utc(t.year, t.month, t.day)
+    when :week then Time.utc(t.year, t.month, t.day) - ((t.wday - 1) % 7).days
+    when :month then Time.utc(t.year, t.month)
+    when :quarter then Time.utc(t.year, ((t.month - 1) / 3 * 3) + 1)
+    when :year then Time.utc(t.year)
+    when :decade then Time.utc(t.year / 10 * 10)
+    when :century then Time.utc(((t.year - 1) / 100 * 100) + 1)
+    when :millennium then Time.utc(((t.year - 1) / 1000 * 1000) + 1)
+    end
+  end
+
+  def cast_time(value)
+    value = ActiveRecord::Type::DateTime.new.cast(value.to_s) unless value.is_a?(Time)
+    value.utc
+  end
 
   def with_dimension_label_callback(fact_model, column, callback)
     original = fact_model.dimension_label_callbacks.dup

@@ -4,7 +4,6 @@ require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
-    SUPPORTED_DBS = %w[PostgreSQL PostGIS Mysql2].freeze
     # Values for the Postgres `date_trunc` method.
     # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
@@ -164,7 +163,7 @@ module ActiveReporting
     end
 
     def validate_supported_database_for_datetime_hierarchies
-      return if SUPPORTED_DBS.include?(model.connection.adapter_name)
+      return if datetime_drill_adapter
 
       raise InvalidDimensionLabel,
             "Cannot utilize datetime grouping for #{name}; " \
@@ -189,54 +188,10 @@ module ActiveReporting
       raise InvalidDimensionLabel, "#{hierarchical_label} is not a hierarchical label in #{name}"
     end
 
-    def datetime_drill_label_fragment(column)
-      if model.connection.adapter_name == 'Mysql2'
-        datetime_drill_mysql(column)
-      else # Postgress
-        datetime_drill_postgress(column)
-      end
-    end
+    def datetime_drill_adapter
+      return @datetime_drill_adapter if defined?(@datetime_drill_adapter)
 
-    def datetime_drill_postgress(column)
-      case @datetime_drill.to_sym
-      when :date
-        "DATE(#{column})"
-      else
-        "DATE_TRUNC('#{@datetime_drill}', #{column})"
-      end
-    end
-
-    def datetime_drill_mysql(column)
-      case @datetime_drill.to_sym
-      when :microseconds
-        "MICROSECOND(#{column})"
-      when :milliseconds
-        "MICROSECOND(#{column}) DIV 1000"
-      when :second
-        "SECOND(#{column})"
-      when :minute
-        "MINUTE(#{column})"
-      when :hour
-        "HOUR(#{column})"
-      when :day
-        "DAY(#{column})"
-      when :week
-        "WEEKDAY(#{column})"
-      when :month
-        "MONTH(#{column})"
-      when :quarter
-        "QUARTER(#{column})"
-      when :year
-        "YEAR(#{column})"
-      when :decade
-        "YEAR(#{column}) DIV 10"
-      when :century
-        "YEAR(#{column}) DIV 100"
-      when :millennium
-        "YEAR(#{column}) DIV 1000"
-      when :date
-        "DATE(#{column})"
-      end
+      @datetime_drill_adapter = DatetimeDrill.adapter_for(model.connection)
     end
 
     def identifier_fragment
@@ -249,7 +204,7 @@ module ActiveReporting
 
     def label_fragment
       fragment = "#{klass.quoted_table_name}.#{model.connection.quote_column_name(@label)}"
-      fragment = datetime_drill_label_fragment(fragment) if @datetime_drill
+      fragment = DatetimeDrill.fragment(datetime_drill_adapter, @datetime_drill, fragment) if @datetime_drill
       fragment
     end
 

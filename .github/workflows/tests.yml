@@ -48,6 +48,10 @@ jobs:
 
           - ruby: "4.0"
             rails: "8.1"
+            db: "trilogy"
+
+          - ruby: "4.0"
+            rails: "8.1"
             db: "pg"
 
           - ruby: "4.0"
@@ -80,7 +84,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
       mysql:
-        image: ${{ matrix.db == 'mysql' && 'mysql:8.4' || '' }}
+        image: ${{ (matrix.db == 'mysql' || matrix.db == 'trilogy') && 'mysql:8.4' || '' }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: active_reporting_test

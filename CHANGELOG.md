@@ -14,12 +14,18 @@
 - Auto-generated fact models for namespaced models (e.g. `Admin::Post`) are now created in the model's namespace (`Admin::PostFactModel`) instead of raising `NameError`
 - A `NameError` raised while loading a defined fact model is no longer swallowed and replaced with an empty auto-generated fact model
 
+### Features
+
+- `datetime_drill` now works on SQLite, truncating datetimes the same way PostgreSQL's `date_trunc` does
+- `datetime_drill` now works with the Trilogy MySQL adapter (and any other adapter built on Rails' MySQL, PostgreSQL, or SQLite adapters)
+
 ### Misc
 
 - `Dimension#hierarchical?` and `Dimension#association` now cache `false`/`nil` results instead of recomputing them on every call
 - Add gem metadata (changelog, source, and bug tracker links) and require MFA for releases
 - Requiring the gem no longer forces `ActiveRecord::Base` to load; models are extended via `ActiveSupport.on_load(:active_record)`
 - Report queries now run through `select_all`, so they use the ActiveRecord query cache and appear as `ActiveReporting` in SQL logs and instrumentation
+- Datetime drill SQL moved to `ActiveReporting::DatetimeDrill`; `ReportingDimension::SUPPORTED_DBS` was removed
 
 ## 0.6.2 (2024-03-18)
 
