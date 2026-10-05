@@ -200,7 +200,7 @@ module ActiveReporting
     def datetime_drill_postgress(column)
       case @datetime_drill.to_sym
       when :date
-        "DATE('#{column}')"
+        "DATE(#{column})"
       else
         "DATE_TRUNC('#{@datetime_drill}', #{column})"
       end

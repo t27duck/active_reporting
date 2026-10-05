@@ -9,4 +9,28 @@ class ActiveReportingTest < Minitest::Test
     assert ActiveReporting.fetch_metric(:a_metric).is_a? ActiveReporting::Metric
     assert ActiveReporting.fetch_metric('a_metric').is_a? ActiveReporting::Metric
   end
+
+  def test_fetch_metric_raises_when_lookup_class_is_not_defined
+    with_metric_lookup_class('::NotARealMetricLookup') do
+      error = assert_raises(ActiveReporting::BadMetricLookupClass) { ActiveReporting.fetch_metric(:a_metric) }
+      assert_match(/::NotARealMetricLookup not defined/, error.message)
+    end
+  end
+
+  def test_fetch_metric_raises_when_lookup_class_does_not_define_lookup
+    with_metric_lookup_class('::Object') do
+      error = assert_raises(ActiveReporting::BadMetricLookupClass) { ActiveReporting.fetch_metric(:a_metric) }
+      assert_match(/needs to define a class method called 'lookup'/, error.message)
+    end
+  end
+
+  private
+
+  def with_metric_lookup_class(klass_name)
+    original = ActiveReporting::Configuration.metric_lookup_class
+    ActiveReporting::Configuration.metric_lookup_class = klass_name
+    yield
+  ensure
+    ActiveReporting::Configuration.instance_variable_set(:@metric_lookup_class, original)
+  end
 end

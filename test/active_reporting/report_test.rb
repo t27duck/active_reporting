@@ -47,6 +47,16 @@ class ActiveReporting::ReportTest < Minitest::Test
     end
   end
 
+  def test_report_runs_with_a_date_datetime_drill
+    skip 'datetime drills require pg or mysql' unless ['pg','mysql'].include?(ENV['DB'])
+
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: :date } }])
+    data = ActiveReporting::Report.new(metric).run
+
+    expected = User.pluck(:created_at).map { |t| t.to_date.to_s }.sort
+    assert_equal expected, data.map { |r| r['created_at_date'].to_s }.sort
+  end
+
   def test_accept_dimension_join_method_option
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: GameFactModel, dimensions: [{ platform: { join_method: :left_outer_joins }}], aggregate: :sum)
     report = ActiveReporting::Report.new(metric)

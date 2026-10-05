@@ -64,9 +64,9 @@ module ActiveReporting
     # Sets the name of the constant used to lookup prebuilt `Reporting::Metric`
     # objects by name.
     #
-    # @param klass_name [String]
+    # @param klass_name [String, Symbol, Class]
     def self.metric_lookup_class=(klass_name)
-      @metric_lookup_class = "::#{klass_name.to_s.classify}"
+      @metric_lookup_class = "::#{klass_name.to_s.camelize.delete_prefix('::')}"
     end
 
     # Sets the name of the constant used to lookup prebuilt `Reporting::Metric`

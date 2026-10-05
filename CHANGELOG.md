@@ -1,3 +1,14 @@
+## Unreleased
+
+### Breaking Changes
+
+* `Configuration.metric_lookup_class=` no longer singularizes the given name. `metric_lookup_class = StoredMetrics` now resolves to `::StoredMetrics` (previously `::StoredMetric`). If you relied on the old behavior (e.g. `metric_lookup_class = :metrics` to mean `::Metric`), pass the singular name instead.
+
+### Bug Fixes
+
+* Fix `datetime_drill: :date` generating invalid SQL on PostgreSQL by quoting the column as a string literal
+* `ActiveReporting.fetch_metric` now raises `BadMetricLookupClass` instead of `NameError` when the configured `metric_lookup_class` is not defined
+
 ## 0.6.2 (2024-03-18)
 
 ### Features

@@ -142,7 +142,7 @@ ActiveReporting::Configuration.setting = value
 
 `ransack_fallback` - If the ransack gem is loaded, allow all unknown dimension filters to be delegated to ransack. (Default: `false`)
 
-`metric_lookup_class` - The name of a constant used to lookup prebuilt `Reporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. (Default: `::Metric`)
+`metric_lookup_class` - The name of a constant used to lookup prebuilt `Reporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. Accepts a class, string, or symbol; the name is used as-is (`:stored_metrics` becomes `::StoredMetrics`). (Default: `::Metric`)
 
 ## ActiveReporting::FactModel
 

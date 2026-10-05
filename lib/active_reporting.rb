@@ -22,17 +22,18 @@ ActiveRecord::Base.extend(ActiveReporting::ActiveRecordAdaptor)
 
 module ActiveReporting
   def self.fetch_metric(name)
-    klass = Configuration.metric_lookup_class
-    unless defined?(klass.constantize)
+    klass_name = Configuration.metric_lookup_class
+    klass = klass_name.safe_constantize
+    if klass.nil?
       raise BadMetricLookupClass,
-            "#{klass} not defined. Please define a class responsible for looking up a metric by name." \
+            "#{klass_name} not defined. Please define a class responsible for looking up a metric by name." \
             ' You may define your own class and set it with `ActiveReporting::Configuration.metric_lookup_class=`.'
     end
-    unless klass.constantize.respond_to?(:lookup)
-      raise BadMetricLookupClass, "#{klass} needs to define a class method called 'lookup'"
+    unless klass.respond_to?(:lookup)
+      raise BadMetricLookupClass, "#{klass_name} needs to define a class method called 'lookup'"
     end
 
-    klass.constantize.lookup(name)
+    klass.lookup(name)
   end
 
   BadMetricLookupClass    = Class.new(StandardError)
