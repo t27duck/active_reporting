@@ -5,14 +5,14 @@ module ActiveReporting
     TYPES = { degenerate: :degenerate, standard: :standard }.freeze
     attr_reader :name
 
-    # @param model [ActiveRecord::Base]
+    # @param fact_model [ActiveReporting::FactModel]
     # @param name [Symbol]
     def initialize(fact_model, name:)
       @fact_model = fact_model
       @name       = name.to_s
     end
 
-    # Determins the type of the dimension
+    # Determines the type of the dimension
     #
     # A dimension type is either:
     #
@@ -42,12 +42,12 @@ module ActiveReporting
     # Returns either the model of the dimension's association or the model
     # itself if the dimension lives on the fact model
     #
-    # @return [Boolean]
+    # @return [Class]
     def klass
       @klass ||= association ? association.klass : model
     end
 
-    # Returns the fact model's dimension
+    # Returns the fact model's ActiveRecord model
     #
     # @return [ActiveRecord::Base]
     def model

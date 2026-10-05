@@ -13,6 +13,8 @@
 - Dimension label callbacks are now applied when the dimension uses a custom `name:`, uses the default `:name` label, or is a degenerate dimension (previously they were silently skipped in all of these cases)
 - Auto-generated fact models for namespaced models (e.g. `Admin::Post`) are now created in the model's namespace (`Admin::PostFactModel`) instead of raising `NameError`
 - A `NameError` raised while loading a defined fact model is no longer swallowed and replaced with an empty auto-generated fact model
+- Metric names are now quoted in the generated SQL, so metrics named after reserved words (e.g. `:order`) no longer produce invalid queries
+- An invalid `order_by_dimension` direction now raises `ActiveReporting::InvalidOrderDirection` (a `RuntimeError` subclass, so existing `rescue RuntimeError` code still works) with a message naming the dimension
 
 ### Features
 
@@ -26,6 +28,7 @@
 - Requiring the gem no longer forces `ActiveRecord::Base` to load; models are extended via `ActiveSupport.on_load(:active_record)`
 - Report queries now run through `select_all`, so they use the ActiveRecord query cache and appear as `ActiveReporting` in SQL logs and instrumentation
 - Datetime drill SQL moved to `ActiveReporting::DatetimeDrill`; `ReportingDimension::SUPPORTED_DBS` was removed
+- Fix typos and inaccurate descriptions in documentation comments, error messages, and the README
 
 ## 0.6.2 (2024-03-18)
 

@@ -28,14 +28,14 @@ module ActiveReporting
       @default_dimension_label = dimension_label.to_sym
     end
 
-    # The default measture for all fact models
+    # The default measure for all fact models
     #
-    # Default value is `:value``
+    # Default value is `:value`
     def self.default_measure
       @default_measure ||= :value
     end
 
-    # Sets the default measture to be used by all fact models
+    # Sets the default measure to be used by all fact models
     #
     # @param measure [String, Symbol]
     # @return [Symbol]
@@ -43,7 +43,7 @@ module ActiveReporting
       @default_measure = measure.to_sym
     end
 
-    # Tells if unkown dimension filters should always fallback to ransack
+    # Tells if unknown dimension filters should always fallback to ransack
     #
     # Default value is `false`
     #
@@ -61,7 +61,7 @@ module ActiveReporting
       @ransack_fallback = fallback
     end
 
-    # Sets the name of the constant used to lookup prebuilt `Reporting::Metric`
+    # Sets the name of the constant used to lookup prebuilt `ActiveReporting::Metric`
     # objects by name.
     #
     # @param klass_name [String, Symbol, Class]
@@ -69,13 +69,13 @@ module ActiveReporting
       @metric_lookup_class = "::#{klass_name.to_s.camelize.delete_prefix('::')}"
     end
 
-    # Sets the name of the constant used to lookup prebuilt `Reporting::Metric`
+    # Returns the name of the constant used to lookup prebuilt `ActiveReporting::Metric`
     # objects by name. The constant should define a class method called `#lookup`
     # which can take a string or symbol of the metric name.
     #
     # Default value is ::Metric
     #
-    # @returns [String]
+    # @return [String]
     def self.metric_lookup_class
       @metric_lookup_class ||= '::Metric'
     end

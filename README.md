@@ -28,13 +28,13 @@ Or install it yourself as:
 
 ## What is "Reporting"?
 
-Reporting is the collection and presentation data so that it can be analyzed. Our databases only store one thing: data. Data is great for computers but mostly worthless to humans. What ActiveReoprting does is turn that _data_ into _information_ to help humans make decisions.
+Reporting is the collection and presentation of data so that it can be analyzed. Our databases only store one thing: data. Data is great for computers but mostly worthless to humans. What ActiveReporting does is turn that _data_ into _information_ to help humans make decisions.
 
 ## Terminology
 
 ROLAP uses a set of terms to describe how a report is generated. ActiveReporting implements them in the closest way possible in Ruby-land.
 
-### Fact table (can be sometimes called fact model)
+### Fact table (sometimes called fact model)
 
 A fact table is the primary table where information is derived from in a report. It commonly contains fact columns (usually numeric values) and dimension columns (foreign keys to other tables or values that can be grouped together).
 
@@ -49,8 +49,8 @@ A dimension is a point of data used to "slice and dice" data from a fact model. 
 Examples:
 
 - A sales rep on a fact table of sales
-- A state of an sale on a state machine
-- The manufacture on a fact table of widgets
+- A state of a sale on a state machine
+- The manufacturer on a fact table of widgets
 
 SQL Equivalent: JOIN, GROUP BY
 
@@ -63,7 +63,7 @@ A hierarchy for a dimension is related attributes that live on a dimension table
 Examples:
 
 - Dates: Date, Month, Year, Quarter
-- Mobile Phone: Model, Manufacture, OS, Wireless Technology
+- Mobile Phone: Model, Manufacturer, OS, Wireless Technology
 
 ### Dimension Member (also known as dimension labels)
 
@@ -142,7 +142,7 @@ ActiveReporting::Configuration.setting = value
 
 `ransack_fallback` - If the ransack gem is loaded, allow all unknown dimension filters to be delegated to ransack. (Default: `false`)
 
-`metric_lookup_class` - The name of a constant used to lookup prebuilt `Reporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. Accepts a class, string, or symbol; the name is used as-is (`:stored_metrics` becomes `::StoredMetrics`). (Default: `::Metric`)
+`metric_lookup_class` - The name of a constant used to lookup prebuilt `ActiveReporting::Metric` objects by name. The constant should define a class method called `#lookup` which can take a string or symbol of the metric name. Accepts a class, string, or symbol; the name is used as-is (`:stored_metrics` becomes `::StoredMetrics`). (Default: `::Metric`)
 
 ## ActiveReporting::FactModel
 
@@ -162,7 +162,7 @@ class TicketFactModel < ActiveReporting::FactModel
 end
 ```
 
-Alternatively, you may manually specify the model manually with `self.model=`
+Alternatively, you may manually specify the model with `self.model=`
 
 ```ruby
 class TicketFactModel < ActiveReporting::FactModel
@@ -212,7 +212,7 @@ end
 
 ### Dimension Hierarchies
 
-For dimensions that can have a hierarchy (such as a mobile phone), you can declare the what columns make it up. This will allow reports to dimension against a fact model and be able to use different labels to group by.
+For dimensions that can have a hierarchy (such as a mobile phone), you can declare what columns make it up. This will allow reports to dimension against a fact model and be able to use different labels to group by.
 
 ```ruby
 class PhoneFactModel < ActiveReporting::FactModel
@@ -222,7 +222,7 @@ end
 
 ### Drill down / Roll up (Drill up) with datetime columns
 
-The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way, ActiveRporting provides a `datetime_drill` option that can be passed with the dimension on the metric definition to drill datetime columns.
+The fastest approach to group by certain date metrics is to create so-called "date dimensions" and add on columns for each desired hierarchy. For those users that are restricted from organizing their data in this way, ActiveReporting provides a `datetime_drill` option that can be passed with the dimension on the metric definition to drill datetime columns.
 
 To use, declare a datetime dimension on a fact model as normal:
 
@@ -307,25 +307,25 @@ my_metric = ActiveReporting::Metric.new(
 
 `dimensions` - An array of dimensions used for the metric. When given just a symbol, the default dimension label will be used for the dimension.
 
-You may pass a hash instead of a symbol to customize the dimension options (example: { dimension_name: { option1: value, option2: value}}). The avaliable options are:
+You may pass a hash instead of a symbol to customize the dimension options (example: { dimension_name: { option1: value, option2: value}}). The available options are:
 
-- `field` - Specify the hierarchy level that should be used instead the default dimension label. Ex: `[:sales_rep, {mobile_phone: { field: :manufacture }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table.
+- `field` - Specify the hierarchy level that should be used instead of the default dimension label. Ex: `[:sales_rep, {mobile_phone: { field: :manufacturer }}]`. If you use a hash instead of a Symbol to define a hierarchy the `field` item must be a valid field in your table.
 
-- `name` - You may costumize the label alias, by default the dimension name will be used. The `name` can be whatever label you want. Ex :`[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`.
+- `name` - You may customize the label alias, by default the dimension name will be used. The `name` can be whatever label you want. Ex: `[{sale_date: { field: :month, name: :a_custom_name_for_month }}]`.
 
 - `join_method` - You may choose the join_method with the dimension. The default value for join_method is :joins which does a standard "INNER JOIN", but you can pass a :left_outer_joins to use "LEFT OUTER JOIN" instead. Ex: `[{sales_rep: { join_method: :left_outer_joins }}]`
 
 - `datetime_drill` - To drill up and down over datetime column you may pass a `datetime_drill`. Ex: `[:sales_rep, { order: { field: :created_at, datetime_drill: :month }}]`. This option will perform an implicit drill over datetime columns and not a date dimension relationship.
 
-`dimension_filter` - A hash were the keys are dimension filter names and the values are the values passed into the filter.
+`dimension_filter` - A hash where the keys are dimension filter names and the values are the values passed into the filter.
 
 `metric_filter` - An additional HAVING clause to be tacked on to the end of the query. This allows for the further filtering of the end results based on the value of the aggregate. (Examples: `{gt: 3}`, `{eq: 5}`, `{lte: 7}`)
 
-`measure` - Override the measure on the `ActiveReporting::Factmodel` used.
+`measure` - Override the measure on the `ActiveReporting::FactModel` used.
 
-`order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. (Examples: `{author: :desc}`, `{sales_ref: :asc}`)
+`order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. (Examples: `{author: :desc}`, `{sales_rep: :asc}`)
 
-For those using Postgres, you can take advantage of implicit hierarchies in `datetime` columns, as mentioned above:
+You can take advantage of datetime drills on `datetime` columns, as mentioned above:
 
 ```ruby
 class UserFactModel < ActiveReporting::FactModel
@@ -341,7 +341,7 @@ my_metric = ActiveReporting::Metric.new(
 
 ## ActiveReporting::Report
 
-A `Report` takes an `ActiveReporting::Metric` and ties everything together. It is responsible for building and executing the query to generate a result. The result is an simple array of hashing.
+A `Report` takes an `ActiveReporting::Metric` and ties everything together. It is responsible for building and executing the query to generate a result. The result is a simple array of hashes.
 
 ```ruby
 metric = ActiveReporting::Metric.new(
@@ -379,7 +379,7 @@ report.run
 => [{sale_count: 17, sales_rep: 'Mary Sue'}]
 ```
 
-It may be more DRY to store ready-made metrics in a database table or stored in memory to use as the bases for various reports. You can pass a string or symbol into a `Report` instead of a `Metric` to look up an pre-made metric. This is done by passing the symbol or string into the `lookup` class method on the constant defined in `ActiveReporting::Configuration.metric_lookup_class`.
+It may be more DRY to store ready-made metrics in a database table or stored in memory to use as the basis for various reports. You can pass a string or symbol into a `Report` instead of a `Metric` to look up a pre-made metric. This is done by passing the symbol or string into the `lookup` class method on the constant defined in `ActiveReporting::Configuration.metric_lookup_class`.
 
 ```ruby
 class StoredMetrics
@@ -408,7 +408,7 @@ a specific Rails version.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/active_reporting. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/t27duck/active_reporting. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

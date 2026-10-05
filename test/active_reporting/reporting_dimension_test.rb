@@ -104,7 +104,7 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     end
   end
 
-  def test_label_can_be_passed_in_if_dimension_is_herarchical
+  def test_label_can_be_passed_in_if_dimension_is_hierarchical
     refute @figure_series_dimension.hierarchical?
     assert_raises ActiveReporting::InvalidDimensionLabel do
       ActiveReporting::ReportingDimension.new(@figure_series_dimension, label: :foo)
@@ -153,9 +153,11 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
 
   def test_order_by_statement_must_have_a_valid_direction
     subject = ActiveReporting::ReportingDimension.new(@figure_kind_dimension)
-    assert_raises RuntimeError do
+    error = assert_raises ActiveReporting::InvalidOrderDirection do
       subject.order_by_statement(direction: :invalid)
     end
+    assert_match(/should be 'asc' or 'desc', got 'invalid'/, error.message)
+    assert_kind_of RuntimeError, error, 'must stay a RuntimeError for backwards compatibility'
   end
 
   def test_raise_exception_with_invalid_join_method

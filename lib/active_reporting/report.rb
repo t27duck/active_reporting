@@ -69,7 +69,7 @@ module ActiveReporting
     end
 
     def select_statement
-      ss = ["#{select_aggregate} AS #{@metric.name}"]
+      ss = ["#{select_aggregate} AS #{model.connection.quote_column_name(@metric.name)}"]
       ss += @dimensions.map { |d| d.select_statement(with_identifier: @dimension_identifiers) }
       ss.flatten
     end

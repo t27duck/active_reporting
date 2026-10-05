@@ -39,6 +39,8 @@ module ActiveReporting
 
   BadMetricLookupClass    = Class.new(StandardError)
   InvalidDimensionLabel   = Class.new(StandardError)
+  # Subclasses RuntimeError, which was raised for invalid directions before this class existed
+  InvalidOrderDirection   = Class.new(RuntimeError)
   RansackNotAvailable     = Class.new(StandardError)
   UnknownAggregate        = Class.new(StandardError)
   UnknownDimension        = Class.new(StandardError)

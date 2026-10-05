@@ -5,8 +5,8 @@ module ActiveReporting
   module ActiveRecordAdaptor
     # Returns the ActiveReporting::FactModel related to the model.
     #
-    # If one is not explictily defined, a constant will be created which
-    # inherits from ActiveReporting::Factmodel named [MyModel]FactModel
+    # If one is not explicitly defined, a constant will be created which
+    # inherits from ActiveReporting::FactModel named [MyModel]FactModel
     #
     # @return [ActiveReporting::FactModel]
     def fact_model

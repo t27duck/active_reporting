@@ -7,7 +7,7 @@ module ActiveReporting
       attr_writer :measure
     end
 
-    # Explicitly sets which ActiveRecord model to to link to this fact model.
+    # Explicitly sets which ActiveRecord model to link to this fact model.
     #
     # @note You should only need to set this if the name of your fact model does not
     #   follow the pattern of [MyModel]FactModel
@@ -104,7 +104,7 @@ module ActiveReporting
       @dimension_label_callbacks ||= {}
     end
 
-    # Sets a call back for a given dimension label. The returned value of
+    # Sets a callback for a given dimension label. The returned value of
     # the callable body will be used as the label value when used in a report.
     # The label's raw database value is passed to the callback.
     #
@@ -119,7 +119,7 @@ module ActiveReporting
 
     # Declares a dimension filter for this fact model
     #
-    # @param name [Stirng, Symbol] The name of the dimension filter
+    # @param name [String, Symbol] The name of the dimension filter
     # @param lambda_or_type [Symbol, Lambda]
     #
     # @note If not provided, the type of the dimension filter will be a scope.

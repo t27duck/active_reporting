@@ -5,11 +5,11 @@ class ActiveReporting::MetricTest < Minitest::Test
     @metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])
   end
 
-  def test_metric_makes_fact_model_avalable
+  def test_metric_makes_fact_model_available
     assert_equal FigureFactModel, @metric.fact_model
   end
 
-  def test_metric_makes_model_avalable
+  def test_metric_makes_model_available
     assert_equal Figure, @metric.model
   end
 

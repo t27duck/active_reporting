@@ -5,7 +5,7 @@ module ActiveReporting
   class ReportingDimension
     extend Forwardable
     # Values for the Postgres `date_trunc` method.
-    # See https://www.postgresql.org/docs/10/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+    # See https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
                               century millennium date].freeze
     JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
@@ -27,7 +27,7 @@ module ActiveReporting
         if !options.is_a?(Hash) && found_dimension.type == Dimension::TYPES[:degenerate]
           deprecation = ActiveSupport::Deprecation.new('0.7.0', 'active_reporting')
           deprecation.warn(<<~MSG)
-            direct use of implict hierarchies is deprecated and will be removed in future versions. \
+            direct use of implicit hierarchies is deprecated and will be removed in future versions. \
             Please use `:datetime_drill` option instead.
           MSG
           options = { datetime_drill: options }
@@ -96,7 +96,10 @@ module ActiveReporting
     # @return [String]
     def order_by_statement(direction:)
       direction = direction.to_s.upcase
-      raise "Ording direction should be 'asc' or 'desc'" unless %w[ASC DESC].include?(direction)
+      unless %w[ASC DESC].include?(direction)
+        raise InvalidOrderDirection,
+              "Ordering direction for #{name} should be 'asc' or 'desc', got '#{direction.downcase}'"
+      end
 
       "#{label_fragment} #{direction}"
     end
@@ -151,12 +154,12 @@ module ActiveReporting
     end
 
     def validate_hierarchical_label(hierarchical_label)
-      validate_dimension_is_hierachical(hierarchical_label)
+      validate_dimension_is_hierarchical(hierarchical_label)
       validate_against_fact_model_properties(hierarchical_label)
       true
     end
 
-    def validate_dimension_is_hierachical(hierarchical_label)
+    def validate_dimension_is_hierarchical(hierarchical_label)
       return if hierarchical?
 
       raise InvalidDimensionLabel, "#{name} must be hierarchical to use label #{hierarchical_label}"

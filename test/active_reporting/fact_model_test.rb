@@ -49,7 +49,7 @@ class ActiveReporting::FactModelTest < Minitest::Test
     FigureFactModel.instance_variable_set('@dimension_label_callbacks', original)
   end
 
-  def test_dimension_label_callback_much_be_a_callable_object
+  def test_dimension_label_callback_must_be_a_callable_object
     assert_raises ArgumentError do
       FigureFactModel.dimension_label_callback :foo, 'bar'
     end

@@ -24,6 +24,14 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert queries.last[:cached], 'second report run did not use the query cache'
   end
 
+  def test_metric_name_is_quoted_in_the_query
+    metric = ActiveReporting::Metric.new(:order, fact_model: FigureFactModel, dimensions: [:kind])
+    data = ActiveReporting::Report.new(metric).run
+
+    refute data.empty?
+    assert data.all? { |r| r.key?('order') }
+  end
+
   def test_result_contains_the_metric_name
     assert @report.run.all? { |r| r.key?(@metric.name.to_s) }, 'metric name not included'
   end

@@ -23,7 +23,7 @@ module ActiveReporting
       @name               = name.to_sym
       @fact_model         = fact_model
       @dimension_filter   = dimension_filter
-      @aggregate          = determin_aggregate(aggregate.to_sym)
+      @aggregate          = validate_aggregate(aggregate.to_sym)
       @metric_filter      = metric_filter
       @dimensions         = ReportingDimension.build_from_dimensions(@fact_model, Array(dimensions))
       @order_by_dimension = order_by_dimension
@@ -46,10 +46,10 @@ module ActiveReporting
       end
     end
 
-    def determin_aggregate(agg)
+    def validate_aggregate(agg)
       raise UnknownAggregate, "Unknown aggregate '#{agg}'" unless AGGREGATES.include?(agg)
 
-      @aggregate = agg
+      agg
     end
   end
 end
