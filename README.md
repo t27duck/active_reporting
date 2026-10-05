@@ -6,9 +6,9 @@ ActiveReporting implements various terminology used in Relational Online Analyti
 
 ActiveReporting officially supports MySQL, PostgreSQL, and SQLite.
 
-ActiveReporting officially supports [Ruby versions under official support](https://endoflife.date/ruby). Other versions may work, but are not supported.
+ActiveReporting officially supports [Ruby versions under official support](https://endoflife.date/ruby).
 
-ActiveReporting officially supports [Rails versions under official support](https://endoflife.date/rails). Other versions may work, but are not supported.
+ActiveReporting officially supports [Rails versions under official support](https://endoflife.date/rails).
 
 ## Installation
 
