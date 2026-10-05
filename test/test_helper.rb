@@ -33,6 +33,32 @@ else
   raise "Unknown ENV['DB']: '#{db}'"
 end
 
+module DateTruncHelper
+  # Reference implementation of Postgres' `date_trunc` (and `DATE()` for :date)
+  def date_trunc(drill, t)
+    case drill
+    when :microseconds then t
+    when :milliseconds then t.floor(3)
+    when :second then t.floor
+    when :minute then Time.utc(t.year, t.month, t.day, t.hour, t.min)
+    when :hour then Time.utc(t.year, t.month, t.day, t.hour)
+    when :day, :date then Time.utc(t.year, t.month, t.day)
+    when :week then Time.utc(t.year, t.month, t.day) - ((t.wday - 1) % 7).days
+    when :month then Time.utc(t.year, t.month)
+    when :quarter then Time.utc(t.year, ((t.month - 1) / 3 * 3) + 1)
+    when :year then Time.utc(t.year)
+    when :decade then Time.utc(t.year / 10 * 10)
+    when :century then Time.utc(((t.year - 1) / 100 * 100) + 1)
+    when :millennium then Time.utc(((t.year - 1) / 1000 * 1000) + 1)
+    end
+  end
+
+  def cast_time(value)
+    value = ActiveRecord::Type::DateTime.new.cast(value.to_s) unless value.is_a?(Time)
+    value.utc
+  end
+end
+
 require 'schema'
 require 'models'
 require 'fact_models'

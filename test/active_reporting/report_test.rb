@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class ActiveReporting::ReportTest < Minitest::Test
+  include DateTruncHelper
+
   def setup
     @metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])
     @report = ActiveReporting::Report.new(@metric)
@@ -119,10 +121,7 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert_includes error.message, '`{ created_at: { datetime_drill: :month } }`'
   end
 
-  # Postgres and SQLite truncate like Postgres' `date_trunc`. MySQL extracts the part instead (e.g. MONTH() => 9).
   def test_datetime_drills_truncate_like_date_trunc
-    skip 'MySQL datetime drills extract date parts instead of truncating' if %w[mysql trilogy].include?(ENV['DB'])
-
     created_ats = User.pluck(:created_at).map(&:utc)
     ActiveReporting::ReportingDimension::DATETIME_HIERARCHIES.each do |drill|
       metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: drill } }])
@@ -168,29 +167,6 @@ class ActiveReporting::ReportTest < Minitest::Test
     FigureFactModel.dimension_filters.delete(:kind_cont)
   end
 
-  # Reference implementation of Postgres' `date_trunc` (and `DATE()` for :date)
-  def date_trunc(drill, t)
-    case drill
-    when :microseconds then t
-    when :milliseconds then t.floor(3)
-    when :second then t.floor
-    when :minute then Time.utc(t.year, t.month, t.day, t.hour, t.min)
-    when :hour then Time.utc(t.year, t.month, t.day, t.hour)
-    when :day, :date then Time.utc(t.year, t.month, t.day)
-    when :week then Time.utc(t.year, t.month, t.day) - ((t.wday - 1) % 7).days
-    when :month then Time.utc(t.year, t.month)
-    when :quarter then Time.utc(t.year, ((t.month - 1) / 3 * 3) + 1)
-    when :year then Time.utc(t.year)
-    when :decade then Time.utc(t.year / 10 * 10)
-    when :century then Time.utc(((t.year - 1) / 100 * 100) + 1)
-    when :millennium then Time.utc(((t.year - 1) / 1000 * 1000) + 1)
-    end
-  end
-
-  def cast_time(value)
-    value = ActiveRecord::Type::DateTime.new.cast(value.to_s) unless value.is_a?(Time)
-    value.utc
-  end
 
   def with_dimension_label_callback(fact_model, column, callback)
     original = fact_model.dimension_label_callbacks.dup

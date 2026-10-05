@@ -38,37 +38,28 @@ module ActiveReporting
       end
     end
 
+    # Mirrors Postgres' `date_trunc`, returning the truncated value as a DATETIME. Values are built from
+    # formatted strings because casting to a lower fractional precision rounds instead of truncating.
     def mysql(drill, column)
-      case drill.to_sym
-      when :microseconds
-        "MICROSECOND(#{column})"
-      when :milliseconds
-        "MICROSECOND(#{column}) DIV 1000"
-      when :second
-        "SECOND(#{column})"
-      when :minute
-        "MINUTE(#{column})"
-      when :hour
-        "HOUR(#{column})"
-      when :day
-        "DAY(#{column})"
-      when :week
-        "WEEKDAY(#{column})"
-      when :month
-        "MONTH(#{column})"
-      when :quarter
-        "QUARTER(#{column})"
-      when :year
-        "YEAR(#{column})"
-      when :decade
-        "YEAR(#{column}) DIV 10"
-      when :century
-        "YEAR(#{column}) DIV 100"
-      when :millennium
-        "YEAR(#{column}) DIV 1000"
-      when :date
-        "DATE(#{column})"
-      end
+      year = "YEAR(#{column})"
+      sql = case drill.to_sym
+            when :microseconds then return column
+            when :milliseconds
+              return "CAST(LEFT(DATE_FORMAT(#{column}, '%Y-%m-%d %H:%i:%s.%f'), 23) AS DATETIME(3))"
+            when :second then "DATE_FORMAT(#{column}, '%Y-%m-%d %H:%i:%s')"
+            when :minute then "DATE_FORMAT(#{column}, '%Y-%m-%d %H:%i:00')"
+            when :hour then "DATE_FORMAT(#{column}, '%Y-%m-%d %H:00:00')"
+            when :day then "DATE_FORMAT(#{column}, '%Y-%m-%d 00:00:00')"
+            when :week then "DATE_SUB(DATE(#{column}), INTERVAL WEEKDAY(#{column}) DAY)"
+            when :month then "DATE_FORMAT(#{column}, '%Y-%m-01 00:00:00')"
+            when :quarter then "MAKEDATE(#{year}, 1) + INTERVAL (QUARTER(#{column}) - 1) QUARTER"
+            when :year then "MAKEDATE(#{year}, 1)"
+            when :decade then "MAKEDATE(#{year} DIV 10 * 10, 1)"
+            when :century then "MAKEDATE((#{year} - 1) DIV 100 * 100 + 1, 1)"
+            when :millennium then "MAKEDATE((#{year} - 1) DIV 1000 * 1000 + 1, 1)"
+            when :date then return "DATE(#{column})"
+            end
+      "CAST(#{sql} AS DATETIME)"
     end
 
     # Mirrors Postgres' `date_trunc`, returning the truncated datetime as 'YYYY-MM-DD HH:MM:SS' text

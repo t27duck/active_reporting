@@ -249,13 +249,13 @@ When creating a metric, ActiveReporting will recognize the following datetime hi
 - millennium
 - date
 
-Under the hood ActiveReporting uses database-specific functions to manipulate datetime columns, and the values returned differ between databases:
+A datetime drill truncates the datetime to the given level, like PostgreSQL's [`date_trunc` function](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). For example, a `month` drill on `2026-09-15 10:30:00` returns `2026-09-01 00:00:00`, so the same month in different years is grouped separately, and a `week` drill returns the Monday the week starts on. The `date` drill returns the date portion of the datetime.
 
-- **PostgreSQL** (including PostGIS) uses the [`date_trunc` function](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC), which truncates the datetime to the given level. A `month` drill on `2026-09-15 10:30:00` returns `2026-09-01 00:00:00`, so the same month in different years is grouped separately.
-- **SQLite** emulates `date_trunc`, returning the truncated datetime as `YYYY-MM-DD HH:MM:SS` text (`2026-09-01 00:00:00` for the example above).
-- **MySQL** (both the `mysql2` and `trilogy` adapters) uses [date and time functions](https://dev.mysql.com/doc/refman/8.4/en/date-and-time-functions.html) that extract a part of the datetime instead of truncating it. A `month` drill returns `9`, so September of every year is grouped together. Note that `day` returns the day of the month and `week` returns the day of the week (`WEEKDAY()`).
+This works the same on every supported database:
 
-The `date` drill returns the date portion of the datetime on all databases.
+- **PostgreSQL** (including PostGIS) uses `date_trunc` and returns timestamps.
+- **MySQL** (both the `mysql2` and `trilogy` adapters) builds the truncated value with [date and time functions](https://dev.mysql.com/doc/refman/8.4/en/date-and-time-functions.html) and returns `DATETIME` values.
+- **SQLite** emulates `date_trunc` and returns the truncated datetime as `YYYY-MM-DD HH:MM:SS` text.
 
 ## Configuring Dimension Filters
 

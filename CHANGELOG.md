@@ -7,6 +7,7 @@
 - `Configuration.metric_lookup_class=` no longer singularizes the given name. `metric_lookup_class = StoredMetrics` now resolves to `::StoredMetrics` (previously `::StoredMetric`). If you relied on the old behavior (e.g. `metric_lookup_class = :metrics` to mean `::Metric`), pass the singular name instead.
 - Removed the `{ created_at: :month }` shorthand for datetime drills on degenerate dimensions, deprecated in 0.6.0. Use `{ created_at: { datetime_drill: :month } }` instead; the old form now raises `InvalidDimensionLabel` with the replacement syntax. This also removes the spurious deprecation warning that was printed for every plain degenerate dimension (e.g. `dimensions: [:kind]`)
 - Ransack is no longer required when the gem is loaded; it is loaded the first time a ransack feature is used
+- On MySQL, `datetime_drill` now truncates datetimes like PostgreSQL's `date_trunc` and returns `DATETIME` values, instead of extracting a part as an integer. For example, a `month` drill now returns `2026-09-01 00:00:00` instead of `9`, so the same month in different years is no longer grouped together. `week` now returns the Monday the week starts on (previously the day of the week) and `day` returns the date at midnight (previously the day of the month)
 
 ### Bug Fixes
 
@@ -22,7 +23,7 @@
 
 ### Features
 
-- `datetime_drill` now works on SQLite, truncating datetimes the same way PostgreSQL's `date_trunc` does
+- `datetime_drill` now works on SQLite. All databases now truncate datetimes the same way PostgreSQL's `date_trunc` does
 - `datetime_drill` now works with the Trilogy MySQL adapter (and any other adapter built on Rails' MySQL, PostgreSQL, or SQLite adapters)
 
 ### Misc
