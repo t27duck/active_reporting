@@ -12,6 +12,10 @@
 - Auto-generated fact models for namespaced models (e.g. `Admin::Post`) are now created in the model's namespace (`Admin::PostFactModel`) instead of raising `NameError`
 - A `NameError` raised while loading a defined fact model is no longer swallowed and replaced with an empty auto-generated fact model
 
+### Misc
+
+* `Dimension#hierarchical?` and `Dimension#association` now cache `false`/`nil` results instead of recomputing them on every call
+
 ## 0.6.2 (2024-03-18)
 
 ### Features

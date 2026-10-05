@@ -34,7 +34,9 @@ module ActiveReporting
     #
     # @return [Boolean]
     def hierarchical?
-      @hierarchical ||= !klass.fact_model.hierarchical_levels.empty?
+      return @hierarchical if defined?(@hierarchical)
+
+      @hierarchical = !klass.fact_model.hierarchical_levels.empty?
     end
 
     # Returns either the model of the dimension's association or the model
@@ -56,7 +58,9 @@ module ActiveReporting
     #
     # @return [ActiveRecord::Reflection]
     def association
-      @association ||= model.reflect_on_association(@name)
+      return @association if defined?(@association)
+
+      @association = model.reflect_on_association(@name)
     end
   end
 end
