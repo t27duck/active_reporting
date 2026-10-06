@@ -22,8 +22,8 @@ module ActiveReporting
     klass = klass_name.safe_constantize
     if klass.nil?
       raise BadMetricLookupClass,
-            "#{klass_name} not defined. Please define a class responsible for looking up a metric by name." \
-            ' You may define your own class and set it with `ActiveReporting::Configuration.metric_lookup_class=`.'
+            "#{klass_name} not defined. Please define a class responsible for looking up a metric by name. " \
+            'You may define your own class and set it with `ActiveReporting::Configuration.metric_lookup_class=`.'
     end
     unless klass.respond_to?(:lookup)
       raise BadMetricLookupClass, "#{klass_name} needs to define a class method called 'lookup'"
@@ -32,14 +32,31 @@ module ActiveReporting
     klass.lookup(name)
   end
 
-  BadMetricLookupClass    = Class.new(StandardError)
-  InvalidDimensionLabel   = Class.new(StandardError)
+  class BadMetricLookupClass < StandardError
+  end
+
+  class InvalidDimensionLabel < StandardError
+  end
+
   # Subclasses RuntimeError, which was raised for invalid directions before this class existed
-  InvalidOrderDirection   = Class.new(RuntimeError)
-  RansackNotAvailable     = Class.new(StandardError)
-  UnknownAggregate        = Class.new(StandardError)
-  UnknownDimension        = Class.new(StandardError)
-  UnknownDimensionFilter  = Class.new(StandardError)
-  UnknownMetric           = Class.new(StandardError)
-  UnknownJoinMethod       = Class.new(StandardError)
+  class InvalidOrderDirection < RuntimeError
+  end
+
+  class RansackNotAvailable < StandardError
+  end
+
+  class UnknownAggregate < StandardError
+  end
+
+  class UnknownDimension < StandardError
+  end
+
+  class UnknownDimensionFilter < StandardError
+  end
+
+  class UnknownMetric < StandardError
+  end
+
+  class UnknownJoinMethod < StandardError
+  end
 end

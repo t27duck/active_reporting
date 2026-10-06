@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ActiveRecord::Schema.define do
   self.verbose = false
 
@@ -5,7 +7,7 @@ ActiveRecord::Schema.define do
     t.string :name, null: false
     t.string :kind, null: false
   end
-  add_index :platforms, [:name, :kind], unique: true
+  add_index :platforms, %i[name kind], unique: true
 
   create_table :locations, force: true do |t|
     t.string :name, null: false

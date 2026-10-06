@@ -6,6 +6,7 @@ module ActiveReporting
 
   class Metric
     extend Forwardable
+
     def_delegators :@fact_model, :model
     attr_reader :fact_model, :name, :dimensions, :dimension_filter, :aggregate
     attr_reader :metric_filter, :order_by_dimension, :measure

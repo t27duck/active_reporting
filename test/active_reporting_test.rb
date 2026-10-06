@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class ActiveReportingTest < Minitest::Test
@@ -8,6 +10,7 @@ class ActiveReportingTest < Minitest::Test
   def test_requiring_the_gem_does_not_load_active_record_base
     script = 'require "active_reporting"; print ActiveRecord.autoload?(:Base).nil?'
     output = IO.popen([RbConfig.ruby, '-Ilib', '-e', script], &:read)
+
     assert_equal 'false', output, 'ActiveRecord::Base was loaded when requiring active_reporting'
   end
 
@@ -15,12 +18,13 @@ class ActiveReportingTest < Minitest::Test
     script = 'require "active_reporting"; print $LOADED_FEATURES.grep(%r{/ransack[./]}).any?; ' \
              'print ActiveReporting::Configuration.ransack_available, defined?(Ransack).nil?'
     output = IO.popen([RbConfig.ruby, '-Ilib', '-e', script], &:read)
+
     assert_equal 'falsetruefalse', output, 'ransack should load on first use, not when requiring the gem'
   end
 
   def test_metrics_can_be_fetched
-    assert ActiveReporting.fetch_metric(:a_metric).is_a? ActiveReporting::Metric
-    assert ActiveReporting.fetch_metric('a_metric').is_a? ActiveReporting::Metric
+    assert_kind_of ActiveReporting::Metric, ActiveReporting.fetch_metric(:a_metric)
+    assert_kind_of ActiveReporting::Metric, ActiveReporting.fetch_metric('a_metric')
   end
 
   def test_fetch_metric_raises_when_lookup_class_is_not_defined

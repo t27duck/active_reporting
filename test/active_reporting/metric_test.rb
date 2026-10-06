@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class ActiveReporting::MetricTest < Minitest::Test
@@ -17,12 +19,13 @@ class ActiveReporting::MetricTest < Minitest::Test
     _, stderr = capture_io do
       ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])
     end
+
     refute_match(/DEPRECATION/, stderr)
   end
 
   def test_metric_makes_dimensions_available
-    assert @metric.dimensions.is_a?(Array)
-    assert @metric.dimensions.all?{ |d| d.is_a?(ActiveReporting::ReportingDimension) }
+    assert_kind_of Array, @metric.dimensions
+    assert(@metric.dimensions.all?(ActiveReporting::ReportingDimension))
   end
 
   def test_metric_raises_if_given_an_unknown_dimension
@@ -32,8 +35,9 @@ class ActiveReporting::MetricTest < Minitest::Test
   end
 
   def test_metric_has_dimension_filter
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimension_filter: {kind_is: 'foo'})
-    assert metric.dimension_filter.is_a?(Hash)
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimension_filter: { kind_is: 'foo' })
+
+    assert_kind_of Hash, metric.dimension_filter
   end
 
   def test_metric_raises_on_an_invalid_aggregate
@@ -44,22 +48,27 @@ class ActiveReporting::MetricTest < Minitest::Test
 
   def test_report_builds_a_report_object
     result = @metric.report
-    assert result.is_a?(ActiveReporting::Report)
+
+    assert_kind_of ActiveReporting::Report, result
   end
 
   def test_metric_can_have_an_order_by_dimension
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind], order_by_dimension: {kind: :asc})
-    assert metric.order_by_dimension.is_a?(Hash)
-    assert_equal({:kind => :asc}, metric.order_by_dimension)
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind],
+                                                    order_by_dimension: { kind: :asc })
+
+    assert_kind_of Hash, metric.order_by_dimension
+    assert_equal({ kind: :asc }, metric.order_by_dimension)
   end
 
   def test_metric_can_define_a_measure
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: :taxes)
+
     assert_equal :taxes, metric.measure
   end
 
   def test_metric_does_not_define_a_measure_by_default
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel)
+
     assert_nil metric.measure
   end
 end

@@ -12,6 +12,7 @@ module ActiveReporting
     }.freeze
 
     extend Forwardable
+
     def_delegators :@metric, :fact_model, :model
 
     def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {})

@@ -1,14 +1,19 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class ActiveReporting::DimensionTest < ActiveSupport::TestCase
   def test_dimension_can_have_a_type
     subject = ActiveReporting::Dimension.new(FigureFactModel, name: :series)
+
     assert_equal :standard, subject.type
 
     subject = ActiveReporting::Dimension.new(FigureFactModel, name: :kind)
+
     assert_equal ActiveReporting::Dimension::TYPES[:degenerate], subject.type
 
     subject = ActiveReporting::Dimension.new(ReleaseDateFactModel, name: :released_on)
+
     assert_equal :standard, subject.type
 
     assert_raises ActiveReporting::UnknownDimension do
@@ -18,18 +23,21 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
 
   def test_dimension_can_be_hierarchical
     subject = ActiveReporting::Dimension.new(FigureFactModel, name: :series)
-    refute subject.hierarchical?
+
+    refute_predicate subject, :hierarchical?
 
     subject = ActiveReporting::Dimension.new(FigureFactModel, name: :kind)
-    refute subject.hierarchical?
+
+    refute_predicate subject, :hierarchical?
 
     subject = ActiveReporting::Dimension.new(ReleaseDateFactModel, name: :released_on)
-    assert subject.hierarchical?
+
+    assert_predicate subject, :hierarchical?
   end
 
   def test_hierarchical_is_memoized_when_false
     dimension = ActiveReporting::Dimension.new(FigureFactModel, name: :series)
-    assert_memoized(dimension, :hierarchical?, :klass) { |result| assert_equal false, result }
+    assert_memoized(dimension, :hierarchical?, :klass) { |result| assert_same false, result }
   end
 
   def test_association_is_memoized_when_nil
@@ -50,6 +58,7 @@ class ActiveReporting::DimensionTest < ActiveSupport::TestCase
     end
 
     2.times { yield dimension.public_send(method) }
+
     assert_equal 1, calls, "#{method} was not memoized"
   end
 end

@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
+# Installs dependencies and creates the test database.
+#
+#   bin/setup            # SQLite (the default test database)
+#   DB=pg bin/setup      # also pg, mysql, or trilogy; see the README for connection settings
 set -euo pipefail
-IFS=$'\n\t'
-set -vx
+
+DB="${DB:-sqlite}"
+case "$DB" in
+  sqlite) ;;
+  pg|mysql|trilogy)
+    # Add the adapter's optional Gemfile group, keeping any groups enabled for other databases
+    groups="$(ruby -rbundler -e 'puts(Bundler.settings[:with].to_a.map(&:to_s) | [ARGV[0]])' "$DB" | xargs)"
+    bundle config set --local with "$groups"
+    ;;
+  *)
+    echo "Unknown DB: '$DB'. Use sqlite (default), pg, mysql, or trilogy." >&2
+    exit 1
+    ;;
+esac
 
 bundle install
-
-# Do any other automated setup that you need to do here
+DB="$DB" bundle exec rake db:create

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 module Reporting
@@ -30,7 +32,7 @@ class ActiveReporting::ActiveRecordAdaptorTest < ActiveSupport::TestCase
   def test_fact_model_is_generated_if_not_defined
     fact_model = Profile.fact_model
 
-    assert fact_model < ActiveReporting::FactModel, '.model is not a FactModel class'
+    assert_operator fact_model, :<, ActiveReporting::FactModel, '.model is not a FactModel class'
     assert_equal Profile, fact_model.model
     assert_same fact_model, Profile.fact_model
   end
@@ -49,6 +51,7 @@ class ActiveReporting::ActiveRecordAdaptorTest < ActiveSupport::TestCase
     assert_nil Reporting::Order.fact_model.name
 
     sales_report = Class.new(ActiveReporting::FactModel) { self.model = 'Reporting::Order' }
+
     assert_same sales_report, Reporting::Order.fact_model
   end
 
@@ -67,7 +70,10 @@ class ActiveReporting::ActiveRecordAdaptorTest < ActiveSupport::TestCase
   # Simulates a defined fact model whose body raises a NameError (e.g. a typo) when autoloaded
   def test_fact_model_does_not_swallow_name_errors_raised_by_a_defined_fact_model
     Object.singleton_class.define_method(:const_missing) do |const_name|
-      raise NameError.new('uninitialized constant SomeTypo', :SomeTypo) if const_name == :BrokenFactModelProfileFactModel
+      if const_name == :BrokenFactModelProfileFactModel
+        raise NameError.new('uninitialized constant SomeTypo',
+                            :SomeTypo)
+      end
 
       super(const_name)
     end

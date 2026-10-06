@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FigureFactModel < ActiveReporting::FactModel
   dimension :kind
   dimension :series
@@ -32,7 +34,7 @@ end
 class DateDimensionFactModel < ActiveReporting::FactModel
   default_dimension_label :date
 
-  dimension_hierarchy [:date, :month, :year, :quarter]
+  dimension_hierarchy %i[date month year quarter]
 
   dimension_label_callback :quarter, ->(q) { "Q#{q}" }
 end
@@ -43,7 +45,7 @@ class UserFactModel < ActiveReporting::FactModel
 end
 
 class SaleFactModel < ActiveReporting::FactModel
-  self.measure= :total
+  self.measure = :total
 
   dimension :placed_at
   dimension :item

@@ -1,9 +1,10 @@
+plugins:
+  - rubocop-minitest
+  - rubocop-rake
+
 AllCops:
-  Exclude:
-    - test/**/*
-    - Gemfile
   TargetRubyVersion: 3.3
-  NewCops: disable
+  NewCops: enable
   SuggestExtensions: false
 
 Metrics/ClassLength:
@@ -32,3 +33,11 @@ Style/Documentation:
 
 Style/RaiseArgs:
   Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - test/schema.rb
+
+# Tests often check several related facts about one result
+Minitest/MultipleAssertions:
+  Max: 6

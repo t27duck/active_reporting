@@ -4,6 +4,7 @@ require 'forwardable'
 module ActiveReporting
   class ReportingDimension
     extend Forwardable
+
     # Values for the Postgres `date_trunc` method.
     # See https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
@@ -112,10 +113,12 @@ module ActiveReporting
     private ####################################################################
 
     def determine_label_field(label_field)
-      @label = if label_field.present? && validate_hierarchical_label(label_field)
-                 type == Dimension::TYPES[:degenerate] ? name : label_field.to_sym
-               elsif type == Dimension::TYPES[:degenerate]
+      validate_hierarchical_label(label_field) if label_field.present?
+
+      @label = if type == Dimension::TYPES[:degenerate]
                  name
+               elsif label_field.present?
+                 label_field.to_sym
                else
                  dimension_fact_model.dimension_label || Configuration.default_dimension_label
                end
@@ -154,7 +157,6 @@ module ActiveReporting
     def validate_hierarchical_label(hierarchical_label)
       validate_dimension_is_hierarchical(hierarchical_label)
       validate_against_fact_model_properties(hierarchical_label)
-      true
     end
 
     def validate_dimension_is_hierarchical(hierarchical_label)

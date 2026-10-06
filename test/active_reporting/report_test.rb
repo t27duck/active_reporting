@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 
 class ActiveReporting::ReportTest < Minitest::Test
@@ -9,7 +11,7 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_run_returns_an_array
-    assert @report.run.is_a?(Array), 'result is not an array'
+    assert_kind_of Array, @report.run, 'result is not an array'
   end
 
   def test_report_query_is_named_and_uses_the_query_cache
@@ -30,16 +32,16 @@ class ActiveReporting::ReportTest < Minitest::Test
     metric = ActiveReporting::Metric.new(:order, fact_model: FigureFactModel, dimensions: [:kind])
     data = ActiveReporting::Report.new(metric).run
 
-    refute data.empty?
-    assert data.all? { |r| r.key?('order') }
+    refute_empty data
+    assert(data.all? { |r| r.key?('order') })
   end
 
   def test_report_applies_a_ransack_dimension_filter
     with_ransack_dimension_filter do
       data = ActiveReporting::Report.new(@metric, dimension_filter: { kind_cont: 'card' }).run
 
-      refute data.empty?
-      assert data.all? { |r| r['kind'].include?('card') }
+      refute_empty data
+      assert(data.all? { |r| r['kind'].include?('card') })
     end
   end
 
@@ -61,20 +63,22 @@ class ActiveReporting::ReportTest < Minitest::Test
   end
 
   def test_result_contains_the_processed_dimension_callback
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel, dimensions: [{released_on: :quarter}])
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel,
+                                                    dimensions: [{ released_on: :quarter }])
     report = ActiveReporting::Report.new(metric)
     data   = report.run
 
-    refute data.empty?
-    assert data.all? { |r| r['released_on_quarter'].to_s.match(/\AQ\d+/) }
+    refute_empty data
+    assert(data.all? { |r| r['released_on_quarter'].to_s.match(/\AQ\d+/) })
   end
 
   def test_dimension_callback_is_applied_to_a_custom_label_name
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel, dimensions: [{ released_on: { field: :quarter, name: :release_quarter } }])
+    dimensions = [{ released_on: { field: :quarter, name: :release_quarter } }]
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel, dimensions: dimensions)
     data = ActiveReporting::Report.new(metric).run
 
-    refute data.empty?
-    assert data.all? { |r| r['release_quarter'].to_s.match(/\AQ\d+/) }
+    refute_empty data
+    assert(data.all? { |r| r['release_quarter'].to_s.match(/\AQ\d+/) })
   end
 
   def test_dimension_callback_is_applied_to_a_standard_dimension_using_the_name_label
@@ -82,18 +86,18 @@ class ActiveReporting::ReportTest < Minitest::Test
       metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:series])
       data = ActiveReporting::Report.new(metric).run
 
-      refute data.empty?
-      assert data.all? { |r| r['series'].start_with?('Series: ') }
+      refute_empty data
+      assert(data.all? { |r| r['series'].start_with?('Series: ') })
     end
   end
 
   def test_dimension_callback_is_applied_to_a_degenerate_dimension
-    with_dimension_label_callback(FigureFactModel, :kind, ->(k) { k.upcase }) do
+    with_dimension_label_callback(FigureFactModel, :kind, lambda(&:upcase)) do
       metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind])
       data = ActiveReporting::Report.new(metric).run
 
-      refute data.empty?
-      assert data.all? { |r| r['kind'] == r['kind'].upcase }
+      refute_empty data
+      assert(data.all? { |r| r['kind'] == r['kind'].upcase })
     end
   end
 
@@ -102,16 +106,18 @@ class ActiveReporting::ReportTest < Minitest::Test
     report = ActiveReporting::Report.new(metric)
     data   = report.run
 
-    refute data.empty?
-    assert data.all? { |r| r.key?('a_metric') }
+    refute_empty data
+    assert(data.all? { |r| r.key?('a_metric') })
   end
 
   def test_report_runs_with_a_date_grouping
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: :month } }])
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel,
+                                                    dimensions: [{ created_at: { datetime_drill: :month } }])
     report = ActiveReporting::Report.new(metric)
     data = report.run
-    assert data.all? { |r| r.key?('created_at_month') }
-    assert data.size == 5
+
+    assert(data.all? { |r| r.key?('created_at_month') })
+    assert_equal 5, data.size
   end
 
   def test_removed_datetime_drill_shorthand_raises_with_the_replacement_syntax
@@ -124,38 +130,45 @@ class ActiveReporting::ReportTest < Minitest::Test
   def test_datetime_drills_truncate_like_date_trunc
     created_ats = User.pluck(:created_at).map(&:utc)
     ActiveReporting::ReportingDimension::DATETIME_HIERARCHIES.each do |drill|
-      metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: drill } }])
+      metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel,
+                                                      dimensions: [{ created_at: { datetime_drill: drill } }])
       data = ActiveReporting::Report.new(metric).run
 
       expected = created_ats.map { |t| date_trunc(drill, t) }.uniq.sort
       actual = data.map { |r| cast_time(r["created_at_#{drill}"]) }.sort
+
       assert_equal expected, actual, "datetime_drill: #{drill}"
     end
   end
 
   def test_report_runs_with_a_date_datetime_drill
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel, dimensions: [{ created_at: { datetime_drill: :date } }])
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel,
+                                                    dimensions: [{ created_at: { datetime_drill: :date } }])
     data = ActiveReporting::Report.new(metric).run
 
     expected = User.pluck(:created_at).map { |t| t.to_date.to_s }.sort
+
     assert_equal expected, data.map { |r| r['created_at_date'].to_s }.sort
   end
 
   def test_accept_dimension_join_method_option
-    metric = ActiveReporting::Metric.new(:a_metric, fact_model: GameFactModel, dimensions: [{ platform: { join_method: :left_outer_joins }}], aggregate: :sum)
+    dimensions = [{ platform: { join_method: :left_outer_joins } }]
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: GameFactModel, dimensions: dimensions, aggregate: :sum)
     report = ActiveReporting::Report.new(metric)
-    assert report.send(:statement).to_sql.include?("LEFT OUTER JOIN")
+
+    assert_includes report.send(:statement).to_sql, 'LEFT OUTER JOIN'
   end
 
   def test_report_uses_the_metrics_measure_when_given
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: :taxes, aggregate: :sum)
     report = ActiveReporting::Report.new(metric)
-    assert report.send(:statement).to_sql.include?("taxes)")
 
-    data   = report.run
+    assert_includes report.send(:statement).to_sql, 'taxes)'
 
-    refute data.empty?
-    assert_equal Sale.sum(:taxes).to_i, data[0]["a_metric"].to_i
+    data = report.run
+
+    refute_empty data
+    assert_equal Sale.sum(:taxes).to_i, data[0]['a_metric'].to_i
   end
 
   private
@@ -166,7 +179,6 @@ class ActiveReporting::ReportTest < Minitest::Test
   ensure
     FigureFactModel.dimension_filters.delete(:kind_cont)
   end
-
 
   def with_dimension_label_callback(fact_model, column, callback)
     original = fact_model.dimension_label_callbacks.dup

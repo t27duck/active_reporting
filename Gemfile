@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 # Specify your gem's dependencies in active_reporting.gemspec
 gemspec
@@ -10,19 +12,24 @@ gem 'railties', "~> #{rails}.0" # to test code reloading in a Rails app
 gem 'minitest'
 gem 'rake'
 gem 'ransack'
-gem 'rubocop', '~> 1.0', require: false
+gem 'rubocop', '~> 1.72', require: false
+gem 'rubocop-minitest', require: false
+gem 'rubocop-rake', require: false
 gem 'simplecov', require: false
 
-# Only the adapter for the database under test is installed, so contributors
-# don't need every database's client libraries. Re-run `bundle install` after
-# changing DB.
-case ENV.fetch('DB', 'sqlite')
-when 'pg'
+gem 'sqlite3' # the default test database
+
+# Adapters for the other test databases are opt-in, so contributors don't need every database's
+# client libraries. `DB=pg bin/setup` enables the group for the chosen database, or enable it with
+# `bundle config set --local with pg` (or mysql, trilogy).
+group :pg, optional: true do
   gem 'pg'
-when 'mysql'
+end
+
+group :mysql, optional: true do
   gem 'mysql2'
-when 'trilogy'
+end
+
+group :trilogy, optional: true do
   gem 'trilogy'
-else
-  gem 'sqlite3'
 end

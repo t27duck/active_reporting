@@ -399,16 +399,27 @@ report = ActiveReporting::Report.new(:a_stored_metric, ...)
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies, then `bundle exec rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+Before opening a pull request, run `bundle exec rubocop` and, if you have [codespell](https://github.com/codespell-project/codespell) installed, `codespell`. CI runs both.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Testing
 
-You can run the test suite using `rake test`. To test against a particular database, set the `DB` environment
-variable (`sqlite` (default), `pg`, `mysql`, or `trilogy`) when installing and running, e.g. `DB=pg bundle install && DB=pg rake test`.
-Only the adapter gem for the chosen database is installed. Set `RAILS` (e.g. `RAILS=8.0`) the same way to test against
-a specific Rails version.
+The tests run against an in-memory SQLite database by default. To test against another database, set `DB` to `pg`, `mysql` (the `mysql2` adapter), or `trilogy`, and run `bin/setup` once for it:
+
+```
+DB=pg bin/setup
+DB=pg bundle exec rake test
+```
+
+`bin/setup` installs the database's adapter gem (each one is in an optional Gemfile group, so you only need the client libraries for databases you test against) and creates the `active_reporting_test` database. It needs the database server to be running. Connection settings come from these environment variables:
+
+- PostgreSQL: `POSTGRES_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD` (plus the standard `PG*` variables, such as `PGPORT`)
+- MySQL: `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`
+
+Set `RAILS` (e.g. `RAILS=8.0`) when installing and running to test against a specific Rails version.
 
 ## Contributing
 

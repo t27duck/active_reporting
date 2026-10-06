@@ -1,0 +1,2 @@
+[codespell]
+skip = ./.git,./tmp,./coverage,./pkg,./Gemfile.lock

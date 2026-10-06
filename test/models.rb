@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Platform < ActiveRecord::Base
   has_many :games
   has_many :game_compatabilities
@@ -43,12 +45,12 @@ class DateDimension < ActiveRecord::Base
   self.primary_key = 'id'
 
   def self.new_from_date(date)
-    new(id:           date.strftime('%Y%m%d'),
-        year:         date.year,
-        month:        date.month,
-        day:          date.day,
-        quarter:      (date.month / 3.0).ceil,
-        date:         date)
+    new(id: date.strftime('%Y%m%d'),
+        year: date.year,
+        month: date.month,
+        day: date.day,
+        quarter: (date.month / 3.0).ceil,
+        date: date)
   end
 end
 

@@ -24,6 +24,15 @@ jobs:
       - name: Run rubocop
         run: bundle exec rubocop
 
+  spelling:
+    runs-on: ubuntu-latest
+    name: codespell
+    steps:
+      - uses: actions/checkout@v7
+
+      # Settings are read from .codespellrc
+      - uses: codespell-project/actions-codespell@v2
+
   tests:
     runs-on: ubuntu-latest
     strategy:
@@ -62,6 +71,8 @@ jobs:
     env:
       DB: ${{ matrix.db }}
       RAILS: ${{ matrix.rails }}
+      # Installs the optional Gemfile group with the adapter for the database under test
+      BUNDLE_WITH: ${{ matrix.db != 'sqlite' && matrix.db || '' }}
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_HOST: localhost

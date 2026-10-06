@@ -37,6 +37,7 @@
 - Datetime drill SQL moved to `ActiveReporting::DatetimeDrill`; `ReportingDimension::SUPPORTED_DBS` was removed
 - Fix typos and inaccurate descriptions in documentation comments, error messages, and the README
 - `Configuration` uses `mattr_reader` with defaults instead of hand-written getters
+- Development: `bin/setup` installs the adapter for `DB` and creates the test database, database adapters are optional Gemfile groups, and CI runs RuboCop (now including the tests) and codespell
 
 ## 0.6.2 (2024-03-18)
 
@@ -55,9 +56,9 @@
 ### Features
 
 - Support to implicit hierarchical on datetime columns in MySQL (#33) - _germanotm_
-- Added `{ datetime_drill: :month }` option for reporting dimentions to explicitly - _germanotm_
+- Added `{ datetime_drill: :month }` option for reporting dimensions to explicitly - _germanotm_
 
-  This depricates the use of key-value only use for report dimension options (ie, `dimensions: [{ dim: single_option }]`).
+  This deprecates the use of key-value only use for report dimension options (ie, `dimensions: [{ dim: single_option }]`).
   Instead, use `dimensions: [{ dim: { option: value} }]` See the README for all reporting dimension options.
 
 ## 0.5.1 (2020-06-31)
@@ -87,7 +88,7 @@
 
 - Test against Rails 6.0 final
 - Fixed deprecated call to `to_hash` - _joshforbes_
-- Corrected readme entry for `dimesions` option for `ActiveReporting::Metric` - _joshforbes_
+- Corrected readme entry for `dimensions` option for `ActiveReporting::Metric` - _joshforbes_
 
 ## 0.4.1 (2019-05-28)
 
