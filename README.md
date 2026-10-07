@@ -366,11 +366,11 @@ A `Report` may also take additional arguments to merge with the `Metric`'s infor
 
 `dimension_identifiers` - When true, the result will include the database identifier columns of the dimensions. For example, when running a report for the total number of sales dimensioned by sales rep, the rep's IDs from the `sales_reps` table will be included. Identifiers are only included for dimensions labeled by their default label; a dimension using another hierarchy level (`field`) or a `datetime_drill` groups many records into one row, so it has no identifier. (Default `true`)
 
-`dimension_filter` - A hash that will be merged with the `Metric`'s dimension filters.
+`dimension_filter` - A hash that will be merged with the `Metric`'s dimension filters. The `Metric`'s dimension filters are part of its definition, so when both set the same filter, the `Metric`'s value is used. This makes it safe to pass user input here without it widening what the metric measures.
 
 `dimensions` - An array of additional dimensions which are merged with the `Metric`'s dimensions.
 
-`metric_filter` - Sets the HAVING clause of the final query and is merged with the `Metric`'s metric filter.
+`metric_filter` - Sets the HAVING clause of the final query and is merged with the `Metric`'s metric filter. Unlike dimension filters, when both set the same operator, the `Report`'s value replaces the `Metric`'s.
 
 ```ruby
 metric = ActiveReporting::Metric.new(

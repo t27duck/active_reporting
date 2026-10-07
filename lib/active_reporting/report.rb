@@ -36,6 +36,7 @@ module ActiveReporting
       @dimension_identifiers  = dimension_identifiers
       local_dimensions        = ReportingDimension.build_from_dimensions(fact_model, Array(dimensions))
       @dimensions             = (@metric.dimensions + local_dimensions).uniq
+      # The report's metric filter replaces the metric's, while the metric's dimension filters can't be overridden
       @metric_filter          = @metric.metric_filter.merge(Report.normalize_metric_filter(metric_filter))
       @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
@@ -58,6 +59,7 @@ module ActiveReporting
 
     def partition_dimension_filters(user_dimension_filter)
       @dimension_filters = { ransack: {}, scope: {}, lambda: {} }
+      # The metric's dimension filters are part of its definition, so they take precedence over the report's
       user_dimension_filter.merge(@metric.dimension_filter).each do |key, value|
         dm = fact_model.find_dimension_filter(key.to_sym)
         @dimension_filters[dm.type][dm] = value

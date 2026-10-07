@@ -52,6 +52,15 @@ class ActiveReporting::ReportTest < Minitest::Test
     refute_empty data
   end
 
+  def test_metric_dimension_filter_cannot_be_overridden_by_the_report
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind],
+                                                    dimension_filter: { kind_is: 'amiibo card' })
+    # A string key names the same filter as the metric's symbol key
+    data = ActiveReporting::Report.new(metric, dimension_filter: { 'kind_is' => 'amiibo figure' }).run
+
+    assert_equal(['amiibo card'], data.map { |r| r['kind'] })
+  end
+
   def test_report_raises_on_an_unknown_metric_filter_operator
     error = assert_raises ActiveReporting::UnknownMetricFilterOperator do
       ActiveReporting::Report.new(@metric, metric_filter: { greater: 1 })
