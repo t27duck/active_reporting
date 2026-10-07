@@ -44,6 +44,7 @@
 - Report queries now run through `select_all`, so they use the ActiveRecord query cache and appear as `ActiveReporting` in SQL logs and instrumentation
 - Datetime drill SQL moved to `ActiveReporting::DatetimeDrill`; `ReportingDimension::SUPPORTED_DBS` was removed
 - Fix typos and inaccurate descriptions in documentation comments, error messages, and the README
+- Document why `has_many` dimensions give wrong results and what to use instead
 - `Configuration` uses `mattr_reader` with defaults instead of hand-written getters
 - Development: `bin/setup` installs the adapter for `DB` and creates the test database, database adapters are optional Gemfile groups, and CI runs RuboCop (now including the tests) and codespell
 

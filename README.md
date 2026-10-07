@@ -192,7 +192,7 @@ end
 
 ### Declaring dimensions on a fact model
 
-You must declare what a fact model is dimensional by. A valid dimension is a column on the fact model's ActiveRecord model or a `belongs_to`/`has_one through` relationship. `has_many` relationships do not work (well) at all.
+You must declare what a fact model is dimensional by. A valid dimension is a column on the fact model's ActiveRecord model or a `belongs_to`/`has_one` relationship (including `has_one :through`). Avoid `has_many` relationships; see [below](#avoid-has_many-dimensions).
 
 ```ruby
 class TicketFactModel < ActiveReporting::FactModel
@@ -201,6 +201,53 @@ class TicketFactModel < ActiveReporting::FactModel
   dimension :category # Column on the tickets table
 end
 ```
+
+### Avoid `has_many` dimensions
+
+A dimension that is a relationship joins its table to the fact table. With `belongs_to` and `has_one`, each fact row joins to at most one row, so aggregates are correct. With `has_many` (or `has_many :through` or `has_and_belongs_to_many`), each fact row is repeated once for every related record before it is aggregated. ActiveReporting allows these dimensions and raises no error, but the results are wrong:
+
+- `count` counts related records instead of facts
+- `sum` and `avg` include a fact's measure once for every related record (`max` and `min` are unaffected)
+- A fact related to records in more than one group is counted in each group, so the rows add up to more than the total
+
+For example, counting tickets by the type of author who commented on them:
+
+```ruby
+class Ticket < ActiveRecord::Base
+  has_many :comments
+end
+
+class CommentFactModel < ActiveReporting::FactModel
+  dimension_hierarchy %i[author_type]
+end
+
+class TicketFactModel < ActiveReporting::FactModel
+  dimension :comments # has_many relationship
+end
+
+ActiveReporting::Metric.new(:ticket_count, fact_model: TicketFactModel, dimensions: [{ comments: { field: :author_type } }])
+```
+
+A ticket with three comments from staff is counted three times under `staff`, and a ticket with comments from both staff and customers is counted under both. The query is effectively `SELECT COUNT(*) ... FROM tickets INNER JOIN comments ... GROUP BY comments.author_type`.
+
+Instead:
+
+- **Use the "many" side as the fact model.** Report on comments, with the ticket as a `belongs_to` dimension. A fact model's rows should be the most detailed level the report needs.
+
+  ```ruby
+  class CommentFactModel < ActiveReporting::FactModel
+    dimension :ticket      # belongs_to relationship
+    dimension :author_type # Column on the comments table
+  end
+  ```
+
+- **Filter instead of grouping.** To count tickets that have a matching related record, use a dimension filter with a subquery. A subquery doesn't repeat fact rows the way a join does.
+
+  ```ruby
+  class TicketFactModel < ActiveReporting::FactModel
+    dimension_filter :commented_on_by, ->(type) { where(id: Comment.where(author_type: type).select(:ticket_id)) }
+  end
+  ```
 
 ### When a fact model is used as a dimension
 
