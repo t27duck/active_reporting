@@ -7,6 +7,7 @@ end
 (1..5).each do |i|
   user = User.create!(
     created_at: Time.now - i.months,
+    last_seen_at: Time.now - i.days,
     username: "user_#{i}"
   )
 

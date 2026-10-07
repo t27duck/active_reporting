@@ -9,6 +9,10 @@ module ActiveReporting
     # See https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     DATETIME_HIERARCHIES = %i[microseconds milliseconds second minute hour day week month quarter year decade
                               century millennium date].freeze
+    # Column types a datetime drill can be used on. PostgreSQL reports `timestamp with time zone` columns as
+    # `timestamptz`, and `timestamp without time zone` columns as `timestamp` when its `datetime_type` is
+    # `:timestamptz`.
+    DATETIME_DRILL_COLUMN_TYPES = %i[datetime timestamp timestamptz date].freeze
     JOIN_METHODS = { joins: :joins, left_outer_joins: :left_outer_joins }.freeze
     attr_reader :join_method, :label, :label_name
 
@@ -180,9 +184,9 @@ module ActiveReporting
     end
 
     def validate_label_is_datetime
-      return if dimension_fact_model.model.column_for_attribute(@label).type == :datetime
+      return if DATETIME_DRILL_COLUMN_TYPES.include?(dimension_fact_model.model.column_for_attribute(@label).type)
 
-      raise InvalidDimensionLabel, "'#{@label}' is not a datetime column"
+      raise InvalidDimensionLabel, "'#{@label}' is not a datetime or date column"
     end
 
     def validate_against_fact_model_properties(hierarchical_label)

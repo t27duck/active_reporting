@@ -57,4 +57,29 @@ class ActiveReporting::DatetimeDrillTest < Minitest::Test
 
     assert_nil ActiveReporting::DatetimeDrill.adapter_for(unsupported.allocate)
   end
+
+  def test_datetime_drill_on_a_timestamptz_column
+    assert_equal :timestamptz, User.column_for_attribute(:last_seen_at).type if TestDatabase.db == 'pg'
+
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: UserFactModel,
+                                                    dimensions: [{ last_seen_at: { datetime_drill: :day } }])
+    data = ActiveReporting::Report.new(metric).run
+
+    expected = User.pluck(:last_seen_at).map { |t| date_trunc(:day, t.utc) }.uniq.sort
+
+    assert_equal expected, data.map { |r| cast_time(r['last_seen_at_day']) }.sort
+  end
+
+  def test_datetime_drill_on_a_date_column
+    dimensions = [{ released_on: { field: :date, datetime_drill: :month } }]
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel, dimensions: dimensions)
+    # Without identifiers, rows are grouped by month rather than by each date_dimensions row
+    data = ActiveReporting::Report.new(metric, dimension_identifiers: false).run
+
+    expected = ReleaseDate.joins(:released_on).pluck('date_dimensions.date')
+                          .group_by { |d| Time.utc(d.year, d.month) }.transform_values(&:size)
+    actual = data.to_h { |r| [cast_time(r['released_on_date_month']), r['a_metric']] }
+
+    assert_equal expected, actual
+  end
 end

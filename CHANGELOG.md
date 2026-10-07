@@ -29,6 +29,7 @@
 
 - `datetime_drill` now works on SQLite. All databases now truncate datetimes the same way PostgreSQL's `date_trunc` does
 - `datetime_drill` now works with the Trilogy MySQL adapter (and any other adapter built on Rails' MySQL, PostgreSQL, or SQLite adapters)
+- `datetime_drill` now works on `date` columns and on PostgreSQL `timestamp with time zone` (`timestamptz`) columns. Previously only columns Rails reports as `datetime` were accepted, so these raised `InvalidDimensionLabel`
 
 ### Misc
 

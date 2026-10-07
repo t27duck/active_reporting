@@ -59,6 +59,7 @@ ActiveRecord::Schema.define do
 
   create_table :users, force: true do |t|
     t.string :username
+    t.column :last_seen_at, connection.adapter_name == 'PostgreSQL' ? :timestamptz : :datetime
     t.timestamps null: false
   end
 

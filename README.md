@@ -255,6 +255,8 @@ When creating a metric, ActiveReporting will recognize the following datetime hi
 
 A datetime drill truncates the datetime to the given level, like PostgreSQL's [`date_trunc` function](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC). For example, a `month` drill on `2026-09-15 10:30:00` returns `2026-09-01 00:00:00`, so the same month in different years is grouped separately, and a `week` drill returns the Monday the week starts on. The `date` drill returns the date portion of the datetime.
 
+Datetime drills may be used on `datetime`, `timestamp`, `timestamptz` (PostgreSQL's `timestamp with time zone`), and `date` columns. A drill on a `date` column is treated as a datetime at midnight.
+
 This works the same on every supported database:
 
 - **PostgreSQL** (including PostGIS) uses `date_trunc` and returns timestamps.
