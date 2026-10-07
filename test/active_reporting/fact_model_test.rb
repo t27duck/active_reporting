@@ -92,4 +92,13 @@ class ActiveReporting::FactModelTest < Minitest::Test
   ensure
     FigureFactModel.instance_variable_set(:@ransack_fallback, false)
   end
+
+  def test_ransack_fallback_does_not_store_the_dimension_filter
+    FigureFactModel.use_ransack_for_unknown_dimension_filters
+    FigureFactModel.find_dimension_filter(:another_ransack_filter)
+
+    refute FigureFactModel.dimension_filters.key?(:another_ransack_filter)
+  ensure
+    FigureFactModel.instance_variable_set(:@ransack_fallback, false)
+  end
 end

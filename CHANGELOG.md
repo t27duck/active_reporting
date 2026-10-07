@@ -26,6 +26,7 @@
 - Using a ransack dimension filter without ransack installed now raises `RansackNotAvailable` instead of `NoMethodError`
 - `metric_filter` operators may now be strings (e.g. `{ 'gt' => 3 }` from request params), and an unknown operator raises `ActiveReporting::UnknownMetricFilterOperator` when the metric or report is built (previously both generated invalid SQL that failed when the report ran)
 - Ordering by a dimension that isn't one of the report's dimensions now raises `UnknownDimension` when the report is created (previously the ordering was silently dropped). An invalid ordering direction also now raises `InvalidOrderDirection` when the report is created instead of when it runs
+- Dimension filters that fall back to ransack are no longer stored on the fact model when a report uses them. Running reports no longer modifies fact models, which are shared between threads, and unknown filter names from user input no longer accumulate in memory
 - `Configuration.ransack_fallback = false` no longer raises `RansackNotAvailable` when ransack is not installed
 - Fact models are looked up again after Rails reloads code. Previously a generated fact model kept pointing to the model class from before the reload, and a model that isn't reloaded (e.g. from an engine) kept returning the old fact model
 

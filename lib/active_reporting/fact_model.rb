@@ -171,10 +171,9 @@ module ActiveReporting
     # @param name [Symbol]
     # @return [ActiveReporting::DimensionFilter]
     def self.find_dimension_filter(name)
-      @dimension_filters ||= {}
-      dm = @dimension_filters[name.to_sym]
-      return dm if dm.present?
-      return @dimension_filters[name.to_sym] = DimensionFilter.build(name, :ransack) if ransack_fallback
+      dimension_filter = @dimension_filters&.fetch(name.to_sym, nil)
+      return dimension_filter if dimension_filter
+      return DimensionFilter.build(name, :ransack) if ransack_fallback
 
       raise UnknownDimensionFilter, "Dimension filter '#{name}' not found on fact model '#{self}'"
     end

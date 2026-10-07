@@ -46,6 +46,17 @@ class ActiveReporting::ReportDimensionFilterTest < Minitest::Test
     assert_equal ['amiibo figure'], kinds(kind_is: 'amiibo figure')
   end
 
+  def test_metric_ransack_fallback_filter_cannot_be_overridden_by_the_report
+    FigureFactModel.use_ransack_for_unknown_dimension_filters
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind],
+                                                    dimension_filter: { kind_cont: 'card' })
+    data = ActiveReporting::Report.new(metric, dimension_filter: { 'kind_cont' => 'figure' }).run
+
+    assert_equal(['amiibo card'], data.map { |r| r['kind'] })
+  ensure
+    FigureFactModel.instance_variable_set(:@ransack_fallback, false)
+  end
+
   private
 
   def kinds(dimension_filter)
