@@ -15,7 +15,7 @@ module ActiveReporting
 
     def_delegators :@metric, :fact_model, :model
 
-    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {})
+    def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {}, data_format: :standard)
       @metric = metric.is_a?(Metric) ? metric : ActiveReporting.fetch_metric(metric)
       raise UnknownMetric, "Unknown metric #{metric}" if @metric.nil?
 
@@ -25,13 +25,17 @@ module ActiveReporting
       @metric_filter          = @metric.metric_filter.merge(metric_filter)
       @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
+      @data_format            = data_format
     end
 
     # Builds and executes a query, returning the raw result
     #
-    # @return [Array]
+    # @return [Array, Hash]
     def run
       @run ||= build_data
+
+      # Pass format as a block
+      block_given? ? yield(@metric, @dimensions, @run) : @run
     end
 
     private ######################################################################
@@ -39,7 +43,22 @@ module ActiveReporting
     def build_data
       @data = model.connection.select_all(statement, 'ActiveReporting').to_a
       apply_dimension_callbacks
+      format_data unless @data_format == :standard
       @data
+    end
+
+    def format_data
+      case @data_format
+      when :grouped
+        if @dimensions.any?
+          dimension_label_names = @dimensions.map { |d| d.label_name.to_s }
+          @data = Hash[@data.map { |r| [ r.fetch_values(*dimension_label_names), r.fetch(@metric.name.to_s)] }]
+        else
+          @data = Hash[@data.map { |r| [ r.keys, r.fetch(@metric.name.to_s)] }]
+        end
+      else
+        raise UnknownDataFormat
+      end
     end
 
     def partition_dimension_filters(user_dimension_filter)
