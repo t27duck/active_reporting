@@ -42,6 +42,14 @@ jobs:
           - ruby: "3.3"
             rails: "8.0"
             db: "sqlite"
+          
+          - ruby: "3.4"
+            rails: "8.0"
+            db: "sqlite"
+          
+          - ruby: "4.0"
+            rails: "8.0"
+            db: "sqlite"
 
           - ruby: "3.3"
             rails: "8.1"
@@ -50,7 +58,7 @@ jobs:
           - ruby: "3.4"
             rails: "8.1"
             db: "sqlite"
-
+          
           - ruby: "4.0"
             rails: "8.1"
             db: "mysql"
