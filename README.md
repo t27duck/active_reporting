@@ -364,7 +364,7 @@ report.run
 
 A `Report` may also take additional arguments to merge with the `Metric`'s information. This can be user input for additional filters, or to expand on a base `Metric`.
 
-`dimension_identifiers` - When true, the result will include the database identifier columns of the dimensions. For example, when running a report for the total number of sales dimensioned by sales rep, the rep's IDs from the `sales_reps` table will be included. (Default `true`)
+`dimension_identifiers` - When true, the result will include the database identifier columns of the dimensions. For example, when running a report for the total number of sales dimensioned by sales rep, the rep's IDs from the `sales_reps` table will be included. Identifiers are only included for dimensions labeled by their default label; a dimension using another hierarchy level (`field`) or a `datetime_drill` groups many records into one row, so it has no identifier. (Default `true`)
 
 `dimension_filter` - A hash that will be merged with the `Metric`'s dimension filters.
 

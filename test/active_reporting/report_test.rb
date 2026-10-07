@@ -102,6 +102,9 @@ class ActiveReporting::ReportTest < Minitest::Test
 
     refute_empty data
     assert(data.all? { |r| r['release_quarter'].to_s.match(/\AQ\d+/) })
+    # Rolled up to one row per quarter, not one per date_dimensions row
+    assert_equal data.size, data.map { |r| r['release_quarter'] }.uniq.size
+    refute data.first.key?('released_on_identifier')
   end
 
   def test_dimension_callback_is_applied_to_a_standard_dimension_using_the_name_label

@@ -106,6 +106,30 @@ class ActiveReporting::ReportingDimensionTest < ActiveSupport::TestCase
     assert_equal expected, subject.group_by_statement(with_identifier: false)
   end
 
+  def test_identifier_is_left_out_for_a_hierarchy_level_other_than_the_default_label
+    subject = ActiveReporting::ReportingDimension.new(@release_date_released_on_dimension, label: :month)
+
+    refute_predicate subject, :identifiable?
+    assert_equal ["#{DateDimension.quoted_table_name}.#{quote_column(:month)}"], subject.group_by_statement
+    assert_equal 1, subject.select_statement.size
+  end
+
+  def test_identifier_is_kept_when_the_default_label_is_given_as_the_field
+    subject = ActiveReporting::ReportingDimension.new(@release_date_released_on_dimension, label: :date)
+
+    assert_predicate subject, :identifiable?
+  end
+
+  def test_identifier_is_left_out_for_a_datetime_drill
+    subject = ActiveReporting::ReportingDimension.new(@release_date_released_on_dimension, datetime_drill: :month)
+
+    refute_predicate subject, :identifiable?
+  end
+
+  def test_identifier_is_never_included_for_a_degenerate_dimension
+    refute_predicate ActiveReporting::ReportingDimension.new(@figure_kind_dimension), :identifiable?
+  end
+
   def test_group_by_statement_includes_label
     subject = ActiveReporting::ReportingDimension.new(@release_date_released_on_dimension, label: :month)
 

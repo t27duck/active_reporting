@@ -79,9 +79,7 @@ module ActiveReporting
     # @return [Array]
     def select_statement(with_identifier: true)
       ss = ["#{label_fragment} AS #{label_fragment_alias}"]
-      if with_identifier && type == Dimension::TYPES[:standard]
-        ss << "#{identifier_fragment} AS #{identifier_fragment_alias}"
-      end
+      ss << "#{identifier_fragment} AS #{identifier_fragment_alias}" if with_identifier && identifiable?
       ss
     end
 
@@ -90,7 +88,7 @@ module ActiveReporting
     # @return [Array]
     def group_by_statement(with_identifier: true)
       group = [label_fragment]
-      group << identifier_fragment if with_identifier && type == Dimension::TYPES[:standard]
+      group << identifier_fragment if with_identifier && identifiable?
       group
     end
 
@@ -105,6 +103,17 @@ module ActiveReporting
       end
 
       "#{label_fragment} #{direction}"
+    end
+
+    # Tells if the dimension's identifier is included in queries when the report asks for identifiers.
+    #
+    # Only a standard dimension labeled by its default label has one row per record. Grouping a dimension
+    # drilled to a hierarchy level or datetime by its identifier as well would split each roll-up back into one
+    # row per record.
+    #
+    # @return [Boolean]
+    def identifiable?
+      type == Dimension::TYPES[:standard] && @datetime_drill.nil? && @label == dimension_fact_model.dimension_label
     end
 
     # Looks up the dimension label callback for the label

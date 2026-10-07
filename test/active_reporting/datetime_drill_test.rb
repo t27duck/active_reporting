@@ -73,8 +73,7 @@ class ActiveReporting::DatetimeDrillTest < Minitest::Test
   def test_datetime_drill_on_a_date_column
     dimensions = [{ released_on: { field: :date, datetime_drill: :month } }]
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: ReleaseDateFactModel, dimensions: dimensions)
-    # Without identifiers, rows are grouped by month rather than by each date_dimensions row
-    data = ActiveReporting::Report.new(metric, dimension_identifiers: false).run
+    data = ActiveReporting::Report.new(metric).run
 
     expected = ReleaseDate.joins(:released_on).pluck('date_dimensions.date')
                           .group_by { |d| Time.utc(d.year, d.month) }.transform_values(&:size)
