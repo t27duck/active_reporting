@@ -36,6 +36,29 @@ class ActiveReporting::ReportTest < Minitest::Test
     assert(data.all? { |r| r.key?('order') })
   end
 
+  def test_metric_filter_accepts_string_operators
+    symbol_data = ActiveReporting::Report.new(@metric, metric_filter: { gt: 1 }).run
+    string_data = ActiveReporting::Report.new(@metric, metric_filter: { 'gt' => 1 }).run
+
+    refute_empty string_data
+    assert_equal symbol_data, string_data
+  end
+
+  def test_report_metric_filter_overrides_metric_filter_with_the_same_operator_as_a_string
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, dimensions: [:kind],
+                                                    metric_filter: { gt: 1_000_000 })
+    data = ActiveReporting::Report.new(metric, metric_filter: { 'gt' => 0 }).run
+
+    refute_empty data
+  end
+
+  def test_report_raises_on_an_unknown_metric_filter_operator
+    error = assert_raises ActiveReporting::UnknownMetricFilterOperator do
+      ActiveReporting::Report.new(@metric, metric_filter: { greater: 1 })
+    end
+    assert_includes error.message, 'greater'
+  end
+
   def test_report_applies_a_ransack_dimension_filter
     with_ransack_dimension_filter do
       data = ActiveReporting::Report.new(@metric, dimension_filter: { kind_cont: 'card' }).run

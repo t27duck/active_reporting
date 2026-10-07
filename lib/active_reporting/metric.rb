@@ -25,7 +25,7 @@ module ActiveReporting
       @fact_model         = fact_model
       @dimension_filter   = dimension_filter
       @aggregate          = validate_aggregate(aggregate.to_sym)
-      @metric_filter      = metric_filter
+      @metric_filter      = Report.normalize_metric_filter(metric_filter)
       @dimensions         = ReportingDimension.build_from_dimensions(@fact_model, Array(dimensions))
       @order_by_dimension = order_by_dimension
       @measure            = measure

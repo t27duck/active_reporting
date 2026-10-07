@@ -46,6 +46,18 @@ class ActiveReporting::MetricTest < Minitest::Test
     end
   end
 
+  def test_metric_raises_on_an_unknown_metric_filter_operator
+    assert_raises ActiveReporting::UnknownMetricFilterOperator do
+      ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, metric_filter: { 'between' => 1 })
+    end
+  end
+
+  def test_metric_symbolizes_metric_filter_operators
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: FigureFactModel, metric_filter: { 'lte' => 7 })
+
+    assert_equal({ lte: 7 }, metric.metric_filter)
+  end
+
   def test_report_builds_a_report_object
     result = @metric.report
 

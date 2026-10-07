@@ -57,6 +57,9 @@ module ActiveReporting
   class UnknownMetric < StandardError
   end
 
+  class UnknownMetricFilterOperator < StandardError
+  end
+
   class UnknownJoinMethod < StandardError
   end
 end

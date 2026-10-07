@@ -13,6 +13,20 @@ module ActiveReporting
 
     extend Forwardable
 
+    # Converts a metric filter's operators to symbols, raising if any operator is not supported
+    #
+    # @param metric_filter [Hash] operator (e.g. `:gt` or `'gt'`) to value
+    # @return [Hash]
+    def self.normalize_metric_filter(metric_filter)
+      metric_filter.to_h.transform_keys do |operator|
+        next operator.to_sym if AGGREGATE_FUNCTION_OPERATORS.key?(operator.to_s.to_sym)
+
+        raise UnknownMetricFilterOperator,
+              "Unknown metric filter operator '#{operator}'. Valid operators are: " \
+              "#{AGGREGATE_FUNCTION_OPERATORS.keys.join(', ')}"
+      end
+    end
+
     def_delegators :@metric, :fact_model, :model
 
     def initialize(metric, dimension_identifiers: true, dimension_filter: {}, dimensions: [], metric_filter: {})
@@ -22,7 +36,7 @@ module ActiveReporting
       @dimension_identifiers  = dimension_identifiers
       local_dimensions        = ReportingDimension.build_from_dimensions(fact_model, Array(dimensions))
       @dimensions             = (@metric.dimensions + local_dimensions).uniq
-      @metric_filter          = @metric.metric_filter.merge(metric_filter)
+      @metric_filter          = @metric.metric_filter.merge(Report.normalize_metric_filter(metric_filter))
       @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
     end

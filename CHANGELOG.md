@@ -20,6 +20,7 @@
 - Metric names are now quoted in the generated SQL, so metrics named after reserved words (e.g. `:order`) no longer produce invalid queries
 - An invalid `order_by_dimension` direction now raises `ActiveReporting::InvalidOrderDirection` (a `RuntimeError` subclass, so existing `rescue RuntimeError` code still works) with a message naming the dimension
 - Using a ransack dimension filter without ransack installed now raises `RansackNotAvailable` instead of `NoMethodError`
+- `metric_filter` operators may now be strings (e.g. `{ 'gt' => 3 }` from request params), and an unknown operator raises `ActiveReporting::UnknownMetricFilterOperator` when the metric or report is built (previously both generated invalid SQL that failed when the report ran)
 - `Configuration.ransack_fallback = false` no longer raises `RansackNotAvailable` when ransack is not installed
 - Fact models are looked up again after Rails reloads code. Previously a generated fact model kept pointing to the model class from before the reload, and a model that isn't reloaded (e.g. from an engine) kept returning the old fact model
 
