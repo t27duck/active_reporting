@@ -11,6 +11,9 @@ module ActiveReporting
       lte: '<='
     }.freeze
 
+    DIMENSION_FILTER_ON_VALUES = [true, 'true'].freeze
+    DIMENSION_FILTER_OFF_VALUES = [false, 'false'].freeze
+
     extend Forwardable
 
     # Converts a metric filter's operators to symbols, raising if any operator is not supported
@@ -118,23 +121,30 @@ module ActiveReporting
       @dimensions.map { |d| d.group_by_statement(with_identifier: @dimension_identifiers) }
     end
 
+    # Rails defines scopes methods taking any arguments, so it can't be known if a scope takes an argument.
     def process_scope_dimension_filter(chain)
-      @dimension_filters[:scope].each do |dm, args|
-        chain = if [true, 'true'].include?(args)
-                  chain.public_send(dm.name)
+      @dimension_filters[:scope].each do |df, value|
+        next if DIMENSION_FILTER_OFF_VALUES.include?(value)
+
+        chain = if DIMENSION_FILTER_ON_VALUES.include?(value)
+                  chain.public_send(df.name)
                 else
-                  chain.public_send(dm.name, args)
+                  chain.public_send(df.name, value)
                 end
       end
       chain
     end
 
+    # A lambda without parameters is a toggle: it is applied unless its value is `false`. A lambda with
+    # parameters is always passed the value, so it can take `true` and `false` as well.
     def process_lambda_dimension_filter(chain)
-      @dimension_filters[:lambda].each do |df, args|
-        chain = if [true, 'true'].include?(args)
-                  chain.scoping { model.instance_exec(&df.body) }
+      @dimension_filters[:lambda].each do |df, value|
+        chain = if df.body.arity.nonzero?
+                  chain.scoping { model.instance_exec(value, &df.body) }
+                elsif DIMENSION_FILTER_OFF_VALUES.include?(value)
+                  chain
                 else
-                  chain.scoping { model.instance_exec(args, &df.body) }
+                  chain.scoping { model.instance_exec(&df.body) }
                 end
       end
       chain

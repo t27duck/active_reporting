@@ -24,6 +24,9 @@ class Figure < ActiveRecord::Base
   belongs_to :series
   has_many :release_dates, foreign_key: :amiibo_id
 
+  scope :cards, -> { where(kind: 'amiibo card') }
+  scope :of_kind, ->(kind) { where(kind: kind) }
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[kind name]
   end

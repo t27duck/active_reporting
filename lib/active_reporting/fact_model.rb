@@ -128,6 +128,10 @@ module ActiveReporting
     #   dimension filter is a ransack search term. Finally, you may pass in
     #   a callable object similar to defining a scope on ActiveRecord
     #
+    # @note A report applies a scope, or a lambda without parameters, for `true` and leaves it out for
+    #   `false`. A lambda with parameters is always passed the report's value. See "Dimension filter values"
+    #   in the README.
+    #
     # @example
     #   class PostFactModel < ActiveReporting::FactModel
     #     # Assumes there's an `active` scope on the model

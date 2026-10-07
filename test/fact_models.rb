@@ -5,6 +5,10 @@ class FigureFactModel < ActiveReporting::FactModel
   dimension :series
 
   dimension_filter :kind_is, ->(k) { where(kind: k) }
+  dimension_filter :cards
+  dimension_filter :of_kind
+  dimension_filter :only_cards, -> { where(kind: 'amiibo card') }
+  dimension_filter :card, ->(card) { card ? where(kind: 'amiibo card') : where.not(kind: 'amiibo card') }
 end
 
 class ReleaseDateFactModel < ActiveReporting::FactModel

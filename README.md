@@ -283,6 +283,33 @@ The second example defines a lambda to be invoked like a Rails scope. It joins a
 
 The third example defines a filter called "subject_cont" and will delegate it to ransack when called. Ransack is loaded the first time it's needed; add it to your Gemfile to use it. Ransack 4 and newer also require the model to allowlist searchable attributes with a `ransackable_attributes` class method (here, `Ticket.ransackable_attributes` must include `subject`).
 
+### Dimension filter values
+
+A report passes each dimension filter's value to the filter. How the value is used depends on the kind of filter, which matters most when values come from request params as strings:
+
+| Filter | `true` / `'true'` | `false` / `'false'` | Any other value |
+|---|---|---|---|
+| Lambda without parameters, e.g. `-> { where(open: true) }` | Applied | Left out | Applied |
+| Lambda with a parameter, e.g. `->(x) { where(name: x) }` | Passed as the argument | Passed as the argument | Passed as the argument |
+| Scope | Called without an argument | Left out | Passed as the argument |
+
+A scope is called without an argument for `true` because Rails defines every scope as a method that accepts any arguments, so ActiveReporting can't tell whether a scope takes one. As a result, a scope can't be passed `true` or `false`. For a filter that takes a boolean, use a lambda with a parameter instead:
+
+```ruby
+class TicketFactModel < ActiveReporting::FactModel
+  # `{ open: true }` applies `Ticket.open`, `{ open: false }` leaves it out
+  dimension_filter :open
+
+  # `{ resolved: true }` and `{ resolved: false }` both reach the lambda. Values from params
+  # are strings, so cast them yourself, e.g. with ActiveModel::Type::Boolean
+  dimension_filter :resolved, ->(resolved) { where(resolved: ActiveModel::Type::Boolean.new.cast(resolved)) }
+end
+```
+
+Ransack filters are always passed their value as is, and ransack decides what it means.
+
+Only `false` and `'false'` leave a filter out. Other "falsy" strings such as `'0'` are passed to a scope as an argument, since a scope may take a number.
+
 Only dimension filters defined in the fact model may be used. Whitelisting available filters allows for more control over what the user may filter by. Giving the user full control to call any scope or method from the ActiveRecord model could lead to unexpected results, poor performing queries, or possible security concerns.
 
 If ransack is available, you may flag a fact model to delegate all unknown dimension filters to ransack.
