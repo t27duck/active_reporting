@@ -186,12 +186,43 @@ class ActiveReporting::ReportTest < Minitest::Test
     metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: :taxes, aggregate: :sum)
     report = ActiveReporting::Report.new(metric)
 
-    assert_includes report.send(:statement).to_sql, 'taxes)'
+    assert_includes report.send(:statement).to_sql,
+                    "SUM(#{Sale.quoted_table_name}.#{Sale.connection.quote_column_name('taxes')})"
 
     data = report.run
 
     refute_empty data
     assert_equal Sale.sum(:taxes).to_i, data[0]['a_metric'].to_i
+  end
+
+  def test_measure_is_qualified_with_the_fact_model_table
+    # date_dimensions also has an id column, so an unqualified MAX(id) would be ambiguous
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, dimensions: [:placed_at],
+                                                    measure: :id, aggregate: :max)
+    data = ActiveReporting::Report.new(metric).run
+
+    refute_empty data
+    expected = Sale.group(:placed_at_id).maximum(:id)
+
+    data.each do |row|
+      assert_equal expected[row['placed_at_identifier'].to_i], row['a_metric'].to_i
+    end
+  end
+
+  def test_measure_is_quoted
+    measure = 'taxes) FROM sales; --'
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel, measure: measure, aggregate: :sum)
+
+    assert_includes ActiveReporting::Report.new(metric).send(:statement).to_sql,
+                    "SUM(#{Sale.quoted_table_name}.#{Sale.connection.quote_column_name(measure)})"
+  end
+
+  def test_measure_may_be_a_sql_expression
+    metric = ActiveReporting::Metric.new(:a_metric, fact_model: SaleFactModel,
+                                                    measure: Arel.sql('base_price + taxes'), aggregate: :sum)
+    data = ActiveReporting::Report.new(metric).run
+
+    assert_equal (Sale.sum(:base_price) + Sale.sum(:taxes)).to_i, data[0]['a_metric'].to_i
   end
 
   private

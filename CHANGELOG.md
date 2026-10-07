@@ -9,6 +9,7 @@
 - Ransack is no longer required when the gem is loaded; it is loaded the first time a ransack feature is used
 - Fact models generated for models without a `[ModelName]FactModel` class are no longer assigned to a constant (previously `PostFactModel` was defined the first time `Post.fact_model` was called). Define the fact model class if you need to reference it
 - On MySQL, `datetime_drill` now truncates datetimes like PostgreSQL's `date_trunc` and returns `DATETIME` values, instead of extracting a part as an integer. For example, a `month` drill now returns `2026-09-01 00:00:00` instead of `9`, so the same month in different years is no longer grouped together. `week` now returns the Monday the week starts on (previously the day of the week) and `day` returns the date at midnight (previously the day of the month)
+- Measures are now quoted and qualified with the fact model's table (e.g. `SUM("sales"."total")`). This fixes ambiguous column errors when a joined dimension table has a column with the same name as the measure, and stops a measure from injecting SQL. A measure that was a SQL expression (e.g. `measure: 'price * quantity'`) must now be wrapped in `Arel.sql`: `measure: Arel.sql('price * quantity')`
 
 ### Bug Fixes
 

@@ -180,7 +180,7 @@ In Rails, fact models are looked up again after code is reloaded in development,
 
 ### Configuring a fact model's measure
 
-ActiveReporting assumes the column of a fact model used for summing, averaging, etc. is called `value`. This may be changed on a fact model using `measure=`. You may pass in a string or symbol of the column you wish to use for aggregations.
+ActiveReporting assumes the column of a fact model used for summing, averaging, etc. is called `value`. This may be changed on a fact model using `measure=`. You may pass in a string or symbol of the column you wish to use for aggregations. The column is quoted and qualified with the fact model's table. To aggregate a SQL expression instead of a column, wrap it in `Arel.sql`, e.g. `self.measure = Arel.sql('base_price + taxes')`. Only use `Arel.sql` with trusted input.
 
 ```ruby
 class SaleFactModel < ActiveReporting::FactModel

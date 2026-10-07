@@ -94,12 +94,17 @@ module ActiveReporting
       when :count
         'COUNT(*)'
       else
-        "#{@metric.aggregate.to_s.upcase}(#{measure})"
+        "#{@metric.aggregate.to_s.upcase}(#{measure_fragment})"
       end
     end
 
-    def measure
-      @metric.measure || fact_model.measure
+    # The measure as a column qualified by the fact model's table, so it is never ambiguous with a column on
+    # a joined dimension. A measure given as `Arel.sql(...)` is used as is, allowing SQL expressions.
+    def measure_fragment
+      measure = @metric.measure || fact_model.measure
+      return measure if measure.is_a?(Arel::Nodes::SqlLiteral)
+
+      "#{model.quoted_table_name}.#{model.connection.quote_column_name(measure)}"
     end
 
     def dimension_joins(join_method)
