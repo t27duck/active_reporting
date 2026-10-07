@@ -329,7 +329,7 @@ You may pass a hash instead of a symbol to customize the dimension options (exam
 
 `measure` - Override the measure on the `ActiveReporting::FactModel` used.
 
-`order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. (Examples: `{author: :desc}`, `{sales_rep: :asc}`)
+`order_by_dimension` - Allows you to set the ordering of the results based on a dimension label. The dimension must be one of the report's dimensions, either from the metric or added by the report, or `UnknownDimension` is raised. (Examples: `{author: :desc}`, `{sales_rep: :asc}`)
 
 You can take advantage of datetime drills on `datetime` columns, as mentioned above:
 

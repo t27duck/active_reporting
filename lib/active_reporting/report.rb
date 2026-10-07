@@ -38,8 +38,8 @@ module ActiveReporting
       @dimensions             = (@metric.dimensions + local_dimensions).uniq
       # The report's metric filter replaces the metric's, while the metric's dimension filters can't be overridden
       @metric_filter          = @metric.metric_filter.merge(Report.normalize_metric_filter(metric_filter))
-      @ordering               = @metric.order_by_dimension
       partition_dimension_filters dimension_filter
+      @order_by = build_order_by
     end
 
     # Builds and executes a query, returning the raw result
@@ -73,7 +73,7 @@ module ActiveReporting
         left_outer_joins: dimension_joins(ReportingDimension::JOIN_METHODS[:left_outer_joins]),
         group: group_by_statement,
         having: having_statement,
-        order: order_by_statement
+        order: @order_by
       }
 
       statement = ([model] + parts.keys).inject do |chain, method|
@@ -159,12 +159,16 @@ module ActiveReporting
       end.join(' AND ')
     end
 
-    def order_by_statement
-      [].tap do |o|
-        @ordering.each do |dimension_key, direction|
-          dim = @dimensions.detect { |d| d.name.to_sym == dimension_key.to_sym }
-          o << dim.order_by_statement(direction: direction) if dim
+    def build_order_by
+      @metric.order_by_dimension.map do |dimension_key, direction|
+        dim = @dimensions.detect { |d| d.name.to_sym == dimension_key.to_sym }
+        if dim.nil?
+          raise UnknownDimension,
+                "Cannot order by '#{dimension_key}'; it is not one of the report's dimensions " \
+                "(#{@dimensions.map(&:name).join(', ')})"
         end
+
+        dim.order_by_statement(direction: direction)
       end
     end
 
